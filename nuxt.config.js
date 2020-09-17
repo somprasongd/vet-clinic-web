@@ -79,6 +79,39 @@ export default {
    */
   axios: {},
   /*
+   ** PWA module configuration
+   ** See https://pwa.nuxtjs.org/
+   */
+  pwa: {
+    icon: {
+      source: 'icon.png',
+      fileName: 'icon.png',
+      purpose: 'maskable',
+    },
+    meta: {
+      charset: 'UTF-8',
+      viewport: 'width=device-width, initial-scale=1.0',
+      mobileApp: 'true',
+      mobileAppIOS: 'true',
+      appleStatusBarStyle: '#49bfe8',
+      favicon: '/favicon.ico',
+      name: 'VetClinic',
+      author: 'Poom',
+      theme_color: '#49bfe8',
+      lang: 'th',
+    },
+    manifest: {
+      name: 'Vet Clinic',
+      short_name: 'Ver Clinic',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#49bfe8',
+      theme_color: '#49bfe8',
+      lang: 'th',
+      useWebmanifestExtension: true,
+    },
+  },
+  /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
    */
@@ -110,4 +143,8 @@ export default {
    ** See https://nuxtjs.org/api/configuration-build/
    */
   build: {},
+  loading: {
+    color: 'white',
+    height: '2px',
+  },
 }
