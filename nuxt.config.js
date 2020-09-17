@@ -16,8 +16,8 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
-    titleTemplate: '%s - ' + process.env.npm_package_name,
-    title: process.env.npm_package_name || '',
+    titleTemplate: 'VetClinic | ' + process.env.npm_package_name,
+    title: process.env.npm_package_name || 'VetClinic',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -34,6 +34,7 @@ export default {
         href:
           'https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap',
       },
+      { rel: 'apple-touch-icon', href: '/icon.png' },
     ],
   },
   /*
@@ -84,17 +85,16 @@ export default {
    */
   pwa: {
     icon: {
-      source: 'icon.png',
-      fileName: 'icon.png',
-      purpose: 'maskable',
+      fileName: 'icon512.png',
+      sizes: [36, 48, 72, 96, 144, 192, 256, 384, 512],
+      purpose: 'maskable any',
     },
     meta: {
       charset: 'UTF-8',
       viewport: 'width=device-width, initial-scale=1.0',
-      mobileApp: 'true',
-      mobileAppIOS: 'true',
+      mobileApp: true,
+      mobileAppIOS: true,
       appleStatusBarStyle: '#49bfe8',
-      favicon: '/favicon.ico',
       name: 'VetClinic',
       author: 'Poom',
       theme_color: '#49bfe8',
@@ -102,13 +102,11 @@ export default {
     },
     manifest: {
       name: 'Vet Clinic',
-      short_name: 'Ver Clinic',
-      start_url: '/',
+      short_name: 'Vet Clinic',
       display: 'standalone',
       background_color: '#49bfe8',
       theme_color: '#49bfe8',
       lang: 'th',
-      useWebmanifestExtension: true,
     },
   },
   /*
