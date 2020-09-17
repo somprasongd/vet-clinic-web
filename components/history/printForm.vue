@@ -8,7 +8,7 @@
           DX : xxxxxxxxxxxxxxxxxxxx
         </h3>
       </div>
-      <v-btn v-if="showPrint" color="cusblue2" icon
+      <v-btn v-if="showPrint" color="cusblue2" icon to="/history/image"
         ><v-icon>mdi-image-area</v-icon></v-btn
       >
       <v-btn v-if="showPrint" color="cusblue2" text @click="print"
