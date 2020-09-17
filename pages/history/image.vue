@@ -74,12 +74,6 @@ export default {
     hisNav,
     imgCard,
   },
-  methods: {
-    showImg(id) {
-      this.dialogImg = true
-      this.imgShowing = id
-    },
-  },
   data() {
     return {
       dialogImg: false,
@@ -129,6 +123,12 @@ export default {
         },
       ],
     }
+  },
+  methods: {
+    showImg(id) {
+      this.dialogImg = true
+      this.imgShowing = id
+    },
   },
 }
 </script>
