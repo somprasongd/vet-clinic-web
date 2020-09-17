@@ -2,8 +2,8 @@
   <div>
     <v-btn
       :key="$nuxt.$route.path"
-      class="v-btn--example"
       color="cusblue2"
+      fixed
       fab
       large
       dark

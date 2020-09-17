@@ -86,15 +86,6 @@
   </v-app>
 </template>
 
-<style>
-.v-btn--example {
-  right: 10px;
-  bottom: 0;
-  position: fixed;
-  margin: 0 0 16px 16px;
-}
-</style>
-
 <script>
 export default {
   data() {
