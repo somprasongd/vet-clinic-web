@@ -12,7 +12,7 @@ export default {
    */
   target: 'static',
   router: {
-    base: '/vet-clinic-web/',
+    base: process.env.BASE_URL || '',
   },
   /*
    ** Headers of the page
