@@ -1,7 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
 const router = {
-  base: 'vet-clinic-web' || '',
+  base: BASE_URL || '',
 }
 
 export default {
