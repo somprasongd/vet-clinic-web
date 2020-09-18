@@ -27,7 +27,9 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: REPO_NAME=vet-clinic-web npm run generate
+        run: npm run generate
+        env:
+          BASE_URL: /vet-clinic-web/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.0
