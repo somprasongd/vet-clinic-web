@@ -94,7 +94,7 @@ export default {
       viewport: 'width=device-width, initial-scale=1.0',
       mobileApp: true,
       mobileAppIOS: true,
-      appleStatusBarStyle: '#49bfe8',
+      appleStatusBarStyle: '#3b9fc0d5',
       name: 'VetClinic',
       author: 'Poom',
       theme_color: '#49bfe8',
