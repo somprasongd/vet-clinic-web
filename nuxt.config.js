@@ -1,7 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
 const router = {
-  base: process.env.BASE_URL || '',
+  base: process.env.REPO_NAME || '',
 }
 
 export default {
