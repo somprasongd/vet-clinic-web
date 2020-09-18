@@ -16,7 +16,7 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
-    titleTemplate: 'VetClinic | ' + process.env.npm_package_name,
+    titleTemplate: 'Vet Clinic | ' + process.env.npm_package_name,
     title: process.env.npm_package_name || 'VetClinic',
     meta: [
       { charset: 'utf-8' },
