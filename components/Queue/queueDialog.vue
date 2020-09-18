@@ -14,9 +14,17 @@
       <v-icon>mdi-calendar-month</v-icon>
     </v-btn>
 
-    <v-dialog v-model="assignModal" max-width="450" scrollable>
+    <v-dialog
+      v-model="assignModal"
+      max-width="450"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.smAndDown"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">ตารางนัดหมาย</h2>
+        <v-btn class="mt-4" icon absolute right @click="assignModal = false"
+          ><v-icon>mdi-close</v-icon></v-btn
+        >
         <v-divider></v-divider>
 
         <div class="px-10 pb-10">

@@ -3,6 +3,10 @@ html, body{
   font-family: 'Kanit', sans-serif;
 }
 
+.second-nav{
+  padding: 0px 25px !important;
+}
+
 .animation {
   transition: all .15s cubic-bezier(.55,0,.1,1);
 }
@@ -62,6 +66,10 @@ html, body{
   }
   .custom-nav{
     padding: 0 10px;
+  }
+
+  .second-nav{
+    padding: 0 10px !important;
   }
 }
 

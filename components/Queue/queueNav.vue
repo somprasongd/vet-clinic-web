@@ -1,13 +1,18 @@
 <template>
-  <v-row class="cusblue1 px-10" align="center" justify="center" dense>
-    <v-col md="5" cols="12">
-      <h1 class="font-weight-medium">คิว</h1>
+  <v-row class="cusblue1 second-nav" align="center" justify="center" dense>
+    <v-col md="6" cols="12">
+      <h1 class="font-weight-medium">คิว ({{ queueCount }})</h1>
     </v-col>
-    <v-col md="1" cols="2">จำนวนคิว : {{ queueCount }}</v-col>
-    <v-col md="3" cols="5">
+    <v-col md="3" cols="6">
       <v-row align="center" justify="center" no-gutters>
-        <v-col class="text-right" cols="6">ประเภทการตรวจ : &nbsp;</v-col>
-        <v-col cols="6">
+        <v-col
+          v-show="!this.$vuetify.breakpoint.smAndDown"
+          class="text-right"
+          cols="0"
+          sm="6"
+          >ประเภทการตรวจ : &nbsp;</v-col
+        >
+        <v-col cols="12" sm="6">
           <v-select
             v-model="type"
             class="cusblue3 rounded-lg"
@@ -23,10 +28,16 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-col md="3" cols="5">
+    <v-col md="3" cols="6">
       <v-row align="center" justify="center" no-gutters>
-        <v-col class="text-right" cols="6">แพทย์ผู้ตรวจ : &nbsp;</v-col>
-        <v-col cols="6">
+        <v-col
+          v-show="!this.$vuetify.breakpoint.smAndDown"
+          class="text-right"
+          cols="0"
+          sm="6"
+          >แพทย์ผู้ตรวจ : &nbsp;</v-col
+        >
+        <v-col cols="12" sm="6">
           <v-select
             class="cusblue3 rounded-lg"
             :items="doct"
