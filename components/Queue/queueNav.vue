@@ -15,8 +15,8 @@
       <v-subheader
         v-show="!this.$vuetify.breakpoint.smAndDown"
         class="cus-subhead"
-        >ประเภทการตรวจ :</v-subheader
-      >
+        >ประเภทการตรวจ :
+      </v-subheader>
       <v-select
         v-model="type"
         class="rounded-lg cus-input mr-3"
@@ -33,8 +33,8 @@
       <v-subheader
         v-show="!this.$vuetify.breakpoint.smAndDown"
         class="cus-subhead"
-        >แพทย์ผู้ตรวจ :</v-subheader
-      >
+        >แพทย์ผู้ตรวจ :
+      </v-subheader>
       <v-select
         class="rounded-lg cus-input"
         background-color="cusblue3"

@@ -12,9 +12,17 @@ html, body{
   .cus-input{
     max-width: 150px;
   }
+  .text-navs.v-text-field.v-text-field--enclosed .v-input__slot {
+    padding: 0px !important;
+    margin: 0 auto;
+    input {
+      text-align: center;
+    }
+  }
   @media screen and (max-width: 599px){
-    .cus-input.v-text-field.v-text-field--enclosed .v-input__slot {
-      padding: 0px !important;
+    .cus-input.v-text-field.v-text-field--enclosed .v-input__slot ,
+    .cus-textfield.v-text-field.v-text-field--enclosed .v-input__slot{
+      padding: 0px 5px !important;
       margin-right: 10px !important;
       border: 1px solid rgb(180, 180, 180);
       input{
@@ -23,6 +31,15 @@ html, body{
     }
     .cus-input{
       max-width: calc(48vw - 20px);
+    }
+    .cus-textfield{
+      max-width: calc(51vw - 15px);
+    }
+    .text-navs.v-text-field.v-text-field--enclosed .v-input__slot,{
+      max-width: calc(15vw - 15px);
+    }
+    .cus-longfield{
+      max-width: calc(70vw - 15px);
     }
   }
 }
