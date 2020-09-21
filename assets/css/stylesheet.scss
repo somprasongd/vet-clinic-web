@@ -5,6 +5,26 @@ html, body{
 
 .second-nav{
   padding: 0px 25px !important;
+  .cus-subhead{
+    color: black !important;
+    font-size: 16px
+  }
+  .cus-input{
+    max-width: 150px;
+  }
+  @media screen and (max-width: 599px){
+    .cus-input.v-text-field.v-text-field--enclosed .v-input__slot {
+      padding: 0px !important;
+      margin-right: 10px !important;
+      border: 1px solid rgb(180, 180, 180);
+      input{
+          text-align: center;
+      }
+    }
+    .cus-input{
+      max-width: calc(48vw - 20px);
+    }
+  }
 }
 
 .animation {
