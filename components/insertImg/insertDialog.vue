@@ -52,9 +52,14 @@ export default {
       this.painterro = Painterro({
         id: 'painterro',
         colorScheme: {
-          main: '#f8f8f8',
-          control: '#d5d5d5',
-          controlContent: '#434649',
+          main: '#49bfe8',
+          control: '#148cad',
+          controlContent: '#ffffff',
+          activeControl: '#17abd4',
+          activeControlContent: '#c9c9c9',
+          dragOverBarColor: '',
+          toolControlNameColor: '',
+          hoverControlContent: 'rgb(211, 211, 211)',
         },
         saveHandler: (image, done) => {
           // const type = 'image/png'
@@ -80,6 +85,7 @@ export default {
 <style>
 #painterro[hidden] {
   opacity: 0;
+  color: #17abd4;
 }
 #painterro {
   position: fixed;
