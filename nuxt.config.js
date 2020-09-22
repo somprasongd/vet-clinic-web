@@ -153,4 +153,7 @@ export default {
     color: 'white',
     height: '2px',
   },
+  generate: {
+    routes: '/users/:queue/:page',
+  },
 }
