@@ -101,6 +101,7 @@
       <v-btn
         v-for="btn in actionBtn"
         :key="btn.index"
+        :to="btn.path"
         class="px-1"
         rounded
         left
@@ -109,7 +110,7 @@
         small
         color="cusblue"
       >
-        {{ btn }}
+        {{ btn.text }}
       </v-btn>
     </v-speed-dial>
   </div>
@@ -137,12 +138,15 @@ export default {
       checkInfo: !this.$vuetify.breakpoint.smAndDown,
 
       actionBtn: [
-        'ประวัติการรักษา',
-        'ทำนัด',
-        'Admit',
-        'แจ้งตาย',
-        'แนบไฟล์ภาพ',
-        'จบการรักษา',
+        {
+          text: 'ประวัติการรักษา',
+          path: '/history/' + this.$route.params.queue,
+        },
+        { text: 'ทำนัด', path: '/appoint/' + this.$route.params.queue },
+        { text: 'Admit', path: '/history/' + this.$route.params.queue },
+        { text: 'แจ้งตาย', path: '/history/' + this.$route.params.queue },
+        { text: 'แนบไฟล์ภาพ', path: '/insertImg/' + this.$route.params.queue },
+        { text: 'จบการรักษา', path: '/history/' + this.$route.params.queue },
       ],
       cardDetail: {
         VS: {
