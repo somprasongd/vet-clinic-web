@@ -155,6 +155,7 @@ export default {
   },
   generate: {
     routes: [
+      '/setting',
       '/setting/hospital',
       '/setting/users',
       '/setting/Chief-Complaint',
