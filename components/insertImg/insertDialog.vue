@@ -55,10 +55,9 @@ export default {
           main: '#49bfe8',
           control: '#148cad',
           controlContent: '#ffffff',
-          activeControl: '#17abd4',
+          activeControl: '#0d6c86',
           activeControlContent: '#c9c9c9',
-          dragOverBarColor: '',
-          toolControlNameColor: '',
+          toolControlNameColor: '#148cad',
           hoverControlContent: 'rgb(211, 211, 211)',
         },
         saveHandler: (image, done) => {
@@ -82,11 +81,7 @@ export default {
 }
 </script>
 
-<style>
-#painterro[hidden] {
-  opacity: 0;
-  color: #17abd4;
-}
+<style lang="scss">
 #painterro {
   position: fixed;
   top: 0;
@@ -94,6 +89,8 @@ export default {
   bottom: 0;
   left: 0;
   z-index: 100;
+  opacity: 1;
+  transition: opacity 300ms;
   /* transition: visibility 0s linear 0.33s, opacity 0.33s linear; */
 }
 .preview-img {
@@ -102,5 +99,52 @@ export default {
   background: rgb(240, 240, 240);
   border-radius: 10px;
   margin: 10px 0px;
+}
+.ptro-icon-btn,
+.ptro-settings-widget,
+.ptro-pallet,
+.ptro-resize-widget {
+  border-radius: 10px;
+  transition: 300ms;
+}
+.ptro-named-btn {
+  border-radius: 10px;
+  padding: 0 10px;
+}
+.ptro-icon-btn[disabled='true'] {
+  color: rgb(158, 158, 158);
+  background: #1397bb;
+}
+.ptro-settings-widget-wrapper[hidden='true'],
+.ptro-color-widget-wrapper[hidden='true'],
+.ptro-resize-widget-wrapper[hidden='true'] {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+.ptro-settings-widget-wrapper,
+.ptro-color-widget-wrapper,
+.ptro-resize-widget-wrapper {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+[hidden] {
+  display: block;
+  visibility: hidden;
+  #painterro-wrapper {
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  #painterro-bar {
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+}
+#painterro-wrapper {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+#painterro-bar {
+  opacity: 1;
+  transition: opacity 300ms;
 }
 </style>
