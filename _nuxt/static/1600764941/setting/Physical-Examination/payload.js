@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/setting/Physical-Examination", {data:[{}],fetch:[],mutations:[]});

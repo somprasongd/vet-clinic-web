@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/setting/Differential-Diagnosis", {data:[{}],fetch:[],mutations:[]});
