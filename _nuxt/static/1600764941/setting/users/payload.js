@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/setting/users", {data:[{}],fetch:[],mutations:[]});

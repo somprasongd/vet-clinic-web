@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/setting/Chief-Complaint", {data:[{}],fetch:[],mutations:[]});

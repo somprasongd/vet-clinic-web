@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/setting/hospital", {data:[{}],fetch:[],mutations:[]});
