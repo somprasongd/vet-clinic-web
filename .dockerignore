@@ -1,0 +1,9 @@
+.github
+.nuxt/
+dist/
+nginx/
+README.md
+node_modules/
+npm-debug*
+docker-compose.yml
+.env

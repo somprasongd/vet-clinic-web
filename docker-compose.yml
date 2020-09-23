@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  nuxt:
+    build: .
+    container_name: vet-clinic-web
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      VIRTUAL_PORT: 3000
+      VIRTUAL_HOST: example.com
+      LETSENCRYPT_HOST: example.com
+      LETSENCRYPT_EMAIL: 'somprasong.damyos@gmail.com'
+    networks:
+      vc_network:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    container_name: nginx-proxy
+    networks:
+      vc_network:
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+
+
+    # https://github.com/nginx-proxy/docker-letsencrypt-nginx-proxy-companion
+  # nginx-proxy-letsencrypt:
+  #   image: jrcs/letsencrypt-nginx-proxy-companion
+  #   environment:
+  #     NGINX_PROXY_CONTAINER: 'nginx-proxy'
+  #   networks:
+  #     vc_network:
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - nginx-certs:/etc/nginx/certs
+  #     - nginx-vhost:/etc/nginx/vhost.d
+  #     - nginx-html:/usr/share/nginx/html
+
+networks:
+  vc_network:
+
+volumes:
+  nginx-certs:
+  nginx-vhost:
+  nginx-html:
