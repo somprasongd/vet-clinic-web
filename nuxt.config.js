@@ -1,12 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
 
-console.log(process.env.BASE_URL)
-const router = {
-  base: process.env.BASE_URL || '',
-}
-
-console.log(router)
-
 export default {
   /*
    ** Nuxt rendering mode
@@ -18,7 +11,9 @@ export default {
    ** See https://nuxtjs.org/api/configuration-target
    */
   target: 'static',
-  router,
+  router: {
+    base: process.env.BASE_URL || '',
+  },
   /*
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head
@@ -164,4 +159,10 @@ export default {
       '/setting/check',
     ],
   },
+  // serverMiddleware: [
+  //   {
+  //     path: '/api',
+  //     handler: '~/api/index.js',
+  //   },
+  // ],
 }
