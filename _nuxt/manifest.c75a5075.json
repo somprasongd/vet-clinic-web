@@ -60,7 +60,7 @@
   ],
   "start_url": "/vet-clinic-web/?standalone=true",
   "display": "standalone",
-  "background_color": "#49bfe8",
+  "background_color": "rgba(87, 220, 253, 0.5)",
   "theme_color": "#49bfe8",
   "lang": "th"
 }
