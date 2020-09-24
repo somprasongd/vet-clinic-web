@@ -4,55 +4,55 @@
   "description": "## Build Setup",
   "icons": [
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_36x36.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_36x36.ffa53e.png",
       "sizes": "36x36",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_48x48.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_48x48.ffa53e.png",
       "sizes": "48x48",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_72x72.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_72x72.ffa53e.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_96x96.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_96x96.ffa53e.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_144x144.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_144x144.ffa53e.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_192x192.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_192x192.ffa53e.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_256x256.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_256x256.ffa53e.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_384x384.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_384x384.ffa53e.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/vet-clinic-web/_nuxt/icons/icon_512x512.ea26c9.png",
+      "src": "/vet-clinic-web/_nuxt/icons/icon_512x512.ffa53e.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
