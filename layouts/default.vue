@@ -3,7 +3,7 @@
     <v-app-bar class="cusblue" dark dense app flat>
       <!-- Logo -->
       <v-toolbar-title class="hidden-sm-and-down">
-        <v-img :src="require('~/assets/logo.svg')" width="150"></v-img>
+        <v-img :src="require('~/assets/logo.png')" width="150"></v-img>
       </v-toolbar-title>
 
       <!-- Tab -->
