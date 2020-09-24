@@ -4,28 +4,27 @@
       class="elevation-4 overflow-y-auto"
       :headers="headers"
       :items="dessert"
+      item-key="i"
       disable-pagination
       hide-default-footer
       height="calc(100vh - 160px)"
     >
-      <!-- <template slot="item" slot-scope="props">
-          <tr>
-            <td class="text-center">{{ props.item.id }}</td>
-            <td class="font-weight-medium"><span style="cursor:pointer" @click="ownDetail(props.item.owner)">{{ props.item.owner }}</span></td>
-            <td>{{ props.item.tel }}</td>
-            <td>{{ props.item.address }}</td>
-          </tr>
-        </template> -->
-
-      <template v-slot:[`item.name`]="{ item }">
-        <td class="font-weight-medium">
-          <nuxt-link
-            class="bold-owner text-decoration-none"
-            :to="'/record/' + item.id"
-            >{{ item.name }}
-            <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
-          >
-        </td>
+      <template slot="item" scope="props">
+        <tr>
+          <td class="text-center">{{ props.index + 1 }}</td>
+          <td class="font-weight-medium">
+            <nuxt-link
+              class="bold-owner text-decoration-none"
+              :to="'/record/' + props.item.id"
+              >{{ props.item.name }}
+              <v-icon color="cusblue2" small
+                >mdi-chevron-right</v-icon
+              ></nuxt-link
+            >
+          </td>
+          <td>{{ props.item.tel }}</td>
+          <td>{{ props.item.address }}</td>
+        </tr>
       </template>
     </v-data-table>
   </div>
@@ -66,11 +65,6 @@ export default {
         { text: 'ที่อยู่', value: 'address', width: '50%', sortable: false },
       ],
     }
-  },
-  methods: {
-    ownDetail(id) {
-      this.$router.push('/record/' + id)
-    },
   },
 }
 </script>

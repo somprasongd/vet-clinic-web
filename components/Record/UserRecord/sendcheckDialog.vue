@@ -240,8 +240,8 @@ export default {
       required: false,
     },
     petId: {
-      default: 0,
-      type: Number,
+      default: null,
+      type: String,
       required: false,
     },
   },

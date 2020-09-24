@@ -30,58 +30,71 @@
                   menu-props="auto"
                   :rules="rules.prefix"
                   required
+                  @keydown.enter="onEnter('f_name')"
                 ></v-select>
               </v-col>
               <v-col cols="4.5">
                 <v-text-field
+                  ref="f_name"
                   v-model="addCustomer.f_name"
                   color="cusblue"
                   label="ชื่อ"
                   :rules="rules.f_name"
                   required
+                  @keydown.enter="onEnter('l_name')"
                 ></v-text-field>
               </v-col>
               <v-col cols="4.5">
                 <v-text-field
+                  ref="l_name"
                   v-model="addCustomer.l_name"
                   color="cusblue"
                   label="นามสกุล"
                   :rules="rules.l_name"
                   required
+                  @keydown.enter="onEnter('address')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
+                  ref="address"
                   v-model="addCustomer.address"
                   color="cusblue"
                   label="ที่อยู่"
                   :rules="rules.address"
                   required
+                  @keydown.enter="onEnter('email')"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
                 <v-text-field
+                  ref="email"
                   v-model="addCustomer.email"
                   color="cusblue"
                   label="อีเมล์"
                   :rules="rules.email"
                   required
+                  @keydown.enter="onEnter('tel')"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
                 <v-text-field
+                  ref="tel"
                   v-model="addCustomer.tel"
                   color="cusblue"
                   label="เบอร์ติดต่อ"
                   :rules="rules.tel"
                   required
+                  @keydown.enter="onEnter('other')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
+                  ref="other"
                   v-model="addCustomer.other"
                   color="cusblue"
                   label="อื่นๆ"
+                  @keydown.enter="submitCustomer()"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -162,6 +175,9 @@ export default {
     cancelForm() {
       this.$refs.form.reset()
       this.assignModal = false
+    },
+    onEnter(ref) {
+      this.$refs[ref].focus()
     },
   },
 }

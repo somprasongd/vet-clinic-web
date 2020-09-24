@@ -4,63 +4,61 @@
     <v-divider class="darker-divider"></v-divider>
 
     <div v-if="customer.pet != ''">
-      <div v-for="pet in customer.pet" :key="pet.id">
+      <div v-for="(pet, i) in customer.pet" :key="i">
         <v-row class="px-10 py-5" no-gutters>
-          <v-col lg="1" md="2" sm="12" cols="12">
-            <v-row no-gutters>
-              <v-col cols="6">
-                <v-row>
-                  <v-col class="text-center" cols="12">
-                    <v-avatar size="100">
-                      <v-img
-                        :src="require('~/assets/profile/003-dog-1.svg')"
-                      ></v-img>
-                    </v-avatar>
-                  </v-col>
-                  <v-col class="text-center" cols="12">
-                    <v-menu offset-y nudge-left="80">
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                          class="mx-7"
-                          color="cusblue2"
-                          dark
-                          v-bind="attrs"
-                          icon
-                          depressed
-                          large
-                          v-on="on"
-                        >
-                          <v-icon>mdi-dots-horizontal-circle</v-icon>
-                        </v-btn>
-                      </template>
-
-                      <v-list width="200">
-                        <v-list-item>
-                          <h4>Action</h4>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-btn
-                          v-for="actionBtn in actionBtns"
-                          :key="actionBtn.text"
-                          class="cusblue2--text"
-                          block
-                          text
-                          tile
-                          >{{ actionBtn.text }}</v-btn
-                        >
-                      </v-list>
-                    </v-menu>
-                  </v-col>
-                </v-row>
+          <v-col lg="1" md="2" cols="6">
+            <v-row>
+              <v-col class="text-center" cols="12">
+                <v-avatar size="100">
+                  <v-img
+                    :src="require('~/assets/profile/003-dog-1.svg')"
+                  ></v-img>
+                </v-avatar>
               </v-col>
-              <v-col cols="6">
-                <div class="hidden-md-and-up">
-                  <sendcheckDialog />
-                </div>
+              <v-col class="text-center" cols="12">
+                <v-menu offset-y nudge-left="80">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      class="mx-7"
+                      color="cusblue2"
+                      dark
+                      v-bind="attrs"
+                      icon
+                      depressed
+                      large
+                      v-on="on"
+                    >
+                      <v-icon>mdi-dots-horizontal-circle</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list width="200">
+                    <v-list-item>
+                      <h4>Action</h4>
+                    </v-list-item>
+                    <v-divider></v-divider>
+                    <v-btn
+                      v-for="actionBtn in actionBtns"
+                      :key="actionBtn.text"
+                      class="cusblue2--text"
+                      block
+                      text
+                      tile
+                      >{{ actionBtn.text }}</v-btn
+                    >
+                  </v-list>
+                </v-menu>
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="pa-4 pb-1" lg="10" md="8" sm="12" cols="12">
+
+          <v-col
+            class="pa-4 pb-1"
+            lg="10"
+            md="8"
+            cols="12"
+            :order="$vuetify.breakpoint.smAndDown ? 'last' : ''"
+          >
             <v-row dense>
               <v-col lg="3" sm="4" cols="6">
                 <span class="font-weight-medium">ชื่อสัตว์เลี้ยง :</span>
@@ -116,7 +114,8 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col class="hidden-sm-and-down" lg="1" md="2" sm="12" cols="12">
+
+          <v-col lg="1" md="2" cols="6">
             <sendcheckDialog :user-detail="customer" :pet-id="pet.id" />
           </v-col>
         </v-row>

@@ -27,13 +27,16 @@
                   color="cusblue"
                   label="ชื่อสัตว์เลี้ยง"
                   :rules="rules.name"
+                  @keydown.enter="onEnter('microship')"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
                 <v-text-field
+                  ref="microship"
                   v-model="addPet.microship"
                   color="cusblue"
                   label="Microchip No"
+                  @keydown.enter="onEnter('bd'), (menuDate = true)"
                 ></v-text-field>
               </v-col>
               <v-col cols="6">
@@ -47,6 +50,7 @@
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
+                      ref="bd"
                       v-model="selectDate"
                       label="วันเกิด"
                       color="cusblue"
@@ -55,6 +59,7 @@
                       v-bind="attrs"
                       readonly
                       v-on="on"
+                      @keydown.enter="onEnter('year'), (menuDate = false)"
                     ></v-text-field>
                   </template>
                   <v-date-picker
@@ -72,72 +77,90 @@
               </v-col>
               <v-col cols="2">
                 <v-text-field
+                  ref="year"
                   v-model="addPet.bd_year"
                   color="cusblue"
                   label="ปี"
                   @change="writeDate"
+                  @keydown.enter="onEnter('month')"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-text-field
+                  ref="month"
                   v-model="addPet.bd_month"
                   color="cusblue"
                   label="เดือน"
                   @change="writeDate"
+                  @keydown.enter="onEnter('day')"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-text-field
+                  ref="day"
                   v-model="addPet.bd_day"
                   color="cusblue"
                   label="วัน"
                   @change="writeDate"
+                  @keydown.enter="onEnter('type')"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-select
+                  ref="type"
                   v-model="addPet.type"
                   :items="type"
                   label="ประเภท"
                   :rules="rules.type"
+                  @keydown.enter="onEnter('gender')"
                 ></v-select>
               </v-col>
               <v-col cols="2">
                 <v-select
+                  ref="gender"
                   v-model="addPet.gender"
                   :items="gender"
                   label="เพศ"
                   :rules="rules.gender"
+                  @keydown.enter="onEnter('color')"
                 ></v-select>
               </v-col>
               <v-col cols="2">
                 <v-text-field
+                  ref="color"
                   v-model="addPet.color"
                   color="cusblue"
                   label="สี"
                   :rules="rules.color"
+                  @keydown.enter="onEnter('sterile')"
                 ></v-text-field>
               </v-col>
               <v-col cols="3">
                 <v-select
+                  ref="sterile"
                   v-model="addPet.sterile"
                   :items="sterile"
                   label="การทำหมัน"
                   :rules="rules.sterile"
+                  @keydown.enter="onEnter('scar')"
                 ></v-select>
               </v-col>
               <v-col cols="3">
                 <v-text-field
+                  ref="scar"
                   v-model="addPet.scar"
                   color="cusblue"
                   label="ตำหนิ"
+                  @keydown.enter="onEnter('note')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
+                  ref="note"
                   v-model="addPet.note"
                   color="cusblue"
                   label="Note"
+                  @keydown.enter="submitPet"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -145,9 +168,9 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="cusblue2" text @click="cancelForm">ยกเลิก</v-btn>
-            <v-btn color="cusblue2" :disabled="!valid" text @click="submitPet"
-              >บันทึก</v-btn
-            >
+            <v-btn color="cusblue2" :disabled="!valid" text @click="submitPet">
+              บันทึก
+            </v-btn>
           </v-card-actions>
         </v-form>
       </v-card>
@@ -170,6 +193,7 @@ export default {
       addPet: {
         name: '',
         microship: '',
+        status: 'ทั่วไป',
         bd: null,
         bd_year: '',
         bd_month: '',
@@ -207,6 +231,9 @@ export default {
     },
   },
   methods: {
+    onEnter(ref) {
+      this.$refs[ref].focus()
+    },
     writeDate() {
       // After Change value in Year, Month, Day Textfield it will subtract now Date for Pet BD
       let now = moment()
@@ -227,9 +254,12 @@ export default {
     submitPet() {
       if (this.$refs.form.validate()) {
         // this.$store.commit('record/addPet', [this.addPet, this.$route.params.owner])
-        const sendPet = { ...this.addPet }
+        // const sendPet = { ...this.addPet }
         this.$store
-          .dispatch('addPet', { id: this.$route.params.owner, pet: sendPet })
+          .dispatch('addPet', {
+            id: this.$route.params.owner,
+            pet: this.addPet,
+          })
           .then(() => {
             this.resetPet()
             this.assignModal = false

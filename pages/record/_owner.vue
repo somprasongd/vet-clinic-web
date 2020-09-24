@@ -27,12 +27,7 @@ export default {
   },
   data() {
     return {
-      ownerDetail: {
-        name: 'นายเอ สามสกุลบี',
-        tel: '098-765-4321',
-        email: 'myemailaddress@gmail.com',
-        address: '55/55 ต.กระทู้ อำเภอเมือง จังหวัดภูเก็ต',
-      },
+      ownerDetail: {},
     }
   },
   computed: {
@@ -43,13 +38,13 @@ export default {
   },
   methods: {
     check_customer() {
-      const nowId = parseInt(this.$route.params.owner)
-      for (const data in this.$store.getters.getCustomer) {
-        if (this.$store.getters.getCustomer[data].id === nowId) {
-          return this.$store.getters.getCustomer[data]
-        }
-      }
+      return this.$store.getters.getCustomerById(this.$route.params.owner)
     },
+  },
+  validate({ params, store }) {
+    return store.state.customerState.some(
+      (customer) => customer.id === params.owner
+    )
   },
 }
 </script>

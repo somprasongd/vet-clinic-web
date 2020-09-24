@@ -1,94 +1,7 @@
+import data from '~/static/customerRecord.json'
+
 export const state = () => ({
-  customerState: [
-    {
-      id: 1,
-      name: 'นายเอ สามสกุลบี',
-      address: '55/55 ต.รัษฎา อ.เมือง จ.ภูเก็ต',
-      email: 'myemailaddress@gmail.com',
-      tel: '098-765-4321',
-      other: 'ไม่มี',
-      pet: [
-        {
-          id: 1,
-          name: 'Snow',
-          status: 'ทั่วไป',
-          microship: '',
-          bd: '2014-11-05',
-          type: 'หมา',
-          specie: 'บางแก้ว',
-          gender: 'เมีย',
-          color: 'ขาวน้ำตาล',
-          sterile: 'ทำแล้ว',
-          scar: '-',
-          appoint: '10/08/2020',
-        },
-        {
-          id: 2,
-          name: 'Snow',
-          status: 'ทั่วไป',
-          microship: '',
-          bd: '2014-11-05',
-          type: 'หมา',
-          specie: 'บางแก้ว',
-          gender: 'เมีย',
-          color: 'ขาวน้ำตาล',
-          sterile: 'ทำแล้ว',
-          scar: '-',
-          appoint: '10/08/2020',
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'นายเอ สามสกุลบี',
-      address: '55/55 ต.รัษฎา อ.เมือง จ.ภูเก็ต',
-      email: 'myemailaddress@gmail.com',
-      tel: '098-765-4321',
-      other: 'ไม่มี',
-      status: null,
-      pet: [
-        {
-          id: 1,
-          name: 'Snow',
-          status: 'ทั่วไป',
-          microship: '',
-          bd: '2014-11-05',
-          type: 'หมา',
-          specie: 'บางแก้ว',
-          gender: 'เมีย',
-          color: 'ขาวน้ำตาล',
-          sterile: 'ทำแล้ว',
-          scar: '-',
-          appoint: '10/08/2020',
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: 'นายเอ สามสกุลบี',
-      address: '55/55 ต.รัษฎา อ.เมือง จ.ภูเก็ต',
-      email: 'myemailaddress@gmail.com',
-      tel: '098-765-4321',
-      other: 'ไม่มี',
-      status: null,
-      pet: [
-        {
-          id: 1,
-          name: 'Snow',
-          status: 'ทั่วไป',
-          microship: '',
-          bd: '2014-11-05',
-          type: 'หมา',
-          specie: 'บางแก้ว',
-          gender: 'เมีย',
-          color: 'ขาวน้ำตาล',
-          sterile: 'ทำแล้ว',
-          scar: '-',
-          appoint: '10/08/2020',
-        },
-      ],
-    },
-  ],
+  customerState: data,
 })
 
 export const mutations = {
@@ -99,24 +12,22 @@ export const mutations = {
     state.customerState.push(customer)
   },
   addPet(state, petContext) {
-    // console.log(state.customer)
-    for (const data in state.customerState) {
-      if (state.customerState[data].id === parseInt(petContext.id)) {
-        state.customerState[data].pet.unshift({
-          name: petContext.pet.name,
-          status: petContext.pet.status,
-          microship: petContext.pet.microship,
-          bd: petContext.pet.bd,
-          type: petContext.pet.type,
-          specie: petContext.pet.specie,
-          gender: petContext.pet.gender,
-          color: petContext.pet.color,
-          sterile: petContext.pet.sterile,
-          scar: petContext.pet.scar,
-          appoint: petContext.pet.appoint,
-        })
-      }
-    }
+    state.customerState[
+      state.customerState.findIndex((customer) => customer.id === petContext.id)
+    ].pet.unshift({
+      id: Date.now().toString(),
+      name: petContext.pet.name,
+      status: petContext.pet.status,
+      microship: petContext.pet.microship,
+      bd: petContext.pet.bd,
+      type: petContext.pet.type,
+      specie: petContext.pet.specie,
+      gender: petContext.pet.gender,
+      color: petContext.pet.color,
+      sterile: petContext.pet.sterile,
+      scar: petContext.pet.scar,
+      appoint: petContext.pet.appoint,
+    })
   },
 }
 
@@ -214,9 +125,9 @@ export const actions = {
     // ]
     // vuexContext.commit('setCustomer', data)
   },
-  addCustomer(vuexContext, customer) {
+  async addCustomer(vuexContext, customer) {
     const addCus = {
-      id: Date.now(),
+      id: Date.now().toString(),
       name: customer.prefix + customer.f_name + ' ' + customer.l_name,
       address: customer.address,
       email: customer.email,
@@ -229,7 +140,7 @@ export const actions = {
       other: customer.other,
       pet: [],
     }
-    vuexContext.commit('addCustomerState', addCus)
+    vuexContext.commit('addCustomerState', await addCus)
   },
   addPet(vuexContext, pet) {
     vuexContext.commit('addPet', pet)
@@ -239,5 +150,8 @@ export const actions = {
 export const getters = {
   getCustomer(state) {
     return state.customerState
+  },
+  getCustomerById: (state) => (id) => {
+    return state.customerState.find((customer) => customer.id === id)
   },
 }
