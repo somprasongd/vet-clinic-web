@@ -66,7 +66,11 @@
             </v-btn>
           </template>
           <v-list class="text-center" width="220" dense>
-            <v-list-item v-for="item in userDrop" :key="item.title">
+            <v-list-item
+              v-for="item in userDrop"
+              :key="item.title"
+              @click="logOut"
+            >
               <v-list-item-title>
                 <v-icon>{{ item.icon }}</v-icon>
                 {{ item.title }}
@@ -90,33 +94,17 @@
 export default {
   data() {
     return {
-      // navbar
-      // tabs: [
-      //   { name: 'คิว', link: '/queue' },
-      //   { name: 'เวชระเบียน', link: '/record' },
-      //   { name: 'POS', link: '/pos' },
-      //   { name: 'รายงาน', link: '/report' },
-      //   { name: 'ตั้งค่า', link: '/setting' },
-      // ],
-      // tabs2: [
-      //   { name: 'คิว', link: '/queue' },
-      //   { name: 'ห้องตรวจ', link: '/queue/' + this.$route.params.queue + '/check' },
-      //   { name: 'รายการสั่งตรวจ', link: '/queue/' + this.$route.params.queue + '/checklist' },
-      //   { name: 'Lab', link: '/queue/' + this.$route.params.queue + '/lab' },
-      //   { name: 'X-ray', link: '/queue/' + this.$route.params.queue + '/xray' },
-      // ],
       user: {
-        name: 'สพ.บลาบลา กขคงdddddddddddddddddddddd',
-        role: 'เจ้าหน้าที่',
+        name: this.$auth.user.name,
+        role: this.$auth.user.name,
       },
-      userDrop: [{ title: 'Logout', link: '', icon: 'mdi-logout' }],
+      userDrop: [{ title: 'Logout', link: this.logOut, icon: 'mdi-logout' }],
     }
   },
-  // computed: {
-  //   switchTab(){
-  //     if(!this.$route.params.queue) return this.tabs
-  //     else return this.tabs2
-  //   }
-  // }
+  methods: {
+    async logOut() {
+      await this.$auth.logout()
+    },
+  },
 }
 </script>

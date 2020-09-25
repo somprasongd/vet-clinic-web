@@ -13,6 +13,7 @@ export default {
   target: 'static',
   router: {
     base: process.env.BASE_URL || '',
+    middleware: ['auth'],
   },
   /*
    ** Headers of the page
@@ -82,7 +83,42 @@ export default {
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {},
+  axios: {
+    baseURL: 'http://dev.opensource-technology.com:3030/api/',
+  },
+  /*
+   ** Auth module configuration
+   ** See https://auth.nuxtjs.org/
+   */
+  auth: {
+    redirect: {
+      login: '/',
+      logout: '/',
+      callback: '/queue',
+      home: '/queue',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: '/auth/',
+            method: 'post',
+            propertyName: 'accessToken',
+          },
+          logout: false,
+          user: {
+            url: '/users/me/',
+            method: 'get',
+            propertyName: '',
+          },
+        },
+        tokenRequired: true,
+        // tokenType: 'bearer',
+        globalToken: true,
+        autoFetchUser: true,
+      },
+    },
+  },
   /*
    ** PWA module configuration
    ** See https://pwa.nuxtjs.org/

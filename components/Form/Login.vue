@@ -9,7 +9,7 @@
         <v-img width="400" :src="require('~/assets/Login/DogCat.png')"></v-img>
       </div>
 
-      <v-form class="pr-15 pl-15" autocomplete="off" @submit="submitLogin">
+      <v-form class="pr-15 pl-15" autocomplete="off">
         <v-text-field
           v-model="loginData.username"
           :color="color"
@@ -31,11 +31,11 @@
         <v-btn
           class="cusblue text-none white--text"
           :color="color"
-          type="submit"
           block
           rounded
           large
           depressed
+          @click="submitLogin"
           >Sign in to your account</v-btn
         >
 
@@ -64,13 +64,19 @@ export default {
     }
   },
   methods: {
-    submitLogin() {
-      alert(
-        'username : ' +
-          this.loginData.username +
-          '\n password : ' +
-          this.loginData.password
-      )
+    async submitLogin() {
+      try {
+        // const response = await this.$auth.loginWith('local', {
+        //   data: this.loginData,
+        // })
+        await this.$auth
+          .loginWith('local', {
+            data: this.loginData,
+          })
+          .then(() => this.$router.push('/queue'))
+      } catch (err) {
+        console.log(err)
+      }
     },
     rmbr() {
       if (this.rmbrMe) {
