@@ -44,7 +44,7 @@
         </v-alert>
 
         <v-btn
-          class="cusblue text-none white--text"
+          class="cusblue text-none white--text my-10"
           :color="color"
           block
           rounded
@@ -54,12 +54,12 @@
           >Sign in to your account</v-btn
         >
 
-        <v-checkbox
+        <!-- <v-checkbox
           v-model="rmbrMe"
           label="Remember me"
           :color="color"
           @click="rmbr"
-        ></v-checkbox>
+        ></v-checkbox> -->
       </v-form>
     </v-card-text>
   </v-card>
