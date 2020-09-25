@@ -19,6 +19,13 @@
  */
 
 /*!
+ * cookie
+ * Copyright(c) 2012-2014 Roman Shtylman
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/*!
  * html2canvas 1.0.0-rc.5 <https://html2canvas.hertzen.com>
  * Copyright (c) 2019 Niklas von Hertzen <https://hertzen.com>
  * Released under MIT License

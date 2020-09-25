@@ -61,6 +61,6 @@
   "start_url": "/vet-clinic-web/?standalone=true",
   "display": "standalone",
   "background_color": "#49bfe8",
-  "theme_color": "#49c0e8b6",
+  "theme_color": "rgba(73, 192, 232, 0.39)",
   "lang": "th"
 }
