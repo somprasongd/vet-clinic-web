@@ -9,69 +9,65 @@
       fixed-header
       height="calc(100vh - 160px)"
     >
-      <template v-slot:[`item.pet`]="{ item }">
-        <!--="{ item }" -->
-        {{ item.pet.name + ' (' + item.pet.type + ')' }}
-      </template>
-
-      <template v-slot:[`item.time`]="{ item }">
-        <!--="{ item }" -->
-        {{ $moment(item.status.time).fromNow() }}
-      </template>
-
-      <template v-slot:[`item.important`]="{ item }">
-        <!--="{ item }" -->
-        {{ item.status.important }}
-      </template>
-
-      <template v-slot:[`item.doctor`]="{ item }">
-        <!--="{ item }" -->
-        {{ item.status.doctor }}
-      </template>
-
-      <template v-slot:[`item.status`]="{ item }">
-        <!--="{ item }" -->
-        <v-chip :color="getColor(item.status.status)" dark small label>{{
-          item.status.status
-        }}</v-chip>
-        <!-- <v-icon :color="getColor(item.status.status)">{{ getIcon(item.status.status) }}</v-icon> -->
-      </template>
-
-      <template v-slot:[`item.action`]="{ item }">
-        <!--="{ item }" -->
-
-        <v-menu :offset-x="offset" nudge-left="200">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="cusblue2"
+      <template slot="item" scope="props">
+        <tr>
+          <td class="text-center">{{ props.index + 1 }}</td>
+          <td>{{ props.item.name }}</td>
+          <td>{{ props.item.pet.name + ' (' + props.item.pet.type + ')' }}</td>
+          <td>{{ $moment(props.item.status.time).fromNow() }}</td>
+          <td>{{ props.item.status.important }}</td>
+          <td>{{ props.item.status.doctor }}</td>
+          <td>
+            <v-chip
+              :color="getColor(props.item.status.status)"
               dark
-              v-bind="attrs"
-              icon
-              depressed
-              v-on="on"
+              small
+              label
             >
-              <v-icon>mdi-dots-horizontal-circle</v-icon>
-            </v-btn>
-          </template>
+              {{ props.item.status.status }}
+            </v-chip>
+          </td>
+          <td>
+            <v-menu :offset-x="offset" nudge-left="200">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="cusblue2"
+                  dark
+                  v-bind="attrs"
+                  icon
+                  depressed
+                  v-on="on"
+                >
+                  <v-icon>mdi-dots-horizontal-circle</v-icon>
+                </v-btn>
+              </template>
 
-          <v-list width="200">
-            <v-list-item>
-              <h4>Action</h4>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-btn
-              v-for="btn in changeAction(item.status.status)"
-              :key="btn.text"
-              class="cusblue2--text"
-              :disabled="btn.disable"
-              block
-              text
-              tile
-              @click="clickAction(item.id, item.status.status, btn.action)"
-              >{{ btn.text }}</v-btn
-            >
-          </v-list>
-        </v-menu>
+              <v-list width="200">
+                <v-list-item>
+                  <h4>Action</h4>
+                </v-list-item>
+                <v-divider></v-divider>
+                <v-btn
+                  v-for="btn in changeAction(props.item.status.status)"
+                  :key="btn.text"
+                  class="cusblue2--text"
+                  :disabled="btn.disable"
+                  block
+                  text
+                  tile
+                  @click="
+                    clickAction(
+                      props.item.id,
+                      props.item.status.status,
+                      btn.action
+                    )
+                  "
+                  >{{ btn.text }}</v-btn
+                >
+              </v-list>
+            </v-menu>
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </div>
