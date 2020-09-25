@@ -1,9 +1,8 @@
 <template>
   <v-container class="fill-height" fluid>
     <v-row align="center" justify="center">
-      <v-col cols="12" sm="8" md="4">
+      <v-col cols="12" sm="8" md="6" lg="4">
         <LoginForm />
-        <v-btn color="primary" to="/queue">Next</v-btn>
       </v-col>
     </v-row>
   </v-container>

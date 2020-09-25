@@ -9,16 +9,19 @@
         <v-img width="400" :src="require('~/assets/Login/DogCat.png')"></v-img>
       </div>
 
-      <v-form class="pr-15 pl-15" autocomplete="off">
+      <v-form class="px-14" autocomplete="off">
         <v-text-field
+          ref="username"
           v-model="loginData.username"
           :color="color"
           type="text"
           name="username"
           label="username"
+          @keydown.enter="onEnter('password')"
         ></v-text-field>
 
         <v-text-field
+          ref="password"
           v-model="loginData.password"
           :color="color"
           :type="showPass ? 'text' : 'password'"
@@ -26,7 +29,19 @@
           label="password"
           :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
           @click:append="showPass = !showPass"
+          @keydown.enter="submitLogin"
         ></v-text-field>
+
+        <v-alert
+          v-model="alert"
+          dense
+          text
+          color="red"
+          transition="scroll-y-transition"
+          dismissible
+        >
+          {{ error }}
+        </v-alert>
 
         <v-btn
           class="cusblue text-none white--text"
@@ -61,6 +76,8 @@ export default {
         username: '',
         password: '',
       },
+      alert: false,
+      error: null,
     }
   },
   methods: {
@@ -69,13 +86,12 @@ export default {
         // const response = await this.$auth.loginWith('local', {
         //   data: this.loginData,
         // })
-        await this.$auth
-          .loginWith('local', {
-            data: this.loginData,
-          })
-          .then(() => this.$router.push('/queue'))
+        await this.$auth.loginWith('local', {
+          data: this.loginData,
+        })
       } catch (err) {
-        console.log(err)
+        this.error = err.response.data.error.message
+        this.alert = true
       }
     },
     rmbr() {
@@ -84,6 +100,9 @@ export default {
       } else {
         alert(this.rmbrMe)
       }
+    },
+    onEnter(ref) {
+      this.$refs[ref].focus()
     },
   },
 }
