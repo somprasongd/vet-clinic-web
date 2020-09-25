@@ -116,11 +116,53 @@
           </v-col>
 
           <v-col lg="1" md="2" cols="6">
-            <sendcheckDialog :user-detail="customer" :pet-id="pet.id" />
+            <!-- <sendcheckDialog :user-detail="customer" :pet-id="pet.id" /> -->
+            <v-btn
+              class="ma-2 px-0"
+              color="cusblue3"
+              dark
+              block
+              depressed
+              @click="onClickCheck(pet.id)"
+            >
+              ส่งตรวจ
+            </v-btn>
+            <v-btn
+              class="ma-2 px-0"
+              color="cusblue3"
+              dark
+              block
+              depressed
+              @click="onClickDepo(pet.id)"
+            >
+              ฝากเลี้ยง
+            </v-btn>
+            <v-btn
+              class="ma-2 px-0"
+              color="cusblue3"
+              dark
+              block
+              depressed
+              @click="onClickCheck(pet.id)"
+            >
+              ทำนัด
+            </v-btn>
+            <v-btn
+              class="ma-2 px-0"
+              color="cusblue3"
+              dark
+              block
+              depressed
+              @click="onClickCheck(pet.id)"
+            >
+              ประวัติการรักษา
+            </v-btn>
           </v-col>
         </v-row>
         <v-divider></v-divider>
       </div>
+      <sendcheckDialog ref="checkDialog" :user-detail="customer" />
+      <depositDialog ref="depoDialog" :user-detail="customer" />
     </div>
 
     <div v-else class="text-center pa-15 grey--text">Not Found Pet</div>
@@ -129,10 +171,12 @@
 
 <script>
 import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
+import depositDialog from '@/components/Record/UserRecord/depositDialog'
 import moment from 'moment'
 export default {
   components: {
     sendcheckDialog,
+    depositDialog,
   },
   props: {
     customer: {
@@ -151,6 +195,13 @@ export default {
     }
   },
   methods: {
+    onClickCheck(id) {
+      console.log(id)
+      this.$refs.checkDialog.open(id)
+    },
+    onClickDepo(id) {
+      this.$refs.depoDialog.open(id)
+    },
     calcAge(date) {
       const nowDate = moment()
       const pickDate = moment(date.toString(), 'YYYY-MM-DD')

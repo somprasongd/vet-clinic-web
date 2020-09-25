@@ -1,29 +1,6 @@
 <template>
   <div>
-    <v-btn
-      class="ma-2 px-0"
-      color="cusblue3"
-      dark
-      block
-      depressed
-      @click.stop="checkDialog = true"
-      >ส่งตรวจ</v-btn
-    >
-    <v-btn
-      class="ma-2 px-0"
-      color="cusblue3"
-      dark
-      block
-      depressed
-      @click="UpdateTime"
-      >ฝากเลี้ยง</v-btn
-    >
-    <v-btn class="ma-2 px-0" color="cusblue3" dark block depressed>ทำนัด</v-btn>
-    <v-btn class="ma-2 px-0" color="cusblue3" dark block depressed
-      >ประวัติการรักษา</v-btn
-    >
-
-    <v-dialog v-model="checkDialog" max-width="700">
+    <v-dialog v-model="sendCheckDialog" max-width="700">
       <v-card>
         <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
           <h2 class="pa-5 pb-2">ส่งตรวจ</h2>
@@ -137,94 +114,19 @@
           </div>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="cusblue2" text @click="checkDialog = false"
-              >ไม่ส่ง</v-btn
+            <v-btn color="cusblue2" text @click="sendCheckDialog = false">
+              ไม่ส่ง
+            </v-btn>
+            <v-btn
+              color="cusblue2"
+              :disabled="!valid"
+              text
+              @click="submitCheck"
             >
-            <v-btn color="cusblue2" :disabled="!valid" text @click="submitCheck"
-              >ส่ง</v-btn
-            >
+              ส่ง
+            </v-btn>
           </v-card-actions>
         </v-form>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="depositDialog" max-width="800" scrollable>
-      <v-card>
-        <h2 class="pa-5 pb-2">ฝากเลี้ยง</h2>
-        <v-divider class="darker-divider"></v-divider>
-        <div class="px-7">
-          <v-row>
-            <v-col cols="6">
-              <v-menu
-                ref="menu"
-                v-model="DepositDate"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                offset-y
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="dateDepo"
-                    color="cusblue"
-                    append-icon="mdi-calendar-month"
-                    background-color="white"
-                    v-bind="attrs"
-                    label="วันที่วัด"
-                    readonly
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  ref="picker"
-                  v-model="dateDepo"
-                  color="cusblue"
-                  :max="new Date().toISOString().substr(0, 10)"
-                  min="1950-01-01"
-                ></v-date-picker>
-              </v-menu>
-            </v-col>
-            <v-col cols="6">
-              <v-menu
-                ref="menu"
-                v-model="DepositTime"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                offset-y
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="TimeDepo"
-                    color="cusblue"
-                    append-icon="mdi-clock-outline"
-                    background-color="white"
-                    v-bind="attrs"
-                    label="เวลา"
-                    readonly
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-time-picker
-                  ref="picker"
-                  v-model="TimeDepo"
-                  color="cusblue"
-                  format="24hr"
-                  scrollable
-                ></v-time-picker>
-              </v-menu>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field color="cusblue" label="รายละเอียด"></v-text-field>
-            </v-col>
-          </v-row>
-        </div>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="cusblue2--text text-none" text>ยกเลิก</v-btn>
-          <v-btn class="cusblue2--text text-none" text>บันทึก</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -239,25 +141,17 @@ export default {
       type: Object,
       required: false,
     },
-    petId: {
-      default: null,
-      type: String,
-      required: false,
-    },
   },
   data() {
     return {
-      depositDialog: false,
-      DepositDate: false,
-      dateDepo: '',
-      DepositTime: false,
-      TimeDepo: '',
+      petId: '',
 
-      enabled: false,
-      checkDialog: false,
-      valid: true,
       doctor: ['Doctor', 'Doctor1', 'Doctor2'],
       nameTitle: ['คุณ', 'นาย', 'นาง', 'นางสาว'],
+
+      sendCheckDialog: false,
+      enabled: false,
+
       userDetails: this.userDetail,
       sendCheck: {
         type: '',
@@ -273,6 +167,8 @@ export default {
         },
         problem: '',
       },
+
+      valid: true,
       rules: {
         doctor: [(v) => !!v || 'กรุณาเลือกแพทย์ผู้ตรวจ'],
         important: [
@@ -294,6 +190,10 @@ export default {
     }
   },
   methods: {
+    open(id) {
+      this.petId = id
+      this.sendCheckDialog = true
+    },
     submitCheck() {
       if (this.$refs.form.validate()) {
         // console.log(this.petId)
@@ -311,23 +211,9 @@ export default {
           })
           .then(() => {
             // this.$refs.form.reset()
-            this.checkDialog = false
+            this.sendCheckDialog = false
           })
       }
-    },
-    submitDeposit() {
-      this.sendCheck.type = 'ฝากเลี้ยง'
-      this.sendCheck.status = 'ฝากเลี้ยง'
-      this.sendCheck.time = moment().format('YYYY-MM-DD, h:mm:ss a')
-
-      this.userDetails.status = this.sendCheck
-      this.$store.commit('queue/addQueueOPD', [this.userDetails, this.petId])
-    },
-    UpdateTime() {
-      this.dateDepo = moment().format('YYYY-MM-DD')
-      this.TimeDepo = moment().format('HH:mm')
-
-      this.depositDialog = true
     },
   },
 }
