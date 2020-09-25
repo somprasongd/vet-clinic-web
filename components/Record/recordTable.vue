@@ -7,6 +7,7 @@
       item-key="i"
       disable-pagination
       hide-default-footer
+      fixed-header
       height="calc(100vh - 160px)"
     >
       <template slot="item" scope="props">
