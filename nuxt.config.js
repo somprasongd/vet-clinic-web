@@ -76,6 +76,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/auth',
   ],
   /*
    ** Axios module configuration
@@ -100,7 +101,7 @@ export default {
       appleStatusBarStyle: '#49c0e8b6',
       name: 'VetClinic',
       author: 'Poom',
-      theme_color: '#49c0e8b6',
+      theme_color: 'rgba(73, 192, 232, 0.39)',
       lang: 'th',
     },
     manifest: {
@@ -108,7 +109,7 @@ export default {
       short_name: 'Vet Clinic',
       display: 'standalone',
       background_color: '#49bfe8',
-      theme_color: '#49c0e8b6',
+      theme_color: 'rgba(73, 192, 232, 0.39)',
       lang: 'th',
     },
   },
