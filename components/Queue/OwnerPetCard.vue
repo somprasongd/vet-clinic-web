@@ -74,7 +74,7 @@
           </div>
         </div>
         <div v-else>
-          <v-divider class="dash-divider hidden-md-and-down"></v-divider>
+          <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
           <div class="hidden-sm-and-down">
             <div class="pa-3">
@@ -95,7 +95,7 @@
               </v-row>
             </div>
 
-            <v-divider class="dash-divider hidden-md-and-down"></v-divider>
+            <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
             <div class="pa-3">
               <span class="font-weight-bold">DX (Differential Diagnosis)</span>
