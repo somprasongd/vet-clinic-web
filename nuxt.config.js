@@ -84,36 +84,30 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://dev.opensource-technology.com:3030/api/',
+    baseURL: process.env.API_URL,
   },
   /*
    ** Auth module configuration
    ** See https://auth.nuxtjs.org/
    */
   auth: {
-    cookie: {
-      prefix: 'auth.',
-      options: {
-        path: '/',
-      },
-    },
     redirect: {
       login: '/',
       logout: '/',
-      callback: '/queue',
+      callback: '/',
       home: '/queue',
     },
     strategies: {
       local: {
         endpoints: {
           login: {
-            url: '/auth/',
+            url: '/api/auth/',
             method: 'post',
             propertyName: 'accessToken',
           },
           logout: false,
           user: {
-            url: '/users/me/',
+            url: '/api/users/me/',
             method: 'get',
             propertyName: '',
           },

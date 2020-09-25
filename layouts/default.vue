@@ -45,17 +45,20 @@
       </v-tabs>
 
       <!-- Name and Logout Dropdown -->
-      <v-toolbar-items class="hidden-sm-and-down" style="width: 200px">
+      <v-toolbar-items class="hidden-sm-and-down" style="min-width: 250px">
         <!-- Name -->
         <v-list-item-content>
-          <v-list-item-title class="text-truncate" style="font-size: 14px">{{
-            user.name
-          }}</v-list-item-title>
-          <v-list-item-subtitle
+          <v-list-item-title class="text-truncate" style="font-size: 14px">
+            <v-avatar class="mr-3" color="indigo" size="36">
+              <span class="white--text headline">36</span>
+            </v-avatar>
+            {{ user.name }}
+          </v-list-item-title>
+          <!-- <v-list-item-subtitle
             class="font-weight-thin text-truncate"
             style="font-size: 12px"
             >{{ user.role }}</v-list-item-subtitle
-          >
+          > -->
         </v-list-item-content>
 
         <!-- Logout Dropdown -->
@@ -96,10 +99,19 @@ export default {
     return {
       user: {
         name: this.$auth.user.name,
-        role: this.$auth.user.name,
+        avatar: this.getRole,
       },
       userDrop: [{ title: 'Logout', link: this.logOut, icon: 'mdi-logout' }],
     }
+  },
+  computed: {
+    getRole() {
+      const myRole = 'hi'
+      for (const role in this.$auth.user.roles) {
+        console.log(this.$auth.user.roles[role].id)
+      }
+      return myRole
+    },
   },
   methods: {
     async logOut() {
