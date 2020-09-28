@@ -45,30 +45,34 @@
       </v-tabs>
 
       <!-- Name and Logout Dropdown -->
-      <v-toolbar-items class="hidden-sm-and-down" style="min-width: 250px">
+      <v-toolbar-items class="hidden-sm-and-down" style="max-width: 250px">
         <!-- Name -->
-        <v-list-item-content>
+        <!-- <v-list-item-content>
           <v-list-item-title class="text-truncate" style="font-size: 14px">
-            <v-avatar class="mr-3" color="indigo" size="36">
-              <span class="white--text headline">36</span>
-            </v-avatar>
-            {{ user.name }}
+            
           </v-list-item-title>
-          <!-- <v-list-item-subtitle
-            class="font-weight-thin text-truncate"
-            style="font-size: 12px"
-            >{{ user.role }}</v-list-item-subtitle
-          > -->
-        </v-list-item-content>
+        </v-list-item-content> -->
 
         <!-- Logout Dropdown -->
         <v-menu transition="slide-y-transition" offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" icon v-on="on">
-              <v-icon>mdi-menu-down</v-icon>
+            <v-btn v-bind="attrs" text width="250px" v-on="on">
+              <v-avatar class="mr-3" size="36">
+                <v-img
+                  src="https://cdn.iconscout.com/icon/free/png-512/avatar-369-456321.png"
+                ></v-img>
+              </v-avatar>
+              <span class="text-truncate" style="max-width: 170px">
+                {{ user.name }}
+              </span>
+              <v-spacer></v-spacer>
+              <v-icon v-if="attrs['aria-expanded'] == 'false'">
+                mdi-menu-down
+              </v-icon>
+              <v-icon v-else>mdi-menu-up</v-icon>
             </v-btn>
           </template>
-          <v-list class="text-center" width="220" dense>
+          <v-list class="text-center" dense>
             <v-list-item
               v-for="item in userDrop"
               :key="item.title"
@@ -98,8 +102,8 @@ export default {
   data() {
     return {
       user: {
-        name: this.$auth.user.name,
-        avatar: this.getRole,
+        name: this.$store.getters.loggedInUser.name,
+        avatar: this.$store.getters.loggedInUser.avatar.url,
       },
       userDrop: [{ title: 'Logout', link: this.logOut, icon: 'mdi-logout' }],
     }

@@ -9,7 +9,6 @@
     <div class="custom-container">
       <queueTable :dessert="customer" :selected-type="defaultType" />
     </div>
-    {{ this.$auth.user }}
     <queueDialog />
   </div>
 </template>

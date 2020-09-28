@@ -148,6 +148,10 @@ export const actions = {
 }
 
 export const getters = {
+  loggedInUser(state) {
+    return state.auth.user
+  },
+
   getCustomer(state) {
     return state.customerState
   },
