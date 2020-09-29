@@ -30,6 +30,7 @@ jobs:
         run: npm run generate
         env:
           BASE_URL: /vet-clinic-web/
+          API_URI: ${{ secrets.API_URI }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.0

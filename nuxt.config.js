@@ -101,13 +101,13 @@ export default {
       local: {
         endpoints: {
           login: {
-            url: '/api/auth/',
+            url: (process.env.API_URI || '' ) + '/api/auth/',
             method: 'post',
             propertyName: 'accessToken',
           },
           logout: false,
           user: {
-            url: '/api/users/me/',
+            url: (process.env.API_URI || '' ) + '/api/users/me/',
             method: 'get',
             propertyName: '',
           },
