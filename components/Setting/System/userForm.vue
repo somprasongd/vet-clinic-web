@@ -7,6 +7,7 @@
         <v-card class="elevation-4" height="540">
           <div class="px-7 py-5">
             <v-text-field
+              v-model="search"
               class="rounded-lg"
               color="cusblue"
               label="ค้นหา"
@@ -16,85 +17,51 @@
               dense
               flat
               hide-details
+              autocomplete="off"
             ></v-text-field>
           </div>
           <div class="px-7 py-5">
-            <v-card-title class="pa-0 px-3 py-1">
-              List
-              <v-spacer></v-spacer>
-              <v-btn
-                class="cusblue3 float-right text-none"
-                dark
-                depressed
-                @click.stop="newItemDialog = true"
-                >New item</v-btn
-              >
-              <v-dialog v-model="newItemDialog" max-width="700">
-                <v-card>
-                  <h2 class="pa-5 pb-2">New Item</h2>
-                  <v-divider class="darker-divider"></v-divider>
-                  <div class="py-5 px-10">
-                    <v-row dense>
+            <v-card-title class="pa-0 px-3 py-1"> User List </v-card-title>
+            <v-divider></v-divider>
+            <v-virtual-scroll
+              :items="filterUser"
+              :item-height="50"
+              height="400  "
+            >
+              <template v-slot="{ item }">
+                <v-list-item class="pa-0 px-5">
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.username }}
+                    </v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-row no-gutters>
                       <v-col cols="6">
-                        <v-text-field
-                          color="cusblue"
-                          label="ชื่อ item"
-                        ></v-text-field>
+                        <v-btn
+                          class="mr-1"
+                          icon
+                          x-small
+                          @click="$emit('edituser', item.id)"
+                        >
+                          <v-icon color="black">mdi-pencil</v-icon>
+                        </v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <v-text-field
-                          color="cusblue"
-                          label="สถานะ"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="6">
-                        <v-text-field
-                          color="cusblue"
-                          label="จำนวน"
-                        ></v-text-field>
+                        <v-btn
+                          class="ml-1"
+                          icon
+                          x-small
+                          @click="confirmDialog(item.id)"
+                        >
+                          <v-icon color="black">mdi-trash-can</v-icon>
+                        </v-btn>
                       </v-col>
                     </v-row>
-                  </div>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="cusblue2" text @click="newItemDialog = false">
-                      ยกเลิก
-                    </v-btn>
-
-                    <v-btn color="cusblue2" text @click="newItemDialog = false">
-                      ตกลง
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-card-title>
-            <v-divider></v-divider>
-            <v-list class="pa-0 px-5">
-              <v-list-item v-for="list in alluser" :key="list.index">
-                <v-list-item-content>
-                  <v-list-item-title> {{ list.username }} </v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-row no-gutters>
-                    <v-col cols="6">
-                      <v-btn class="mr-1" icon x-small>
-                        <v-icon color="black">mdi-pencil</v-icon>
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-btn
-                        class="ml-1"
-                        icon
-                        x-small
-                        @click="confirmDel = true"
-                      >
-                        <v-icon color="black">mdi-trash-can</v-icon>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+                  </v-list-item-action>
+                </v-list-item>
+              </template>
+            </v-virtual-scroll>
           </div>
         </v-card>
 
@@ -107,7 +74,9 @@
             <v-card-actions>
               <v-spacer></v-spacer>
 
-              <v-btn color="red" text @click="confirmDel = false"> ลบ </v-btn>
+              <v-btn color="red" text @click="deleteUser(confirmID)">
+                ลบ
+              </v-btn>
 
               <v-btn color="grey" text @click="confirmDel = false">
                 ยกเลิก
@@ -131,11 +100,39 @@ export default {
   },
   data() {
     return {
-      // userList: this.alluser,
+      search: '',
+      userList: this.alluser,
       confirmDel: false,
       newItemDialog: false,
       listItem: null,
+      confirmID: null,
     }
+  },
+  computed: {
+    filterUser() {
+      return this.alluser.filter((user) => {
+        return user.username.toLowerCase().includes(this.search.toLowerCase())
+      })
+    },
+  },
+  methods: {
+    confirmDialog(id) {
+      this.confirmDel = true
+      this.confirmID = id
+    },
+    deleteUser(id) {
+      this.confirmDel = false
+      this.$axios
+        .$delete(`/api/users/${id}`)
+        .then((response) => {
+          // this.$refs.form.reset()
+          // this.assignModal = false
+          this.$emit('removed', id)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
   },
 }
 </script>

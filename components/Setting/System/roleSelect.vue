@@ -6,7 +6,7 @@
       :dense="this.$vuetify.breakpoint.xsOnly"
     >
       <v-col cols="12" sm="5">
-        <v-card class="elevation-4" height="180">
+        <v-card class="elevation-4" height="180" :disabled="disable">
           <v-card-title class="pa-0 pl-5 pt-3"> สิทธิทั้งหมด </v-card-title>
           <v-divider></v-divider>
           <v-row dense>
@@ -36,7 +36,7 @@
                         : 'black--text text-uppercase'
                     "
                   >
-                    {{ item.rank }}
+                    {{ item.label }}
                   </span>
                 </v-card>
               </div>
@@ -85,8 +85,20 @@
       </v-col>
 
       <v-col cols="12" sm="5">
-        <v-card class="elevation-4" height="180">
-          <v-card-title class="pa-0 pl-5 pt-3">สิทธิที่เลือก</v-card-title>
+        <v-card class="elevation-4" height="180" :disabled="disable">
+          <v-card-title class="pa-0 pl-5 pt-3">
+            <span :class="alerts ? 'red--text' : ''">สิทธิที่เลือก</span>
+            <v-chip
+              v-show="alerts"
+              class="ma-2"
+              color="red"
+              outlined
+              pill
+              x-small
+            >
+              กรุณาเลือกสิทธิ
+            </v-chip>
+          </v-card-title>
           <v-divider></v-divider>
           <v-row dense>
             <v-item
@@ -114,7 +126,7 @@
                         ? 'white--text text-uppercase'
                         : 'black--text text-uppercase'
                     "
-                    >{{ item.rank }}</span
+                    >{{ item.label }}</span
                   >
                 </v-card>
               </div>
@@ -128,86 +140,133 @@
 
 <script>
 export default {
+  props: {
+    alert: {
+      type: Boolean,
+      required: true,
+    },
+    defaultrole: {
+      default: null,
+      type: Array,
+      required: false,
+    },
+    disable: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       selected: null,
+      enableValidate: false,
       overBtn: true,
       lessBtn: true,
-      rankList: {
-        register: {
-          id: 1,
-          rank: 'register',
-          state: false,
-        },
-        doctor: {
-          id: 2,
-          rank: 'doctor',
-          state: false,
-        },
-        lab: {
-          id: 3,
-          rank: 'lab',
-          state: false,
-        },
-        xray: {
-          id: 4,
-          rank: 'xray',
-          state: false,
-        },
-        pharmacy: {
-          id: 5,
-          rank: 'pharmacy',
-          state: false,
-        },
-        cashier: {
-          id: 6,
-          rank: 'cashier',
-          state: false,
-        },
-      },
+      rankList: {},
+      alerts: false,
     }
   },
   computed: {
     selectedRank() {
+      // loop หา role ที่เลือกแล้ว
       const array = []
       const id = []
       for (const rank in this.rankList) {
-        if (this.rankList[rank].state === true) {
+        if (this.rankList[rank].active === true) {
           array.push(this.rankList[rank])
           id.push(this.rankList[rank].id)
         }
       }
+
+      if (id.length === 0 && this.enableValidate) {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.alerts = true
+        this.$emit('error', true)
+      } else {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.alerts = false
+        this.$emit('error', false)
+      }
+
       this.$emit('rank', id)
       return array
     },
     allRank() {
+      // loop หา role ที่ยังไม่เลือก
       let rank
       const array = []
       for (rank in this.rankList) {
-        if (this.rankList[rank].state === false) {
+        if (this.rankList[rank].active === false) {
           array.push(this.rankList[rank])
         }
       }
       return array
     },
   },
+  watch: {
+    defaultrole() {
+      if (this.defaultrole === null) {
+        this.resetRole()
+      } else this.roleDefault()
+    },
+    selected() {
+      this.enableValidate = true
+    },
+    alert() {
+      this.alerts = true
+    },
+  },
+  async created() {
+    // ดัง role จาก api แล้ว loop ใส่ this.ranklist
+    const getRole = await this.$axios.$get('/api/master/user-roles')
+    const array = []
+    for (const role of getRole.results) {
+      array.push({
+        id: role.id,
+        label: role.label,
+        active: false,
+      })
+    }
+    this.rankList = array
+
+    // ตอนกดแก้ไขถ้ามี role ที่เลือกแล้ว (สำหรับครั้งแรก ถ้าไม่มีครั้งแรกตอนกดแก้ไขจะไม่ขึ้น role ที่เลือกแล้ว)
+    if (this.defaultrole) {
+      this.roleDefault()
+    }
+  },
   methods: {
+    roleDefault() {
+      for (const id of this.defaultrole) {
+        const index = this.rankList.findIndex((res) => {
+          return res.id === id.id
+        })
+        this.rankList[index].active = true
+      }
+    },
+    resetRole() {
+      this.enableValidate = false
+      for (const id in this.rankList) {
+        this.rankList[id].active = false
+      }
+    },
     buttonSwitch() {
+      // disable/enable ปุ่มตาม role ตามสถานะ ที่เรากด
       if (this.selected == null) {
         this.overBtn = true
         this.lessBtn = true
-      } else if (this.selected.state === false) {
+      } else if (this.selected.active === false) {
         this.overBtn = false
         this.lessBtn = true
-      } else if (this.selected.state === true) {
+      } else if (this.selected.active === true) {
         this.overBtn = true
         this.lessBtn = false
       }
     },
     clickSelect() {
-      this.rankList[this.selected.rank].state = !this.rankList[
-        this.selected.rank
-      ].state
+      // พอกดปุ่มลูกศรก็เปลี่ยนสถานะ active ของ role เป็นตรงข้าม
+      const index = this.rankList.findIndex((rank) => {
+        return rank.id === this.selected.id
+      })
+      this.rankList[index].active = !this.rankList[index].active
       this.selected = null
       this.overBtn = true
       this.lessBtn = true
