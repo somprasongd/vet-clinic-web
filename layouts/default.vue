@@ -46,23 +46,19 @@
 
       <!-- Name and Logout Dropdown -->
       <v-toolbar-items class="hidden-sm-and-down" style="max-width: 250px">
-        <!-- Name -->
-        <!-- <v-list-item-content>
-          <v-list-item-title class="text-truncate" style="font-size: 14px">
-            
-          </v-list-item-title>
-        </v-list-item-content> -->
-
         <!-- Logout Dropdown -->
         <v-menu transition="slide-y-transition" offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn v-bind="attrs" text width="250px" v-on="on">
-              <v-avatar class="mr-3" size="36">
-                <v-img
-                  src="https://cdn.iconscout.com/icon/free/png-512/avatar-369-456321.png"
-                ></v-img>
+              <!-- Name -->
+              <v-avatar
+                class="mr-3"
+                size="36"
+                style="border: 1px solid #3894b3"
+              >
+                <v-img :src="avatarImg"></v-img>
               </v-avatar>
-              <span class="text-truncate" style="max-width: 170px">
+              <span class="text-truncate text-none" style="max-width: 170px">
                 {{ user.name }}
               </span>
               <v-spacer></v-spacer>
@@ -99,27 +95,35 @@
 
 <script>
 export default {
+  // eslint-disable-next-line prettier/prettier
   data() {
     return {
       user: {
         name: this.$store.getters.loggedInUser.name,
-        avatar: this.$store.getters.loggedInUser.avatar.url,
+        // avatar: (process.env.API_URI || '') + '/api/users/me/avatar',
       },
       userDrop: [{ title: 'Logout', link: this.logOut, icon: 'mdi-logout' }],
     }
   },
   computed: {
-    getRole() {
-      const myRole = 'hi'
-      for (const role in this.$auth.user.roles) {
-        console.log(this.$auth.user.roles[role].id)
+    // a computed getter
+    avatarImg() {
+      // `this` points to the vm instance
+      const avatar =
+        process.env.apiUrl +
+        '/api/users/' +
+        this.$store.getters.loggedInUser.id +
+        '/avatar'
+      if (avatar) {
+        return avatar
+      } else {
+        return require('~/assets/profile/profile.png')
       }
-      return myRole
     },
   },
   methods: {
-    async logOut() {
-      await this.$auth.logout()
+    logOut() {
+      this.$auth.logout()
     },
   },
 }

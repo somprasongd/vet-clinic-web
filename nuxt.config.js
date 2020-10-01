@@ -202,4 +202,7 @@ export default {
   //     handler: '~/api/index.js',
   //   },
   // ],
+  env: {
+    apiUrl: process.env.API_URI,
+  },
 }

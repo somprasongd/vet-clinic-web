@@ -91,6 +91,23 @@
                 >
                 </v-checkbox>
               </v-col>
+              <v-col v-if="addUser.id !== ''" class="row" cols="12">
+                <v-avatar class="mx-3" size="41">
+                  <v-img :src="userAvatar"></v-img>
+                </v-avatar>
+                <v-file-input
+                  label="Profile Image"
+                  color="cusblue"
+                  prepend-icon=""
+                  append-icon="mdi-file-upload-outline"
+                  accept="image/*"
+                  outlined
+                  dense
+                  @change="onFilePicked"
+                >
+                </v-file-input>
+                {{ addUser.profile }}
+              </v-col>
             </v-row>
             <roleSelect
               :alert="roleAlert"
@@ -169,6 +186,9 @@ export default {
       roleAlert: false,
       defaultRole: [],
 
+      avatar: '',
+      newAvatar: '',
+
       addUser: {
         id: '',
         name: '',
@@ -176,6 +196,7 @@ export default {
         email: '',
         password: '',
         confirm: '',
+        profile: '',
         isAdmin: false,
         rank: [],
       },
@@ -233,9 +254,17 @@ export default {
       }
     },
   },
+  computed: {
+    userAvatar() {
+      if (this.newAvatar !== '') {
+        return this.newAvatar
+      } else {
+        return this.avatar
+      }
+    },
+  },
   methods: {
     open(id) {
-      this.assignModal = true
       // ถ้ามี id ส่งมา (แก้ไข)
       if (Number.isInteger(id)) {
         // console.log(id)
@@ -243,23 +272,25 @@ export default {
         //   return user.id === id
         // })
         // console.log(editUser)
-        setTimeout(() => {
-          this.$axios
-            .$get(`/api/users/${id}`, { progress: false })
-            .then((editUser) => {
-              this.addUser = {
-                id: editUser.id,
-                name: editUser.name,
-                username: editUser.username,
-                email: editUser.email,
-                password: '',
-                confirm: '',
-                isAdmin: editUser.isAdmin,
-                rank: editUser.roles,
-              }
-              this.defaultRole = editUser.roles
-            })
-        }, 100)
+
+        this.$axios
+          .$get(`/api/users/${id}`, { progress: false })
+          .then((editUser) => {
+            this.addUser = {
+              id: editUser.id,
+              name: editUser.name,
+              username: editUser.username,
+              email: editUser.email,
+              password: '',
+              confirm: '',
+              isAdmin: editUser.isAdmin,
+              rank: editUser.roles,
+            }
+            this.defaultRole = editUser.roles
+            // error ยังไม่เสร็จ ***************************
+            this.avatar = `${process.env.apiUrl}/api/users/${id}/avatar`
+            this.assignModal = true
+          })
       } else this.assignModal = true
     },
     roleError(bool) {
@@ -344,6 +375,11 @@ export default {
           return user.username === val && user.id !== this.addUser.id
         })
       }
+    },
+    onFilePicked(e) {
+      console.log(e)
+      if (e !== undefined) this.newAvatar = URL.createObjectURL(e)
+      else this.newAvatar = ''
     },
   },
 }
