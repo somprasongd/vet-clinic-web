@@ -111,6 +111,13 @@
             class="cusblue2--text text-none"
             text
             :disabled="!valid || loading"
+            @click="assignModal = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            class="cusblue2--text text-none"
+            text
+            :disabled="!valid || loading"
             @click="addUser.id == '' ? submitUser() : updateUser()"
             ><v-progress-circular
               v-show="loading"
@@ -151,7 +158,7 @@ export default {
       alert: false,
       error: '',
       roleAlert: false,
-      defaultRole: null,
+      defaultRole: [],
 
       addUser: {
         id: '',
@@ -204,9 +211,11 @@ export default {
   watch: {
     assignModal() {
       if (this.assignModal === false) {
-        this.defaultRole = null
-        this.$refs.form.reset()
-        this.addUser.id = ''
+        setTimeout(() => {
+          this.defaultRole = null
+          this.$refs.form.reset()
+          this.addUser.id = ''
+        }, 200)
       }
     },
   },
@@ -258,8 +267,8 @@ export default {
           })
           .then((response) => {
             setTimeout(() => {
-              this.$refs.form.reset()
               this.assignModal = false
+              this.$refs.form.reset()
               this.$emit('update', response)
               // console.log(response)
               this.loading = false

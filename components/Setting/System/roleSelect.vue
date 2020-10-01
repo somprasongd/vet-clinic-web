@@ -24,10 +24,7 @@
                   light
                   height="22"
                   max-width="95"
-                  @click="
-                    toggle()
-                    buttonSwitch()
-                  "
+                  @click="toggle()"
                 >
                   <span
                     :class="
@@ -115,10 +112,7 @@
                   light
                   height="22"
                   max-width="95"
-                  @click="
-                    toggle()
-                    buttonSwitch()
-                  "
+                  @click="toggle()"
                 >
                   <span
                     :class="
@@ -205,11 +199,30 @@ export default {
   watch: {
     defaultrole() {
       if (this.defaultrole === null) {
+        // รีเซ็ตตอน dialog เปิดแล้วส่งค่า default role เป็น null มา
         this.resetRole()
-      } else this.roleDefault()
+      } else {
+        // เซ็ตค่า default ตอนเปิด dialog แล้วมี ค่า this.defaultrole ส่งมา
+        this.roleDefault()
+        this.selected = null
+      }
     },
     selected() {
       this.enableValidate = true
+      // disable/enable ปุ่มตาม role ตามสถานะ ที่เรากด
+      if (this.selected == null) {
+        this.overBtn = true
+        this.lessBtn = true
+      } else if (this.selected.active === false) {
+        this.overBtn = false
+        this.lessBtn = true
+      } else if (this.selected.active === true) {
+        this.overBtn = true
+        this.lessBtn = false
+      } else {
+        this.overBtn = false
+        this.lessBtn = false
+      }
     },
     alert() {
       this.alerts = true
@@ -244,21 +257,10 @@ export default {
     },
     resetRole() {
       this.enableValidate = false
+      this.selected = null
+      console.log('reset')
       for (const id in this.rankList) {
         this.rankList[id].active = false
-      }
-    },
-    buttonSwitch() {
-      // disable/enable ปุ่มตาม role ตามสถานะ ที่เรากด
-      if (this.selected == null) {
-        this.overBtn = true
-        this.lessBtn = true
-      } else if (this.selected.active === false) {
-        this.overBtn = false
-        this.lessBtn = true
-      } else if (this.selected.active === true) {
-        this.overBtn = true
-        this.lessBtn = false
       }
     },
     clickSelect() {
