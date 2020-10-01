@@ -30,6 +30,7 @@
                 <v-text-field
                   ref="username"
                   v-model="addUser.username"
+                  :disabled="addUser.id == '' ? false : true"
                   :color="color"
                   :rules="rules.username"
                   label="username"
@@ -55,8 +56,16 @@
                   ref="password"
                   v-model="addUser.password"
                   :color="color"
-                  :rules="rules.password"
-                  label="password"
+                  :rules="
+                    addUser.id == ''
+                      ? rules.password
+                      : addUser.password !== ''
+                      ? rules.password1
+                      : []
+                  "
+                  :label="
+                    addUser.id == '' ? 'password' : 'password (not required)'
+                  "
                   type="password"
                   @keydown.enter="onEnter('confirm')"
                 >
@@ -110,7 +119,7 @@
           <v-btn
             class="cusblue2--text text-none"
             text
-            :disabled="!valid || loading"
+            :disabled="loading"
             @click="assignModal = false"
             >Cancel</v-btn
           >
@@ -201,10 +210,15 @@ export default {
             (v && v.length <= 50) ||
             'รหัสผ่านต้องมีน้อยหรือเท่ากับ 50 ตัวอักษร',
         ],
-        confirm: [
-          (v) => !!v || 'กรุณากรอกรหัสผ่านอีกครั้ง',
-          (v) => (v && v === this.addUser.password) || 'รหัสผ่านไม่ตรงกัน',
+        password1: [
+          (v) =>
+            (v && v.length >= 5) ||
+            'รหัสผ่านต้องมีมากกว่าหรือเท่ากับ 5 ตัวอักษร',
+          (v) =>
+            (v && v.length <= 50) ||
+            'รหัสผ่านต้องมีน้อยหรือเท่ากับ 50 ตัวอักษร',
         ],
+        confirm: [(v) => v === this.addUser.password || 'รหัสผ่านไม่ตรงกัน'],
       },
     }
   },
@@ -225,21 +239,27 @@ export default {
       // ถ้ามี id ส่งมา (แก้ไข)
       if (Number.isInteger(id)) {
         // console.log(id)
-        const editUser = this.alluser.find((user) => {
-          return user.id === id
-        })
+        // const editUser = this.alluser.find((user) => {
+        //   return user.id === id
+        // })
         // console.log(editUser)
-        this.addUser = {
-          id: editUser.id,
-          name: editUser.name,
-          username: editUser.username,
-          email: editUser.email,
-          password: editUser.password,
-          confirm: editUser.confirm,
-          isAdmin: editUser.isAdmin,
-          rank: editUser.roles,
-        }
-        this.defaultRole = editUser.roles
+        setTimeout(() => {
+          this.$axios
+            .$get(`/api/users/${id}`, { progress: false })
+            .then((editUser) => {
+              this.addUser = {
+                id: editUser.id,
+                name: editUser.name,
+                username: editUser.username,
+                email: editUser.email,
+                password: '',
+                confirm: '',
+                isAdmin: editUser.isAdmin,
+                rank: editUser.roles,
+              }
+              this.defaultRole = editUser.roles
+            })
+        }, 100)
       } else this.assignModal = true
     },
     roleError(bool) {
@@ -261,7 +281,7 @@ export default {
             username: userData.username.toLowerCase(),
             name: userData.name,
             email: userData.email,
-            password: userData.password,
+            password: userData.password === '' ? null : userData.password,
             isAdmin: userData.isAdmin,
             roles: userData.rank,
           })
@@ -279,7 +299,9 @@ export default {
             this.error = error.response.data.error.message
             this.loading = false
           })
-      } else this.roleAlert = true
+      } else if (this.addUser.rank.length === 0) {
+        this.roleAlert = true
+      }
     },
     submitUser() {
       if (this.$refs.form.validate() && this.addUser.rank.length !== 0) {
