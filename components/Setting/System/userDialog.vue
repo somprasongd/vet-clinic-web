@@ -215,7 +215,7 @@ export default {
           this.defaultRole = null
           this.$refs.form.reset()
           this.addUser.id = ''
-        }, 200)
+        }, 150)
       }
     },
   },

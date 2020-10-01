@@ -203,8 +203,10 @@ export default {
         this.resetRole()
       } else {
         // เซ็ตค่า default ตอนเปิด dialog แล้วมี ค่า this.defaultrole ส่งมา
-        this.roleDefault()
         this.selected = null
+        setTimeout(() => {
+          this.roleDefault()
+        }, 100)
       }
     },
     selected() {
@@ -258,7 +260,7 @@ export default {
     resetRole() {
       this.enableValidate = false
       this.selected = null
-      console.log('reset')
+      // console.log('reset')
       for (const id in this.rankList) {
         this.rankList[id].active = false
       }
