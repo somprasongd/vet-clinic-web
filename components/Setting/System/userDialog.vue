@@ -93,20 +93,27 @@
               </v-col>
               <v-col v-if="addUser.id !== ''" class="row" cols="12">
                 <v-avatar class="mx-3" size="41">
-                  <v-img :src="userAvatar"></v-img>
+                  <v-img
+                    :src="userAvatar"
+                    :lazy-src="require('~/assets/profile/defaultProfile.svg')"
+                  ></v-img>
                 </v-avatar>
                 <v-file-input
-                  label="Profile Image"
+                  label="Profile Image (not requied)"
                   color="cusblue"
                   prepend-icon=""
-                  append-icon="mdi-file-upload-outline"
                   accept="image/*"
+                  hide-details
                   outlined
                   dense
                   @change="onFilePicked"
                 >
+                  <template v-slot:append-outer>
+                    <v-icon color="red" @click="avatar = null"
+                      >mdi-trash-can</v-icon
+                    >
+                  </template>
                 </v-file-input>
-                {{ addUser.profile }}
               </v-col>
             </v-row>
             <roleSelect
@@ -179,10 +186,12 @@ export default {
     return {
       color: 'cusblue',
       assignModal: false,
+
       valid: true,
       loading: false,
       alert: false,
       error: '',
+
       roleAlert: false,
       defaultRole: [],
 
@@ -243,39 +252,68 @@ export default {
       },
     }
   },
+  computed: {
+    userAvatar() {
+      if (this.newAvatar !== '') {
+        return this.newAvatar
+      } else if (this.avatar == null) {
+        return require('~/assets/profile/defaultProfile.svg')
+      } else {
+        return this.avatar
+      }
+    },
+  },
   watch: {
     assignModal() {
       if (this.assignModal === false) {
         setTimeout(() => {
           this.defaultRole = null
           this.$refs.form.reset()
+          this.alert = false
           this.addUser.id = ''
+          this.avatar = ''
         }, 150)
       }
     },
   },
-  computed: {
-    userAvatar() {
-      if (this.newAvatar !== '') {
-        return this.newAvatar
+  methods: {
+    roleError(bool) {
+      this.valid = !bool
+    },
+    onEnter(ref) {
+      this.$refs[ref].focus()
+    },
+    addRank(id) {
+      this.addUser.rank = id
+    },
+    checkDuplicate(val) {
+      if (this.addUser.id === '') {
+        // เช็คเตือนชื่อซ้ำตอนเพิ่มข้อมูล
+        return !this.alluser.some((user) => {
+          return user.username === val
+        })
       } else {
-        return this.avatar
+        // เช็คเตื่อนชื่อซ้ำตอนแก้ไข โดยชื่อเดิมจะไม่เตือน
+        return !this.alluser.some((user) => {
+          return user.username === val && user.id !== this.addUser.id
+        })
       }
     },
-  },
-  methods: {
+    onFilePicked(e) {
+      // เลือกไฟล์แล้วเปลี่ยนรูป Preview
+      if (e !== undefined) {
+        this.addUser.profile = e
+        this.newAvatar = URL.createObjectURL(e)
+      } else this.newAvatar = ''
+    },
+    // REQUEST GET *********************************************************
     open(id) {
-      // ถ้ามี id ส่งมา (แก้ไข)
+      // ถ้ามี id ส่งมาเ (แก้ไข) (เซ็ตค่า default)
       if (Number.isInteger(id)) {
-        // console.log(id)
-        // const editUser = this.alluser.find((user) => {
-        //   return user.id === id
-        // })
-        // console.log(editUser)
-
         this.$axios
           .$get(`/api/users/${id}`, { progress: false })
           .then((editUser) => {
+            // set default detail to textfield
             this.addUser = {
               id: editUser.id,
               name: editUser.name,
@@ -286,54 +324,15 @@ export default {
               isAdmin: editUser.isAdmin,
               rank: editUser.roles,
             }
+            // set default role
             this.defaultRole = editUser.roles
-            // error ยังไม่เสร็จ ***************************
+            // Preview Profile Img
             this.avatar = `${process.env.apiUrl}/api/users/${id}/avatar`
             this.assignModal = true
           })
       } else this.assignModal = true
     },
-    roleError(bool) {
-      this.valid = !bool
-    },
-    onEnter(ref) {
-      this.$refs[ref].focus()
-    },
-    addRank(id) {
-      this.addUser.rank = id
-    },
-    updateUser() {
-      if (this.$refs.form.validate() && this.addUser.rank.length !== 0) {
-        this.roleAlert = false
-        this.loading = true
-        const userData = { ...this.addUser }
-        this.$axios
-          .$put(`/api/users/${userData.id}`, {
-            username: userData.username.toLowerCase(),
-            name: userData.name,
-            email: userData.email,
-            password: userData.password === '' ? null : userData.password,
-            isAdmin: userData.isAdmin,
-            roles: userData.rank,
-          })
-          .then((response) => {
-            setTimeout(() => {
-              this.assignModal = false
-              this.$refs.form.reset()
-              this.$emit('update', response)
-              // console.log(response)
-              this.loading = false
-            }, 500)
-          })
-          .catch((error) => {
-            this.alert = true
-            this.error = error.response.data.error.message
-            this.loading = false
-          })
-      } else if (this.addUser.rank.length === 0) {
-        this.roleAlert = true
-      }
-    },
+    // REQUEST SEND **********************************************************************************
     submitUser() {
       if (this.$refs.form.validate() && this.addUser.rank.length !== 0) {
         this.roleAlert = false
@@ -357,29 +356,83 @@ export default {
             }, 500)
           })
           .catch((error) => {
-            this.alert = true
-            this.error = error.response.data.error.message
-            this.loading = false
+            this.requestError(error)
           })
       } else this.roleAlert = true
     },
-    checkDuplicate(val) {
-      if (this.addUser.id === '') {
-        // เช็คเตือนชื่อซ้ำตอนเพิ่มข้อมูล
-        return !this.alluser.some((user) => {
-          return user.username === val
-        })
-      } else {
-        // เช็คเตื่อนชื่อซ้ำตอนแก้ไข โดยชื่อเดิมจะไม่เตือน
-        return !this.alluser.some((user) => {
-          return user.username === val && user.id !== this.addUser.id
-        })
+    updateUser() {
+      if (this.$refs.form.validate() && this.addUser.rank.length !== 0) {
+        this.roleAlert = false
+        this.loading = true
+        const userData = { ...this.addUser }
+        const sendData = {
+          username: userData.username.toLowerCase(),
+          name: userData.name,
+          email: userData.email,
+          password: userData.password === '' ? null : userData.password,
+          isAdmin: userData.isAdmin,
+          roles: userData.rank,
+        }
+        this.$axios
+          .$put(`/api/users/${userData.id}`, sendData)
+          .then((response) => {
+            // upload profile img
+
+            if (this.avatar === null && userData.profile === undefined) {
+              this.deleteProfile(userData.id, response)
+            } else if (userData.profile !== undefined) {
+              this.uploadProfile(userData.id, userData.profile, response)
+            } else {
+              this.updateSuccess(response)
+            }
+          })
+          .catch((error) => {
+            this.requestError(error)
+          })
+      } else if (this.addUser.rank.length === 0) {
+        this.roleAlert = true
       }
     },
-    onFilePicked(e) {
-      console.log(e)
-      if (e !== undefined) this.newAvatar = URL.createObjectURL(e)
-      else this.newAvatar = ''
+    uploadProfile(id, img, response) {
+      const formData = new FormData()
+      formData.append('avatar', img)
+
+      this.$axios
+        .$post(`/api/users/${id}/avatar`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        .then((data) => {
+          this.updateSuccess(response)
+        })
+        .catch((error) => {
+          this.requestError(error)
+        })
+    },
+    deleteProfile(id, response) {
+      this.$axios
+        .$delete(`/api/users/${id}/avatar`)
+        .then((data) => {
+          this.updateSuccess(response)
+        })
+        .catch((error) => {
+          this.requestError(error)
+        })
+    },
+    // REQUEST RESULT ***************************************************
+    updateSuccess(response) {
+      setTimeout(() => {
+        this.assignModal = false
+        this.$refs.form.reset()
+        this.$emit('update', response)
+        this.loading = false
+      }, 500)
+    },
+    requestError(error) {
+      this.alert = true
+      this.error = error.response.data.error.message
+      this.loading = false
     },
   },
 }

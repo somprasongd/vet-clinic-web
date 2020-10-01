@@ -56,7 +56,10 @@
                 size="36"
                 style="border: 1px solid #3894b3"
               >
-                <v-img :src="avatarImg"></v-img>
+                <v-img
+                  :src="avatarImg"
+                  :lazy-src="require('~/assets/profile/defaultProfile.svg')"
+                ></v-img>
               </v-avatar>
               <span class="text-truncate text-none" style="max-width: 170px">
                 {{ user.name }}
@@ -114,11 +117,8 @@ export default {
         '/api/users/' +
         this.$store.getters.loggedInUser.id +
         '/avatar'
-      if (avatar) {
-        return avatar
-      } else {
-        return require('~/assets/profile/profile.png')
-      }
+
+      return avatar
     },
   },
   methods: {
