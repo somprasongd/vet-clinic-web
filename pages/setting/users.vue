@@ -70,7 +70,7 @@ export default {
       const index = this.allUser.findIndex((user) => {
         return user.id === res.id
       })
-      console.log(index)
+      // console.log(index)
       this.allUser.splice(index, 1, res)
     },
     removeUser(id) {
