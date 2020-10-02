@@ -10,22 +10,18 @@
       fixed-header
       height="calc(100vh - 160px)"
     >
-      <template slot="item" scope="props">
-        <tr>
-          <td class="text-center">{{ props.index + 1 }}</td>
-          <td class="font-weight-medium">
-            <nuxt-link
-              class="bold-owner text-decoration-none"
-              :to="'/record/' + props.item.id"
-              >{{ props.item.name }}
-              <v-icon color="cusblue2" small
-                >mdi-chevron-right</v-icon
-              ></nuxt-link
-            >
-          </td>
-          <td>{{ props.item.tel }}</td>
-          <td>{{ props.item.address }}</td>
-        </tr>
+      <template v-slot:[`item.id`]="{ item }">
+        <div>{{ orderNum(dessert, item.id) }}</div>
+      </template>
+      <template v-slot:[`item.name`]="{ item }">
+        <div class="font-weight-medium">
+          <nuxt-link
+            class="bold-owner text-decoration-none"
+            :to="'/record/' + item.id"
+            >{{ item.name }}
+            <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
+          >
+        </div>
       </template>
     </v-data-table>
   </div>
@@ -66,6 +62,17 @@ export default {
         { text: 'ที่อยู่', value: 'address', width: '50%', sortable: false },
       ],
     }
+  },
+  methods: {
+    orderNum(data, id) {
+      return (
+        data
+          .map(function (x) {
+            return x.id
+          })
+          .indexOf(id) + 1
+      )
+    },
   },
 }
 </script>
