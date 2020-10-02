@@ -6,7 +6,21 @@
           {{ addUser.id == '' ? 'เพิ่ม' : 'แก้ไข' }}
         </h2>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="px-7">
+        <v-card-text class="px-7 py-1">
+          <v-row
+            v-if="!addUser.id == ''"
+            class="pt-2"
+            justify="center"
+            align="center"
+            no-gutters
+          >
+            <userAvatar :avatarid="addUser.id" :avatars="avatar" />
+            <div class="col-12 text-center">
+              <h1 class="my-4">{{ addUser.username }}</h1>
+              <v-divider></v-divider>
+            </div>
+          </v-row>
+
           <v-form
             ref="form"
             v-model="valid"
@@ -23,14 +37,15 @@
                   :rules="rules.name"
                   label="name"
                   type="text"
-                  @keydown.enter="onEnter('username')"
+                  @keydown.enter="
+                    addUser.id == '' ? onEnter('username') : onEnter('email')
+                  "
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col v-if="addUser.id == ''" cols="6">
                 <v-text-field
                   ref="username"
                   v-model="addUser.username"
-                  :disabled="addUser.id == '' ? false : true"
                   :color="color"
                   :rules="rules.username"
                   label="username"
@@ -56,6 +71,8 @@
                   ref="password"
                   v-model="addUser.password"
                   :color="color"
+                  :type="showPass ? 'text' : 'password'"
+                  :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
                   :rules="
                     addUser.id == ''
                       ? rules.password
@@ -66,12 +83,14 @@
                   :label="
                     addUser.id == '' ? 'password' : 'password (not required)'
                   "
-                  type="password"
-                  @keydown.enter="onEnter('confirm')"
+                  @click:append="showPass = !showPass"
+                  @keydown.enter="
+                    addUser.id == '' ? onEnter('confirm') : updateUser()
+                  "
                 >
                 </v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col v-if="addUser.id == ''" cols="6">
                 <v-text-field
                   ref="confirm"
                   v-model="addUser.confirm"
@@ -90,30 +109,6 @@
                   label="ผู้ดูแลระบบ"
                 >
                 </v-checkbox>
-              </v-col>
-              <v-col v-if="addUser.id !== ''" class="row" cols="12">
-                <v-avatar class="mx-3" size="41">
-                  <v-img
-                    :src="userAvatar"
-                    :lazy-src="require('~/assets/profile/defaultProfile.svg')"
-                  ></v-img>
-                </v-avatar>
-                <v-file-input
-                  label="Profile Image (not requied)"
-                  color="cusblue"
-                  prepend-icon=""
-                  accept="image/*"
-                  hide-details
-                  outlined
-                  dense
-                  @change="onFilePicked"
-                >
-                  <template v-slot:append-outer>
-                    <v-icon color="red" @click="avatar = null"
-                      >mdi-trash-can</v-icon
-                    >
-                  </template>
-                </v-file-input>
               </v-col>
             </v-row>
             <roleSelect
@@ -171,9 +166,11 @@
 <script>
 // import axios from 'axios'
 import roleSelect from '@/components/Setting/System/roleSelect'
+import userAvatar from '@/components/Setting/System/userAvatar'
 export default {
   components: {
     roleSelect,
+    userAvatar,
   },
   props: {
     alluser: {
@@ -186,6 +183,7 @@ export default {
     return {
       color: 'cusblue',
       assignModal: false,
+      showPass: false,
 
       valid: true,
       loading: false,
@@ -196,7 +194,6 @@ export default {
       defaultRole: [],
 
       avatar: '',
-      newAvatar: '',
 
       addUser: {
         id: '',
@@ -205,7 +202,7 @@ export default {
         email: '',
         password: '',
         confirm: '',
-        profile: '',
+        // profile: '',
         isAdmin: false,
         rank: [],
       },
@@ -252,17 +249,6 @@ export default {
       },
     }
   },
-  computed: {
-    userAvatar() {
-      if (this.newAvatar !== '') {
-        return this.newAvatar
-      } else if (this.avatar == null) {
-        return require('~/assets/profile/defaultProfile.svg')
-      } else {
-        return this.avatar
-      }
-    },
-  },
   watch: {
     assignModal() {
       if (this.assignModal === false) {
@@ -298,13 +284,6 @@ export default {
           return user.username === val && user.id !== this.addUser.id
         })
       }
-    },
-    onFilePicked(e) {
-      // เลือกไฟล์แล้วเปลี่ยนรูป Preview
-      if (e !== undefined) {
-        this.addUser.profile = e
-        this.newAvatar = URL.createObjectURL(e)
-      } else this.newAvatar = ''
     },
     // REQUEST GET *********************************************************
     open(id) {
@@ -376,15 +355,8 @@ export default {
         this.$axios
           .$put(`/api/users/${userData.id}`, sendData)
           .then((response) => {
-            // upload profile img
-
-            if (this.avatar === null && userData.profile === undefined) {
-              this.deleteProfile(userData.id, response)
-            } else if (userData.profile !== undefined) {
-              this.uploadProfile(userData.id, userData.profile, response)
-            } else {
-              this.updateSuccess(response)
-            }
+            // save success
+            this.updateSuccess(response)
           })
           .catch((error) => {
             this.requestError(error)
@@ -392,33 +364,6 @@ export default {
       } else if (this.addUser.rank.length === 0) {
         this.roleAlert = true
       }
-    },
-    uploadProfile(id, img, response) {
-      const formData = new FormData()
-      formData.append('avatar', img)
-
-      this.$axios
-        .$post(`/api/users/${id}/avatar`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then((data) => {
-          this.updateSuccess(response)
-        })
-        .catch((error) => {
-          this.requestError(error)
-        })
-    },
-    deleteProfile(id, response) {
-      this.$axios
-        .$delete(`/api/users/${id}/avatar`)
-        .then((data) => {
-          this.updateSuccess(response)
-        })
-        .catch((error) => {
-          this.requestError(error)
-        })
     },
     // REQUEST RESULT ***************************************************
     updateSuccess(response) {
