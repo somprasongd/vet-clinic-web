@@ -19,10 +19,13 @@
       </v-subheader>
 
       <v-select
+        v-model="select"
         class="rounded-lg cus-input mr-3"
         background-color="cusblue3"
-        :items="doct"
-        label="บ้านเลขที่"
+        :items="items"
+        item-text="label"
+        item-value="value"
+        return-object
         dark
         filled
         rounded
@@ -30,8 +33,10 @@
         dense
         flat
         hide-details
+        @keydown.enter="sendValue"
       ></v-select>
       <v-text-field
+        v-model="search"
         class="rounded-lg cus-textfield"
         background-color="cusblue3"
         append-icon="mdi-magnify"
@@ -42,6 +47,7 @@
         dense
         flat
         hide-details
+        autocomplete="off"
       ></v-text-field>
     </v-row>
   </v-card>
@@ -51,10 +57,30 @@
 export default {
   data() {
     return {
-      items: ['OPD', 'IPD'],
-      doct: ['คนแรก', 'คนสอง', 'คนสาม', 'คนสี่'],
-      queueCount: '5',
+      select: { label: 'บ้านเลขที่', value: 'houseNo' },
+      search: '',
+      items: [
+        { label: 'บ้านเลขที่', value: 'houseNo' },
+        { label: 'เบอร์โทร', value: 'tel' },
+        { label: 'ชื่อเจ้าของ', value: 'firstName' },
+        { label: 'นามสกุลเจ้าของ', value: 'lastName' },
+        { label: 'ชื่อสัตว์เลี้ยง', value: 'petName' },
+        { label: 'รหัสเจ้าของ', value: 'code' },
+      ],
     }
+  },
+  watch: {
+    search() {
+      this.sendValue()
+    },
+    select() {
+      this.sendValue()
+    },
+  },
+  methods: {
+    sendValue() {
+      this.$emit('search', [this.select.value, this.search])
+    },
   },
 }
 </script>

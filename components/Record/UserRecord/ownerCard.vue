@@ -50,11 +50,19 @@
         <v-col class="pa-6" lg="11" md="10" sm="9" cols="8">
           <v-row no-gutters>
             <v-col cols="12">
-              <div class="font-weight-medium">{{ owner.name }}</div>
+              <div class="font-weight-medium">
+                {{ owner.firstName + ' ' + owner.lastName }}
+              </div>
             </v-col>
             <v-col lg="3" md="6" cols="12">
               <span class="font-weight-medium">เบอร์ติดต่อ :</span>
-              <span class="font-weight-light">{{ owner.tel }}</span>
+              <span
+                v-for="tel in owner.tels"
+                :key="tel"
+                class="font-weight-light"
+              >
+                {{ dashPhone(tel) + ', ' }}
+              </span>
             </v-col>
             <v-col lg="4" md="6" cols="12">
               <span class="font-weight-medium">Email :</span>
@@ -87,6 +95,11 @@ export default {
         { text: 'ลบข้อมูล', action: '' },
       ],
     }
+  },
+  methods: {
+    dashPhone(num) {
+      return num.slice(0, 3) + '-' + num.slice(3, 6) + '-' + num.slice(6, 11)
+    },
   },
 }
 </script>

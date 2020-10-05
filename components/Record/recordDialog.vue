@@ -16,102 +16,153 @@
 
     <v-dialog v-model="assignModal" max-width="700" scrollable>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
-          <h2 class="pa-5 pb-2">เพิ่มข้อมูลลูกค้า</h2>
-          <v-divider class="darker-divider"></v-divider>
-          <div class="py-5 px-10">
-            <v-row dense>
-              <v-col cols="3">
-                <v-select
-                  v-model="addCustomer.prefix"
-                  color="cusblue"
-                  :items="nameTitle"
-                  label="คำนำหน้าชื่อ"
-                  menu-props="auto"
-                  :rules="rules.prefix"
-                  required
-                  @keydown.enter="onEnter('f_name')"
-                ></v-select>
-              </v-col>
-              <v-col cols="4.5">
-                <v-text-field
-                  ref="f_name"
-                  v-model="addCustomer.f_name"
-                  color="cusblue"
-                  label="ชื่อ"
-                  :rules="rules.f_name"
-                  required
-                  @keydown.enter="onEnter('l_name')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4.5">
-                <v-text-field
-                  ref="l_name"
-                  v-model="addCustomer.l_name"
-                  color="cusblue"
-                  label="นามสกุล"
-                  :rules="rules.l_name"
-                  required
-                  @keydown.enter="onEnter('address')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="address"
-                  v-model="addCustomer.address"
-                  color="cusblue"
-                  label="ที่อยู่"
-                  :rules="rules.address"
-                  required
-                  @keydown.enter="onEnter('email')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  ref="email"
-                  v-model="addCustomer.email"
-                  color="cusblue"
-                  label="อีเมล์"
-                  :rules="rules.email"
-                  required
-                  @keydown.enter="onEnter('tel')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  ref="tel"
-                  v-model="addCustomer.tel"
-                  color="cusblue"
-                  label="เบอร์ติดต่อ"
-                  :rules="rules.tel"
-                  required
-                  @keydown.enter="onEnter('other')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="other"
-                  v-model="addCustomer.other"
-                  color="cusblue"
-                  label="อื่นๆ"
-                  @keydown.enter="submitCustomer()"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="cusblue2" text @click="cancelForm">ยกเลิก</v-btn>
+        <h2 class="pa-5 pb-2">เพิ่มข้อมูลลูกค้า</h2>
+        <v-divider class="darker-divider"></v-divider>
+        <v-card-text class="py-5 px-10">
+          <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
+            <div>
+              <v-row dense>
+                <v-col cols="4">
+                  <v-select
+                    v-model="addCustomer.prefix"
+                    color="cusblue"
+                    :disabled="loading"
+                    :items="nameTitle"
+                    item-text="label"
+                    item-value="id"
+                    label="คำนำหน้าชื่อ"
+                    menu-props="auto"
+                    :rules="rules.prefix"
+                    required
+                    @keydown.enter="onEnter('f_name')"
+                  ></v-select>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    ref="f_name"
+                    v-model="addCustomer.f_name"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="ชื่อ"
+                    :rules="rules.f_name"
+                    required
+                    @keydown.enter="onEnter('l_name')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    ref="l_name"
+                    v-model="addCustomer.l_name"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="นามสกุล"
+                    :rules="rules.l_name"
+                    required
+                    @keydown.enter="onEnter('houseno')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    ref="houseno"
+                    v-model="addCustomer.houseNo"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="บ้านเลขที่"
+                    :rules="rules.houseNo"
+                    required
+                    @keydown.enter="onEnter('address')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="8">
+                  <v-text-field
+                    ref="address"
+                    v-model="addCustomer.address"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="ที่อยู่"
+                    :rules="rules.address"
+                    required
+                    @keydown.enter="onEnter('email')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    ref="email"
+                    v-model="addCustomer.email"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="อีเมล์"
+                    :rules="rules.email"
+                    required
+                    @keydown.enter="onEnter('tel')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-combobox
+                    ref="tel"
+                    v-model="addCustomer.tel"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="เบอร์ติดต่อ"
+                    height="32"
+                    append-icon=""
+                    :rules="rules.tel"
+                    multiple
+                    small-chips
+                    deletable-chips
+                    @keydown.enter="onEnter('other')"
+                  ></v-combobox>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    ref="other"
+                    v-model="addCustomer.other"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="อื่นๆ"
+                    auto-grow
+                    row-height="24"
+                    rows="1"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
+            </div>
+          </v-form>
+          <v-alert
+            v-model="alert"
+            dense
+            text
+            color="red"
+            transition="scroll-y-transition"
+            dismissible
+          >
+            {{ error }}
+          </v-alert>
+        </v-card-text>
 
-            <v-btn
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn :disabled="loading" color="cusblue2" text @click="cancelForm">
+            ยกเลิก
+          </v-btn>
+
+          <v-btn
+            color="cusblue2"
+            :disabled="!valid || loading"
+            text
+            @click="submitCustomer()"
+          >
+            <v-progress-circular
+              v-show="loading"
+              class="mr-2"
+              indeterminate
               color="cusblue2"
-              :disabled="!valid"
-              text
-              @click="submitCustomer()"
-              >บันทึก</v-btn
-            >
-          </v-card-actions>
-        </v-form>
+              :size="15"
+              :width="2"
+            ></v-progress-circular>
+            บันทึก
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -123,14 +174,20 @@ export default {
     return {
       assignModal: false,
       valid: true,
-      nameTitle: ['คุณ', 'นาย', 'นาง', 'นางสาว'],
+
+      loading: false,
+      alert: false,
+      error: '',
+
+      nameTitle: [],
       addCustomer: {
-        prefix: '',
+        prefix: 1,
         f_name: '',
         l_name: '',
+        houseNo: '',
         address: '',
         email: '',
-        tel: '',
+        tel: [],
         other: '',
       },
       rules: {
@@ -143,41 +200,94 @@ export default {
           (v) => !!v || 'กรุณากรอกนามสกุล',
           (v) => (v && v.length <= 100) || 'ไม่ควรกรอกนามสกุลเกิน 100 ตัวอักษร',
         ],
+        houseNo: [
+          (v) => !!v || 'กรุณากรอกบ้านเลขที่',
+          (v) =>
+            (v && v.length <= 300) || 'ไม่ควรกรอกบ้านเลขที่เกิน 50 ตัวอักษร',
+        ],
         address: [
           (v) => !!v || 'กรุณากรอกที่อยู่',
-          (v) =>
-            (v && v.length <= 1000) || 'ไม่ควรกรอกที่อยู่เกิน 1000 ตัวอักษร',
+          (v) => (v && v.length <= 300) || 'ไม่ควรกรอกที่อยู่เกิน 300 ตัวอักษร',
         ],
         email: [
           (v) => !!v || 'กรุณากรอกอีเมล์',
           (v) => /.+@.+\..+/.test(v) || 'กรุณากรอกอีเมล์ให้ถูกรูปแบบ',
         ],
         tel: [
-          (v) => !!v || 'กรุณากรอกที่อยู่',
-          (v) => (v && v.length <= 10) || 'ไม่กรอกใส่ชื่อเกิน 10 ตัวอักษร',
-          (v) =>
-            /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(v) ||
-            'กรุณากรอกเบอร์ติดต่อให้ถูกรูปแบบ',
+          (v) => !!v || 'กรุณากรอกเบอร์โทรศัพท์',
+          (v) => (v && this.validatePhone(v)) || 'กรุณากรอกเบอร์ให้ถูกรูปแบบ',
+          (v) => (v && v.length <= 2) || 'ไม่ควรใส่เบอร์เกิน 2 เบอร์',
         ],
       },
     }
   },
+  async mounted() {
+    const prefix = await this.$axios.$get('/api/master/prefixes', {
+      progress: false,
+    })
+    this.nameTitle = prefix.results
+  },
   methods: {
-    submitCustomer() {
-      if (this.$refs.form.validate()) {
-        const sendCustomer = { ...this.addCustomer }
-        this.$store.dispatch('addCustomer', sendCustomer).then(() => {
-          this.$refs.form.reset()
-          this.assignModal = false
-        })
-      }
-    },
     cancelForm() {
       this.$refs.form.reset()
       this.assignModal = false
     },
     onEnter(ref) {
       this.$refs[ref].focus()
+    },
+    validatePhone(num) {
+      if (num.length !== 0) {
+        return num.every((n) => {
+          return n.length >= 9 && n.length <= 10 && n.match(/^[0-9]*$/)
+        })
+      } else if (num.length > 2) {
+        this.addCustomer.tel.pop()
+      }
+    },
+    submitCustomer() {
+      if (this.$refs.form.validate()) {
+        // const sendCustomer = { ...this.addCustomer }
+        // this.$store.dispatch('addCustomer', sendCustomer).then(() => {
+        //   this.$refs.form.reset()
+        //   this.assignModal = false
+        // })
+        this.loading = true
+        const sendCustomer = { ...this.addCustomer }
+        const sendData = {
+          prefixId: sendCustomer.prefix,
+          firstName: sendCustomer.f_name,
+          lastName: sendCustomer.l_name,
+          houseNo: sendCustomer.houseNo,
+          address: sendCustomer.address,
+          tels: sendCustomer.tel,
+          email: sendCustomer.email,
+          remark: sendCustomer.other,
+        }
+        console.log(sendCustomer)
+        this.$axios
+          .$post('/api/members', sendData)
+          .then((res) => {
+            this.successSubmit(res)
+          })
+          .catch((error) => {
+            this.errorSubmit(error)
+          })
+      }
+    },
+    successSubmit(res) {
+      setTimeout(() => {
+        this.loading = false
+        this.assignModal = false
+        this.alert = false
+        this.$refs.form.reset()
+        console.log(res)
+        this.$emit('update', res)
+      }, 500)
+    },
+    errorSubmit(error) {
+      this.loading = false
+      this.alert = true
+      this.error = error.response.data.error.message
     },
   },
 }
