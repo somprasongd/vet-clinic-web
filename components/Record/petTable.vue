@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-simple-table v-if="petDetail.length" dense fixed-header max-height="200">
+    <v-simple-table v-if="pets.length" dense fixed-header max-height="200">
       <template v-slot:default>
         <thead>
           <tr>
@@ -12,8 +12,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="pet in petDetail" :key="pet.id">
-            <td class="text-center">{{ orderNum(petDetail, pet.id) }}</td>
+          <tr v-for="pet in pets" :key="pet.id">
+            <td class="text-center">{{ orderNum(pets, pet.id) }}</td>
             <td>{{ pet.name }}</td>
             <td>{{ pet.type.label }}</td>
             <td>{{ pet.gender.label }}</td>
@@ -29,8 +29,12 @@
 <script>
 export default {
   props: {
-    owner: {
-      type: Number,
+    // owner: {
+    //   type: Number,
+    //   required: true,
+    // },
+    pets: {
+      type: Array,
       required: true,
     },
   },
@@ -39,13 +43,13 @@ export default {
       petDetail: [],
     }
   },
-  async mounted() {
-    const pet = await this.$axios.$get(
-      `/api/pets?ownerId=${this.owner}&limit=0`,
-      { progress: false }
-    )
-    this.petDetail = pet.results
-  },
+  // async mounted() {
+  //   const pet = await this.$axios.$get(
+  //     `/api/pets?ownerId=${this.owner}&limit=0`,
+  //     { progress: false }
+  //   )
+  //   this.petDetail = pet.results
+  // },
   methods: {
     orderNum(data, id) {
       return (

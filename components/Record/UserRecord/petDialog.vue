@@ -1,178 +1,227 @@
 <template>
   <div>
-    <v-btn
-      :key="$nuxt.$route.path"
-      color="cusblue2"
-      fixed
-      fab
-      large
-      dark
-      bottom
-      right
-      @click.stop="assignModal = true"
-    >
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
-
     <v-dialog v-model="assignModal" max-width="700" scrollable>
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
-          <h2 class="pa-5 pb-2">เพิ่มข้อมูลสัตว์เลี้ยง</h2>
-          <v-divider class="darker-divider"></v-divider>
-          <div class="py-5 px-10">
-            <v-row dense>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="addPet.name"
-                  color="cusblue"
-                  label="ชื่อสัตว์เลี้ยง"
-                  :rules="rules.name"
-                  @keydown.enter="onEnter('microship')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  ref="microship"
-                  v-model="addPet.microship"
-                  color="cusblue"
-                  label="Microchip No"
-                  @keydown.enter="onEnter('bd'), (menuDate = true)"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-menu
-                  ref="menu"
-                  v-model="menuDate"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="290px"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      ref="bd"
-                      v-model="selectDate"
-                      label="วันเกิด"
-                      color="cusblue"
-                      append-icon="mdi-calendar-month"
-                      :rules="rules.bd"
-                      v-bind="attrs"
-                      readonly
-                      v-on="on"
-                      @keydown.enter="onEnter('year'), (menuDate = false)"
-                    ></v-text-field>
-                  </template>
-                  <v-date-picker
-                    ref="picker"
-                    v-model="addPet.bd"
+        <h2 class="pa-5 pb-2">
+          {{ addPet.id ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'เพิ่มข้อมูลสัตว์เลี้ยง' }}
+        </h2>
+        <v-divider class="darker-divider"></v-divider>
+        <v-card-text class="py-5 px-10">
+          <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
+            <div>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="addPet.name"
+                    :disabled="loading"
                     color="cusblue"
-                    :max="new Date().toISOString().substr(0, 10)"
-                    min="1950-01-01"
-                    value="YYYY-mm"
-                    locale="th"
-                    :show-current="false"
-                    scrollable
-                  ></v-date-picker>
-                </v-menu>
-              </v-col>
-              <v-col cols="2">
-                <v-text-field
-                  ref="year"
-                  v-model="addPet.bd_year"
-                  color="cusblue"
-                  label="ปี"
-                  @change="writeDate"
-                  @keydown.enter="onEnter('month')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="2">
-                <v-text-field
-                  ref="month"
-                  v-model="addPet.bd_month"
-                  color="cusblue"
-                  label="เดือน"
-                  @change="writeDate"
-                  @keydown.enter="onEnter('day')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="2">
-                <v-text-field
-                  ref="day"
-                  v-model="addPet.bd_day"
-                  color="cusblue"
-                  label="วัน"
-                  @change="writeDate"
-                  @keydown.enter="onEnter('type')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="2">
-                <v-select
-                  ref="type"
-                  v-model="addPet.type"
-                  :items="type"
-                  label="ประเภท"
-                  :rules="rules.type"
-                  @keydown.enter="onEnter('gender')"
-                ></v-select>
-              </v-col>
-              <v-col cols="2">
-                <v-select
-                  ref="gender"
-                  v-model="addPet.gender"
-                  :items="gender"
-                  label="เพศ"
-                  :rules="rules.gender"
-                  @keydown.enter="onEnter('color')"
-                ></v-select>
-              </v-col>
-              <v-col cols="2">
-                <v-text-field
-                  ref="color"
-                  v-model="addPet.color"
-                  color="cusblue"
-                  label="สี"
-                  :rules="rules.color"
-                  @keydown.enter="onEnter('sterile')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="3">
-                <v-select
-                  ref="sterile"
-                  v-model="addPet.sterile"
-                  :items="sterile"
-                  label="การทำหมัน"
-                  :rules="rules.sterile"
-                  @keydown.enter="onEnter('scar')"
-                ></v-select>
-              </v-col>
-              <v-col cols="3">
-                <v-text-field
-                  ref="scar"
-                  v-model="addPet.scar"
-                  color="cusblue"
-                  label="ตำหนิ"
-                  @keydown.enter="onEnter('note')"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="note"
-                  v-model="addPet.note"
-                  color="cusblue"
-                  label="Note"
-                  @keydown.enter="submitPet"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </div>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="cusblue2" text @click="cancelForm">ยกเลิก</v-btn>
-            <v-btn color="cusblue2" :disabled="!valid" text @click="submitPet">
-              บันทึก
-            </v-btn>
-          </v-card-actions>
-        </v-form>
+                    label="ชื่อสัตว์เลี้ยง"
+                    :rules="rules.name"
+                    @keydown.enter="onEnter('microship')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    ref="microship"
+                    v-model="addPet.microship"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="Microchip No"
+                    @keydown.enter="onEnter('bd'), (menuDate = true)"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-menu
+                    ref="menu"
+                    v-model="menuDate"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        ref="bd"
+                        v-model="selectDate"
+                        :disabled="loading"
+                        label="วันเกิด"
+                        color="cusblue"
+                        append-icon="mdi-calendar-month"
+                        :rules="rules.bd"
+                        v-bind="attrs"
+                        readonly
+                        v-on="on"
+                        @keydown.enter="onEnter('year'), (menuDate = false)"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      ref="picker"
+                      v-model="addPet.bd"
+                      :disabled="loading"
+                      color="cusblue"
+                      :max="new Date().toISOString().substr(0, 10)"
+                      min="1950-01-01"
+                      value="YYYY-mm"
+                      locale="th"
+                      :show-current="false"
+                      scrollable
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <v-col cols="2">
+                  <v-text-field
+                    ref="year"
+                    v-model="addPet.bd_year"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="ปี"
+                    @change="writeDate"
+                    @keydown.enter="onEnter('month')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="2">
+                  <v-text-field
+                    ref="month"
+                    v-model="addPet.bd_month"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="เดือน"
+                    @change="writeDate"
+                    @keydown.enter="onEnter('day')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="2">
+                  <v-text-field
+                    ref="day"
+                    v-model="addPet.bd_day"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="วัน"
+                    @change="writeDate"
+                    @keydown.enter="onEnter('type')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-select
+                    ref="type"
+                    v-model="addPet.type"
+                    :disabled="loading"
+                    :items="type"
+                    item-text="label"
+                    item-value="id"
+                    label="ประเภท"
+                    :rules="rules.type"
+                    @keydown.enter="onEnter('gender')"
+                  ></v-select>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    ref="breed"
+                    v-model="addPet.breed"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="สายพันธุ์"
+                    :rules="rules.breed"
+                    @keydown.enter="onEnter('scar')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-select
+                    ref="gender"
+                    v-model="addPet.gender"
+                    :disabled="loading"
+                    :items="gender"
+                    item-text="label"
+                    item-value="id"
+                    label="เพศ"
+                    :rules="rules.gender"
+                    @keydown.enter="onEnter('color')"
+                  ></v-select>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    ref="color"
+                    v-model="addPet.color"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="สี"
+                    :rules="rules.color"
+                    @keydown.enter="onEnter('sterile')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-select
+                    ref="sterile"
+                    v-model="addPet.sterile"
+                    :disabled="loading"
+                    :items="sterile"
+                    item-text="label"
+                    item-value="state"
+                    label="การทำหมัน"
+                    :rules="rules.sterile"
+                    @keydown.enter="onEnter('breed')"
+                  ></v-select>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    ref="scar"
+                    v-model="addPet.scar"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="ตำหนิ"
+                    :rules="rules.scar"
+                    @keydown.enter="onEnter('note')"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    ref="note"
+                    v-model="addPet.note"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="Note"
+                    auto-grow
+                    row-height="24"
+                    rows="1"
+                    :rules="rules.note"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
+            </div>
+            <v-alert
+              v-model="alert"
+              dense
+              text
+              color="red"
+              transition="scroll-y-transition"
+              dismissible
+            >
+              {{ error }}
+            </v-alert>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="cusblue2" :disabled="loading" text @click="cancelForm">
+            ยกเลิก
+          </v-btn>
+          <v-btn
+            color="cusblue2"
+            :disabled="!valid || loading"
+            text
+            @click="addPet.id ? updatePet() : submitPet()"
+          >
+            <v-progress-circular
+              v-show="loading"
+              class="mr-2"
+              indeterminate
+              color="cusblue2"
+              :size="15"
+              :width="2"
+            ></v-progress-circular>
+            {{ addPet.id ? 'บันทึก' : 'ตกลง' }}
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -186,22 +235,33 @@ export default {
       assignModal: false,
       date: null,
       menuDate: false,
+
       valid: true,
-      type: ['หมา', 'แมว', 'นก', 'หนู'],
-      gender: ['ผู้', 'เมีย'],
-      sterile: ['ทำแล้ว', 'ยังไม่ทำ'],
+      loading: false,
+      alert: false,
+      error: '',
+
+      type: [],
+      gender: [],
+      sterile: [
+        { state: 1, label: 'ทำแล้ว' },
+        { state: 2, label: 'ยังไม่ทำ' },
+      ],
+
       addPet: {
+        id: '',
         name: '',
         microship: '',
-        status: 'ทั่วไป',
+        // status: '',
         bd: null,
         bd_year: '',
         bd_month: '',
         bd_day: '',
-        type: '',
-        gender: '',
+        type: 1,
+        gender: 1,
         color: '',
-        sterile: '',
+        sterile: 2,
+        breed: '',
         scar: '',
         note: '',
       },
@@ -213,11 +273,11 @@ export default {
         bd: [(v) => !!v || 'กรุณาเลือกวันเกิดของสัตว์เลี้ยง'],
         type: [(v) => !!v || 'กรุณาเลือกประเภทสัตว์เลี้ยง'],
         gender: [(v) => !!v || 'กรุณาเลือกเพศสัตว์เลี้ยง'],
-        color: [
-          (v) => !!v || 'กรุณากรอกสีสัตว์เลี้ยง',
-          (v) => (v && v.length <= 100) || 'ไม่ควรกรอกสีเกิน 100 ตัวอักษร',
-        ],
+        breed: [(v) => v.length <= 100 || 'ไม่ควรกรอกพันธุ์เกิน 100 ตัวอักษร'],
+        color: [(v) => v.length <= 100 || 'ไม่ควรกรอกสีเกิน 100 ตัวอักษร'],
         sterile: [(v) => !!v || 'กรุณาเลือกการทำหมัน'],
+        scar: [(v) => v.length <= 1000 || 'ไม่ควรกรอกตำหนิเกิน 1000 ตัวอักษร'],
+        note: [(v) => v.length <= 2000 || 'ไม่ควรกรอกโน๊ตเกิน 2000 ตัวอักษร'],
       },
     }
   },
@@ -230,20 +290,56 @@ export default {
       return moment(this.addPet.bd).format('DD/MM/YYYY')
     },
   },
+  watch: {
+    assignModal() {
+      if (this.assignModal === false) {
+        this.resetPet()
+      }
+    },
+  },
+  async mounted() {
+    const gender = await this.$axios.$get('/api/master/pet-genders')
+    const type = await this.$axios.$get('/api/master/pet-types')
+    this.gender = gender.results
+    this.type = type.results
+  },
   methods: {
+    open(pet) {
+      this.assignModal = true
+      // ยังไม่เสร็จ
+      if (pet) {
+        this.addPet = {
+          id: pet.id,
+          name: pet.name || '',
+          microship: pet.microchipNo || '',
+          // status: '',
+          bd: pet.birthDate,
+          bd_year: '',
+          bd_month: '',
+          bd_day: '',
+          type: pet.type.id,
+          gender: pet.gender.id,
+          color: pet.color || '',
+          sterile: pet.sterilization ? 1 : 2,
+          breed: pet.breed || '',
+          scar: pet.earmark || '',
+          note: pet.note || '',
+        }
+      }
+    },
     onEnter(ref) {
       this.$refs[ref].focus()
     },
+    // After Change value in Year, Month, Day Textfield it will subtract now Date for Pet BD
     writeDate() {
-      // After Change value in Year, Month, Day Textfield it will subtract now Date for Pet BD
       let now = moment()
       now = moment(now).subtract(this.addPet.bd_year, 'years')
       now = moment(now).subtract(this.addPet.bd_month, 'months')
       now = moment(now).subtract(this.addPet.bd_day, 'days')
       this.addPet.bd = moment(now).format('YYYY-MM-DD')
     },
+    // This Function will calculate Picked Date for Year, Month, Day Textfield
     calcDate(date) {
-      // This Function will calculate Picked Date for Year, Month, Day Textfield
       const nowDate = moment()
       const pickDate = moment(date.toString(), 'YYYY-MM-DD')
       const dateDiff = moment.duration(nowDate.diff(pickDate))
@@ -251,38 +347,105 @@ export default {
       this.addPet.bd_month = dateDiff.months()
       this.addPet.bd_day = dateDiff.days()
     },
+    // ************** REQUEST ************
     submitPet() {
       if (this.$refs.form.validate()) {
-        // this.$store.commit('record/addPet', [this.addPet, this.$route.params.owner])
-        // const sendPet = { ...this.addPet }
-        this.$store
-          .dispatch('addPet', {
-            id: this.$route.params.owner,
-            pet: this.addPet,
+        this.loading = true
+        const pet = { ...this.addPet }
+        const sendPet = {
+          name: pet.name,
+          breed: pet.breed,
+          color: pet.color,
+          sterilization:
+            pet.sterile === 1 ? true : pet.sterile === 2 ? false : '',
+          ownerId: this.$route.params.owner,
+          genderId: pet.gender,
+          typeId: pet.type,
+          birthDate: pet.bd,
+          earmark: pet.scar,
+          note: pet.note,
+          microchipNo: pet.microship,
+        }
+        // console.log(sendPet)
+        this.$axios
+          .$post('/api/pets', sendPet)
+          .then((res) => {
+            this.successSubmit(res)
           })
-          .then(() => {
-            this.resetPet()
-            this.assignModal = false
+          .catch((err) => {
+            this.errorSubmit(err)
           })
       }
     },
+    updatePet() {
+      if (this.$refs.form.validate()) {
+        this.loading = true
+        const pet = { ...this.addPet }
+        const sendPet = {
+          name: pet.name,
+          breed: pet.breed,
+          color: pet.color,
+          sterilization:
+            pet.sterile === 1 ? true : pet.sterile === 2 ? false : '',
+          ownerId: this.$route.params.owner,
+          genderId: pet.gender,
+          typeId: pet.type,
+          birthDate: pet.bd,
+          earmark: pet.scar,
+          note: pet.note,
+          microchipNo: pet.microship,
+        }
+        // console.log(sendPet)
+        this.$axios
+          .$patch(`/api/pets/${pet.id}`, sendPet)
+          .then((res) => {
+            this.successSubmit(res)
+          })
+          .catch((err) => {
+            this.errorSubmit(err)
+          })
+      }
+    },
+    // Result **********
+    successSubmit(res) {
+      this.loading = false
+      this.alert = false
+      this.assignModal = false
+      this.resetPet()
+      // console.log(res)
+      this.$emit('update', res)
+    },
+    errorSubmit(error) {
+      this.loading = false
+      this.alert = true
+      this.error = error.response.data.error.message
+    },
+
+    // Fix Reset Dialog********
     cancelForm() {
       this.resetPet()
       this.assignModal = false
     },
     resetPet() {
-      this.addPet.name = ''
-      this.addPet.microship = ''
-      this.addPet.bd = null
-      this.addPet.bd_year = ''
-      this.addPet.bd_month = ''
-      this.addPet.bd_day = ''
-      this.addPet.type = ''
-      this.addPet.gender = ''
-      this.addPet.color = ''
-      this.addPet.sterile = ''
-      this.addPet.scar = ''
-      this.addPet.note = ''
+      this.addPet = {
+        id: '',
+        name: '',
+        microship: '',
+        // status: '',
+        bd: null,
+        bd_year: '',
+        bd_month: '',
+        bd_day: '',
+        type: 1,
+        gender: 1,
+        color: '',
+        sterile: 2,
+        breed: '',
+        scar: '',
+        note: '',
+      }
+      this.valid = true
+      this.$refs.form.resetValidation()
     },
   },
 }

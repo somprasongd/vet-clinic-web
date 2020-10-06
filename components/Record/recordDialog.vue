@@ -1,22 +1,10 @@
 <template>
   <div>
-    <v-btn
-      :key="$nuxt.$route.path"
-      color="cusblue2"
-      fixed
-      fab
-      large
-      dark
-      bottom
-      right
-      @click.stop="assignModal = true"
-    >
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
-
     <v-dialog v-model="assignModal" max-width="700" scrollable>
       <v-card>
-        <h2 class="pa-5 pb-2">เพิ่มข้อมูลลูกค้า</h2>
+        <h2 class="pa-5 pb-2">
+          {{ addCustomer.id ? 'แก้ไขข้อมูลลูกค้า' : 'เพิ่มข้อมูลลูกค้า' }}
+        </h2>
         <v-divider class="darker-divider"></v-divider>
         <v-card-text class="py-5 px-10">
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
@@ -150,7 +138,7 @@
             color="cusblue2"
             :disabled="!valid || loading"
             text
-            @click="submitCustomer()"
+            @click="addCustomer.id ? updateCustomer() : submitCustomer()"
           >
             <v-progress-circular
               v-show="loading"
@@ -160,7 +148,7 @@
               :size="15"
               :width="2"
             ></v-progress-circular>
-            บันทึก
+            {{ addCustomer.id ? 'บันทึก' : 'ตกลง' }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -181,6 +169,7 @@ export default {
 
       nameTitle: [],
       addCustomer: {
+        id: '',
         prefix: 1,
         f_name: '',
         l_name: '',
@@ -228,6 +217,23 @@ export default {
     this.nameTitle = prefix.results
   },
   methods: {
+    open(val) {
+      this.assignModal = true
+      if (this.$route.params.owner) {
+        console.log(val)
+        this.addCustomer = {
+          id: val.id,
+          prefix: val.prefixId || 1,
+          f_name: val.firstName,
+          l_name: val.lastName,
+          houseNo: val.houseNo,
+          address: val.address,
+          email: val.email,
+          tel: val.tels,
+          other: val.remark,
+        }
+      }
+    },
     cancelForm() {
       this.$refs.form.reset()
       this.assignModal = false
@@ -236,21 +242,18 @@ export default {
       this.$refs[ref].focus()
     },
     validatePhone(num) {
+      if (num.length > 2) {
+        this.addCustomer.tel.pop()
+      }
       if (num.length !== 0) {
         return num.every((n) => {
           return n.length >= 9 && n.length <= 10 && n.match(/^[0-9]*$/)
         })
-      } else if (num.length > 2) {
-        this.addCustomer.tel.pop()
       }
     },
+    // ************ Request ************
     submitCustomer() {
       if (this.$refs.form.validate()) {
-        // const sendCustomer = { ...this.addCustomer }
-        // this.$store.dispatch('addCustomer', sendCustomer).then(() => {
-        //   this.$refs.form.reset()
-        //   this.assignModal = false
-        // })
         this.loading = true
         const sendCustomer = { ...this.addCustomer }
         const sendData = {
@@ -263,11 +266,34 @@ export default {
           email: sendCustomer.email,
           remark: sendCustomer.other,
         }
-        console.log(sendCustomer)
         this.$axios
           .$post('/api/members', sendData)
           .then((res) => {
             this.successSubmit(res)
+          })
+          .catch((error) => {
+            this.errorSubmit(error)
+          })
+      }
+    },
+    updateCustomer() {
+      if (this.$refs.form.validate()) {
+        this.loading = true
+        const sendCustomer = { ...this.addCustomer }
+        const sendData = {
+          prefixId: sendCustomer.prefix,
+          firstName: sendCustomer.f_name,
+          lastName: sendCustomer.l_name,
+          houseNo: sendCustomer.houseNo,
+          address: sendCustomer.address,
+          tels: sendCustomer.tel,
+          email: sendCustomer.email,
+          remark: sendCustomer.other,
+        }
+        this.$axios
+          .$patch(`/api/members/${sendCustomer.id}`, sendData)
+          .then((res) => {
+            this.updateubmit(res)
           })
           .catch((error) => {
             this.errorSubmit(error)
@@ -280,7 +306,15 @@ export default {
         this.assignModal = false
         this.alert = false
         this.$refs.form.reset()
-        console.log(res)
+        this.$router.push(`/record/${res.id}`)
+      }, 500)
+    },
+    updateubmit(res) {
+      setTimeout(() => {
+        this.loading = false
+        this.assignModal = false
+        this.alert = false
+        this.$refs.form.reset()
         this.$emit('update', res)
       }, 500)
     },

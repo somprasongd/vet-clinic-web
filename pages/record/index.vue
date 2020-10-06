@@ -6,7 +6,21 @@
       <recordTable :dessert="member" />
     </div>
     <!-- {{ this.customer }} -->
-    <recordDialog :update="updateMember" />
+    <recordDialog ref="addMemberDialog" />
+
+    <v-btn
+      :key="$nuxt.$route.path"
+      color="cusblue2"
+      fixed
+      fab
+      large
+      dark
+      bottom
+      right
+      @click.stop="addMemberDialog"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -20,41 +34,39 @@ export default {
     recordTable,
     recordDialog,
   },
-  async asyncData({ $axios }) {
-    try {
-      const member = await $axios.$get('/api/registration')
-      return { member: member.results }
-    } catch (err) {
-      console.log(err)
-    }
-  },
+  // async asyncData({ $axios }) {
+  //   try {
+  //     const member = await $axios.$get('/api/registration')
+  //     return { member: member.results }
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // },
   data() {
     return {
-      allMemmber: [],
+      member: [],
     }
   },
-  computed: {
-    customer() {
-      return this.$store.getters.getCustomer
-    },
-  },
   methods: {
-    async filter(val) {
-      try {
-        const filterMember = await this.$axios.$get(
-          `/api/registration?limit=0${
-            val[1] !== '' ? '&' + val[0] + '=' + val[1] : ''
-          }`,
-          { progress: false }
-        )
-        this.member = filterMember.results
-        console.log(this.member)
-      } catch (err) {
-        console.log(err)
-      }
+    addMemberDialog() {
+      this.$refs.addMemberDialog.open()
     },
-    updateMember(val) {
-      //
+    async filter(val) {
+      if (val[1] !== '') {
+        try {
+          const filterMember = await this.$axios.$get(
+            `/api/registration?limit=0${
+              val[1] !== '' ? '&' + val[0] + '=' + val[1] : ''
+            }`,
+            { progress: false }
+          )
+          this.member = filterMember.results
+        } catch (err) {
+          console.log(err)
+        }
+      } else {
+        this.member = []
+      }
     },
   },
 }

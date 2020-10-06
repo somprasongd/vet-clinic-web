@@ -71,11 +71,21 @@ export default {
   },
   watch: {
     search() {
+      // this.$auth.$storage.setLocalStorage('search', this.search, false)
+      localStorage.search = this.search
       this.sendValue()
     },
     select() {
+      // this.$auth.$storage.setLocalStorage('select', this.select, false)
+      localStorage.setItem('select', JSON.stringify(this.select))
       this.sendValue()
     },
+  },
+  mounted() {
+    // this.search = this.$auth.$storage.getState('searchHis')
+    if (localStorage.getItem('select') !== null)
+      this.select = JSON.parse(localStorage.getItem('select'))
+    if (localStorage.search !== undefined) this.search = localStorage.search
   },
   methods: {
     sendValue() {

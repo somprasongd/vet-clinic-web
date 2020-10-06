@@ -108,7 +108,7 @@
               <div v-show="transitioned[getItemId(item)]">
                 <!-- container for content. replace with whatever you want -->
                 <div class="pa-2" style="min-height: 100px">
-                  <petTable :owner="item.id" />
+                  <petTable :pets="item.pets" />
                 </div>
               </div>
             </v-expand-transition>
