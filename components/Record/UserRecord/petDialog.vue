@@ -241,8 +241,8 @@ export default {
       alert: false,
       error: '',
 
-      type: [],
-      gender: [],
+      type: this.$store.state.form.petType,
+      gender: this.$store.state.form.petGender,
       sterile: [
         { state: 1, label: 'ทำแล้ว' },
         { state: 2, label: 'ยังไม่ทำ' },
@@ -297,11 +297,17 @@ export default {
       }
     },
   },
-  async mounted() {
-    const gender = await this.$axios.$get('/api/master/pet-genders')
-    const type = await this.$axios.$get('/api/master/pet-types')
-    this.gender = gender.results
-    this.type = type.results
+  mounted() {
+    if (this.$store.state.form.petGender.length === 0) {
+      this.$store.dispatch('form/addGender').then((res) => {
+        this.gender = res
+      })
+    }
+    if (this.$store.state.form.petType.length === 0) {
+      this.$store.dispatch('form/addType').then((res) => {
+        this.type = res
+      })
+    }
   },
   methods: {
     open(pet) {

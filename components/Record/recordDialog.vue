@@ -167,7 +167,7 @@ export default {
       alert: false,
       error: '',
 
-      nameTitle: [],
+      nameTitle: this.$store.state.form.prefixes,
       addCustomer: {
         id: '',
         prefix: 1,
@@ -210,11 +210,12 @@ export default {
       },
     }
   },
-  async mounted() {
-    const prefix = await this.$axios.$get('/api/master/prefixes', {
-      progress: false,
-    })
-    this.nameTitle = prefix.results
+  mounted() {
+    if (this.$store.state.form.prefixes.length === 0) {
+      this.$store.dispatch('form/addPrefixes').then((res) => {
+        this.nameTitle = res
+      })
+    }
   },
   methods: {
     open(val) {
