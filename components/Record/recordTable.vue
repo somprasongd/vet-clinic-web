@@ -11,6 +11,8 @@
       disable-pagination
       hide-default-footer
       fixed-header
+      color="cusblue"
+      :loading="loading"
       height="calc(100vh - 160px)"
     >
       <!-- <template v-slot:item="{ item, isMobile, headers, index }">
@@ -71,7 +73,7 @@
       <template v-slot:[`item.fullName`]="{ item }">
         <div class="font-weight-medium">
           <nuxt-link
-            class="bold-owner text-decoration-none"
+            class="bold-owner text-decoration-none text-truncate"
             :to="'/record/' + item.id"
             >{{ item.fullName }}
             <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
@@ -131,6 +133,11 @@ export default {
       type: Array,
       required: false,
     },
+    loading: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   data() {
     return {
@@ -144,11 +151,17 @@ export default {
           align: 'center',
           sortable: false,
           value: 'id',
+          width: '100',
         },
-        { text: 'รหัส', width: '150', value: 'code', sortable: false },
+        { text: 'รหัส', value: 'code', width: '200', sortable: false },
         { text: 'เจ้าของ', value: 'fullName', sortable: false },
         { text: 'เบอร์ติดต่อ', value: 'tels', sortable: false },
-        { text: 'ที่อยู่', value: 'fullAddress', sortable: false },
+        {
+          text: 'ที่อยู่',
+          value: 'fullAddress',
+          width: '300',
+          sortable: false,
+        },
         {
           text: 'ข้อมูลสัตว์เลี้ยง',
           align: 'center',
