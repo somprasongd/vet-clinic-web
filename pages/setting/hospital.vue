@@ -4,10 +4,22 @@
 
     <div class="custom-container">
       <v-row no-gutters>
-        <v-col cols="4" sm="3" md="2">
+        <v-col
+          :class="this.$vuetify.breakpoint.smAndUp ? 'px-2' : ''"
+          cols="12"
+          sm="4"
+          md="3"
+          lg="2"
+        >
           <settingTab />
         </v-col>
-        <v-col class="pl-5" cols="8" sm="9" md="10">
+        <v-col
+          :class="this.$vuetify.breakpoint.smAndUp ? 'px-2' : ''"
+          cols="12"
+          sm="8"
+          md="9"
+          lg="10"
+        >
           <hospitalForm />
         </v-col>
       </v-row>
