@@ -10,22 +10,55 @@
               <v-col cols="6">
                 <v-select
                   v-model="sendCheck.doctor"
-                  :items="this.$store.state.doctor.doctors"
+                  :disabled="loading"
+                  :items="doctor"
+                  item-text="name"
+                  item-value="id"
+                  color="cusblue"
+                  item-color="cusblue"
                   label="แพทย์ผู้ตรวจ"
-                  :rules="rules.doctor"
+                  :menu-props="{ closeOnContentClick: true }"
+                >
+                  <template v-slot:prepend-item>
+                    <v-list-item
+                      :style="
+                        sendCheck.doctor === ''
+                          ? 'background-color: #e2f5fc'
+                          : ''
+                      "
+                      ripple
+                      @click="sendCheck.doctor = ''"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title
+                          :class="
+                            sendCheck.doctor === '' ? 'cusblue--text' : ''
+                          "
+                        >
+                          ไม่ระบุแพทย์
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-divider class="mt-2"></v-divider>
+                  </template>
+                </v-select>
+              </v-col>
+              <v-col cols="6">
+                <v-select
+                  v-model="sendCheck.important"
+                  :disabled="loading"
+                  :items="priority"
+                  item-text="label"
+                  item-value="id"
+                  color="cusblue"
+                  label="ความสำคัญ"
+                  :rules="rules.important"
                 ></v-select>
               </v-col>
               <v-col cols="6">
                 <v-text-field
-                  v-model="sendCheck.important"
-                  color="cusblue"
-                  label="ความสำคัญ"
-                  :rules="rules.important"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
                   v-model="sendCheck.weight"
+                  :disabled="loading"
                   color="cusblue"
                   label="นำหนัก / kg"
                   :rules="rules.weight"
@@ -34,6 +67,7 @@
               <v-col cols="6">
                 <v-text-field
                   v-model="sendCheck.temp"
+                  :disabled="loading"
                   color="cusblue"
                   label="อุณหภูมิ / C°"
                   :rules="rules.temp"
@@ -42,6 +76,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="ดูอาการ"
                   label="ดูอาการ"
@@ -50,6 +85,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="ทำแผล"
                   label="ทำแผล"
@@ -58,6 +94,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="ฟังผลตรวจ"
                   label="ฟังผลตรวจ Lab"
@@ -66,6 +103,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="ฉีดยา"
                   label="ฉีดยา"
@@ -74,6 +112,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="ให้น้ำเกลือ"
                   label="ให้น้ำเกลือ"
@@ -82,6 +121,7 @@
               <v-col cols="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
+                  :disabled="loading"
                   class="mx-2"
                   value="Xray / Ultrasound"
                   label="Xray / Ultrasound"
@@ -90,15 +130,17 @@
               <v-col cols="12" class="px-3">
                 <v-row align="center" no-gutters>
                   <v-checkbox
-                    v-model="enabled"
+                    v-model="sendCheck.do.other.enabled"
+                    :disabled="loading"
                     hide-details
                     class="shrink mr-2 mt-0"
                     label="อื่นๆ"
                   ></v-checkbox>
                   <v-text-field
-                    v-model="sendCheck.do.other"
+                    v-model="sendCheck.do.other.text"
+                    color="cusblue"
                     dense
-                    :disabled="!enabled"
+                    :disabled="!sendCheck.do.other.enabled || loading"
                     class="mt-5"
                   ></v-text-field>
                 </v-row>
@@ -106,6 +148,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="sendCheck.problem"
+                  :disabled="loading"
                   color="cusblue"
                   label="สาเหตุการเข้ารับบริการ"
                 ></v-text-field>
@@ -114,15 +157,28 @@
           </div>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="cusblue2" text @click="sendCheckDialog = false">
+            <v-btn
+              color="cusblue2"
+              :disabled="loading"
+              text
+              @click="sendCheckDialog = false"
+            >
               ไม่ส่ง
             </v-btn>
             <v-btn
               color="cusblue2"
-              :disabled="!valid"
+              :disabled="!valid || loading"
               text
               @click="submitCheck"
             >
+              <v-progress-circular
+                v-show="loading"
+                class="mr-2"
+                indeterminate
+                color="cusblue2"
+                :size="15"
+                :width="2"
+              ></v-progress-circular>
               ส่ง
             </v-btn>
           </v-card-actions>
@@ -133,85 +189,93 @@
 </template>
 
 <script>
-import moment from 'moment'
 export default {
-  props: {
-    userDetail: {
-      default: null,
-      type: Object,
-      required: false,
-    },
-  },
   data() {
     return {
-      petId: '',
-
-      doctor: ['Doctor', 'Doctor1', 'Doctor2'],
-      nameTitle: ['คุณ', 'นาย', 'นาง', 'นางสาว'],
-
       sendCheckDialog: false,
-      enabled: false,
 
-      userDetails: this.userDetail,
+      doctor: this.$store.state.form.doctor,
+      priority: this.$store.state.form.priority,
+
+      loading: false,
+
       sendCheck: {
+        petId: '',
         type: '',
         time: '',
         status: '',
         doctor: '',
-        important: '',
+        important: 1,
         weight: '',
         temp: '',
         do: {
           check: [],
-          other: '',
+          other: { text: '', enabled: false },
         },
         problem: '',
       },
 
       valid: true,
       rules: {
-        doctor: [(v) => !!v || 'กรุณาเลือกแพทย์ผู้ตรวจ'],
-        important: [
-          (v) => !!v || 'กรุณากรอกความสำคัญ',
-          (v) =>
-            (v && v.length <= 100) || 'ไม่ควรกรอกความสำคัญเกิน 100 ตัวอักษร',
-        ],
+        important: [(v) => !!v || 'กรุณาเลือกความสำคัญ'],
         weight: [
           (v) => !!v || 'กรุณากรอกน้ำหนัก',
           (v) => /^[0-9]*$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
-          (v) => (v && v.length <= 3) || 'ไม่ควรกรอกน้ำหนักเกิน 10 ตัวอักษร',
+          (v) => (v && v.length <= 3) || 'ไม่ควรกรอกน้ำหนักเกิน 3 หลัก',
         ],
         temp: [
           (v) => !!v || 'กรุณากรอกอุณหภูมิ',
           (v) => /^[0-9]*$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
-          (v) => (v && v.length <= 3) || 'ไม่ควรกรอกอุณหภูมิเกิน 10 ตัวอักษร',
+          (v) => (v && v.length <= 3) || 'ไม่ควรกรอกอุณหภูมิเกิน 3 หลัก',
         ],
       },
     }
   },
+  mounted() {
+    if (this.$store.state.form.doctor.length === 0) {
+      this.$store.dispatch('form/addDoctor').then((res) => {
+        this.doctor = res
+      })
+    }
+    if (this.$store.state.form.priority.length === 0) {
+      this.$store.dispatch('form/addPriority').then((res) => {
+        this.priority = res
+      })
+    }
+  },
   methods: {
     open(id) {
-      this.petId = id
+      this.sendCheck.petId = id
       this.sendCheckDialog = true
     },
     submitCheck() {
       if (this.$refs.form.validate()) {
-        // console.log(this.petId)
-        this.sendCheck.type = 'OPD'
-        this.sendCheck.status = 'รอตรวจ'
-        this.sendCheck.time = moment().format('YYYY-MM-DD, h:mm:ss a')
+        this.loading = true
+        const pet = { ...this.sendCheck }
+        if (pet.do.other.enabled && pet.do.other.text !== '') {
+          pet.do.check.push(pet.do.other.text)
+        }
+        const sendPet = {
+          petId: pet.petId,
+          doctorId: pet.doctor,
+          visitPriorityId: pet.important,
+          weight: pet.weight,
+          temp: pet.temp,
+          visitCause: pet.do.check.join(', '),
+          note: pet.problem,
+        }
 
-        // this.userDetails.status = this.sendCheck
-
-        this.$store
-          .dispatch('queue/addQueueOPD', {
-            user: this.userDetails,
-            petId: this.petId,
-            status: this.sendCheck,
+        this.$axios
+          .$post('/api/visits', sendPet)
+          .then((res) => {
+            setTimeout(() => {
+              this.loading = false
+              this.$router.push('/queue')
+            }, 500)
           })
-          .then(() => {
-            // this.$refs.form.reset()
-            this.sendCheckDialog = false
+          .catch((err) => {
+            console.log(err)
+            this.loading = false
           })
       }
     },
