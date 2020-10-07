@@ -48,7 +48,6 @@
         flat
         hide-details
         autocomplete="off"
-        @change="test()"
       ></v-text-field>
     </v-row>
   </v-card>
@@ -91,9 +90,6 @@ export default {
   methods: {
     sendValue() {
       this.$emit('search', [this.select.value, this.search])
-    },
-    test() {
-      console.log('hi')
     },
   },
 }
