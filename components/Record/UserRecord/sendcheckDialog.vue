@@ -2,10 +2,10 @@
   <div>
     <v-dialog v-model="sendCheckDialog" max-width="700">
       <v-card>
-        <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
-          <h2 class="pa-5 pb-2">ส่งตรวจ</h2>
-          <v-divider class="darker-divider"></v-divider>
-          <div class="py-5 px-10">
+        <h2 class="pa-5 pb-2">ส่งตรวจ</h2>
+        <v-divider class="darker-divider"></v-divider>
+        <v-card-text class="py-5 px-10">
+          <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <v-row dense>
               <v-col cols="6">
                 <v-select
@@ -154,35 +154,46 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-          </div>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="cusblue2"
-              :disabled="loading"
+            <v-alert
+              v-model="alert"
+              dense
               text
-              @click="sendCheckDialog = false"
+              color="red"
+              transition="scroll-y-transition"
+              dismissible
             >
-              ไม่ส่ง
-            </v-btn>
-            <v-btn
+              {{ error }}
+            </v-alert>
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="cusblue2"
+            :disabled="loading"
+            text
+            @click="sendCheckDialog = false"
+          >
+            ไม่ส่ง
+          </v-btn>
+          <v-btn
+            color="cusblue2"
+            :disabled="!valid || loading"
+            text
+            @click="submitCheck"
+          >
+            <v-progress-circular
+              v-show="loading"
+              class="mr-2"
+              indeterminate
               color="cusblue2"
-              :disabled="!valid || loading"
-              text
-              @click="submitCheck"
-            >
-              <v-progress-circular
-                v-show="loading"
-                class="mr-2"
-                indeterminate
-                color="cusblue2"
-                :size="15"
-                :width="2"
-              ></v-progress-circular>
-              ส่ง
-            </v-btn>
-          </v-card-actions>
-        </v-form>
+              :size="15"
+              :width="2"
+            ></v-progress-circular>
+            ส่ง
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -198,6 +209,8 @@ export default {
       priority: this.$store.state.form.priority,
 
       loading: false,
+      alert: false,
+      error: '',
 
       sendCheck: {
         petId: '',
@@ -257,7 +270,7 @@ export default {
         }
         const sendPet = {
           petId: pet.petId,
-          doctorId: pet.doctor,
+          doctorId: pet.doctor === '' ? null : pet.doctor,
           visitPriorityId: pet.important,
           weight: pet.weight,
           temp: pet.temp,
@@ -270,12 +283,16 @@ export default {
           .then((res) => {
             setTimeout(() => {
               this.loading = false
-              this.$router.push('/queue')
+              this.alert = false
+              this.sendCheckDialog = false
+              this.$refs.form.reset()
+              console.log(res)
             }, 500)
           })
-          .catch((err) => {
-            console.log(err)
+          .catch((error) => {
             this.loading = false
+            this.alert = true
+            this.error = error.response.data.error.message
           })
       }
     },

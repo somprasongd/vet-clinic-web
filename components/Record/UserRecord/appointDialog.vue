@@ -1,7 +1,7 @@
 <template>
-  <v-dialog v-model="depositDialog" max-width="800" scrollable>
+  <v-dialog v-model="appointDialog" max-width="800" scrollable>
     <v-card>
-      <h2 class="pa-5 pb-2">ฝากเลี้ยง</h2>
+      <h2 class="pa-5 pb-2">ทำนัด</h2>
       <v-divider class="darker-divider"></v-divider>
       <v-card-text class="px-7">
         <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
@@ -28,11 +28,26 @@
                     readonly
                     v-on="on"
                   >
+                    <template v-slot:append>
+                      <v-btn
+                        v-for="btn in plusBtn"
+                        :key="btn.value"
+                        class="mb-1 ml-1"
+                        color="cusblue3 white--text"
+                        depressed
+                        icon
+                        small
+                        outlined
+                        @click="plusDate(btn.value)"
+                      >
+                        {{ btn.text }}
+                      </v-btn>
+                    </template>
                   </v-text-field>
                 </template>
                 <v-date-picker
                   ref="picker"
-                  v-model="sendDeposit.DepositDate"
+                  v-model="sendAppoint.appointDate"
                   color="cusblue"
                   :min="new Date().toISOString().substr(0, 10)"
                   value="YYYY-mm"
@@ -45,7 +60,7 @@
             <v-col cols="6">
               <v-menu
                 ref="menu"
-                v-model="DepositTime"
+                v-model="AppointTime"
                 :close-on-content-click="false"
                 transition="scale-transition"
                 offset-y
@@ -53,9 +68,9 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="sendDeposit.DepositTime"
+                    v-model="sendAppoint.appointTime"
                     :disabled="loading"
-                    :rules="rules.DepositTime"
+                    :rules="rules.appointTime"
                     color="cusblue"
                     append-icon="mdi-clock-outline"
                     background-color="white"
@@ -67,20 +82,31 @@
                 </template>
                 <v-time-picker
                   ref="picker"
-                  v-model="sendDeposit.DepositTime"
+                  v-model="sendAppoint.appointTime"
                   color="cusblue"
                   format="24hr"
-                  use-seconds
                   scrollable
                 ></v-time-picker>
               </v-menu>
             </v-col>
             <v-col cols="12">
               <v-textarea
-                v-model="sendDeposit.note"
+                v-model="sendAppoint.cause"
                 :disabled="loading"
-                :rules="rules.note"
-                label="Note"
+                :rules="rules.cause"
+                label="สาเหตุการนัด"
+                color="cusblue"
+                auto-grow
+                row-height="24"
+                rows="1"
+              ></v-textarea>
+            </v-col>
+            <v-col cols="12">
+              <v-textarea
+                v-model="sendAppoint.remark"
+                :disabled="loading"
+                :rules="rules.remark"
+                label="หมายเหตุ"
                 color="cusblue"
                 auto-grow
                 row-height="24"
@@ -110,7 +136,7 @@
           :disabled="!valid || loading"
           class="cusblue2--text text-none"
           text
-          @click="submitDeposit"
+          @click="submitAppoint"
         >
           <v-progress-circular
             v-show="loading"
@@ -133,66 +159,76 @@ export default {
   data() {
     return {
       petId: '',
-      depositDialog: false,
+      appointDialog: false,
       valid: false,
       loading: false,
       alert: false,
       error: '',
 
       menuDate: false,
-      DepositDate: false,
-      DepositTime: false,
+      AppointDate: false,
+      AppointTime: false,
 
-      sendDeposit: {
+      plusBtn: [
+        { text: '+3', value: 3 },
+        { text: '+5', value: 5 },
+        { text: '+7', value: 7 },
+        { text: '+30', value: 30 },
+      ],
+      sendAppoint: {
         petId: '',
-        DepositDate: '',
-        DepositTime: '',
-        note: '',
+        appointDate: '',
+        appointTime: '',
+        cause: '',
+        remark: '',
+        fromVisitId: '',
       },
 
       rules: {
-        DepositDate: [(v) => !!v || 'กรุณาเลือกวันที่นัด'],
-        DepositTime: [(v) => !!v || 'กรุณาเลือกเวลานัด'],
-        note: [
+        appointDate: [(v) => !!v || 'กรุณาเลือกวันที่นัด'],
+        appointTime: [(v) => !!v || 'กรุณาเลือกเวลานัด'],
+        cause: [
+          (v) => !!v || 'กรุณากรอกสาเหตุการนัด',
           (v) => v.length <= 1000 || 'ไม่ควรกรอกสาเหตุการนัด 1000 ตัวอักษร',
+        ],
+        remark: [
+          (v) => v.length <= 1000 || 'ไม่ควรกรอกหมายเหตุเกิน 1000 ตัวอักษร',
         ],
       },
     }
   },
   computed: {
     selectDate() {
-      if (!this.sendDeposit.DepositDate) return null
-      else return moment(this.sendDeposit.DepositDate).format('DD/MM/YYYY')
+      if (!this.sendAppoint.appointDate) return null
+      else return moment(this.sendAppoint.appointDate).format('DD/MM/YYYY')
     },
   },
   methods: {
     open(id) {
-      this.sendDeposit.petId = id
-      this.depositDialog = true
-      this.sendDeposit.DepositDate = new Date().toISOString().substr(0, 10)
-      this.sendDeposit.DepositTime = moment().format('HH:mm:ss')
+      this.sendAppoint.petId = id
+      this.appointDialog = true
+      this.sendAppoint.appointDate = new Date().toISOString().substr(0, 10)
+      this.sendAppoint.appointTime = moment().format('HH:mm')
     },
     plusDate(num) {
-      this.sendDeposit.DepositDate = moment(this.sendDeposit.DepositDate)
+      this.sendAppoint.appointDate = moment(this.sendAppoint.appointDate)
         .add(num, 'days')
         .format('YYYY-MM-DD')
     },
-    submitDeposit() {
+    submitAppoint() {
       if (this.$refs.form.validate()) {
-        // this.loading = true
-        const deposit = { ...this.sendDeposit }
-        const date = moment(
-          deposit.DepositDate + ' ' + deposit.DepositTime,
-          'YYYY-MM-DD HH:mm:ss'
-        )
-        const sendDeposit = {
-          petId: deposit.petId,
-          visitAt: date.toISOString(),
-          note: deposit.note,
+        this.loading = true
+        const appoint = { ...this.sendAppoint }
+        const sendAppoint = {
+          petId: appoint.petId,
+          appointDate: appoint.appointDate,
+          appointTime: appoint.appointTime,
+          cause: appoint.cause,
+          remark: appoint.remark,
+          fromVisitId: null,
         }
-        // console.log(sendDeposit)
         this.$axios
-          .$post('/api/visits/daycare', sendDeposit)
+          .$post('/api/appoints', sendAppoint)
           .then((res) => {
             this.successSubmit(res)
           })
@@ -205,9 +241,10 @@ export default {
       setTimeout(() => {
         this.loading = false
         this.alert = false
-        this.depositDialog = false
-        console.log(res)
-        this.sendDeposit.note = ''
+        this.appointDialog = false
+
+        this.sendAppoint.cause = ''
+        this.sendAppoint.remark = ''
         this.$refs.form.resetValidation()
       }, 500)
     },
