@@ -40,6 +40,7 @@
                       <v-divider></v-divider>
                       <v-btn
                         class="cusblue2--text"
+                        :disabled="pet.death"
                         block
                         text
                         tile

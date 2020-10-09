@@ -226,6 +226,7 @@ export default {
           other: { text: '', enabled: false },
         },
         problem: '',
+        appointId: '',
       },
 
       valid: true,
@@ -244,6 +245,11 @@ export default {
       },
     }
   },
+  watch: {
+    sendCheckDialog() {
+      if (this.sendCheckDialog === false) this.$refs.form.reset()
+    },
+  },
   mounted() {
     if (this.$store.state.form.doctor.length === 0) {
       this.$store.dispatch('form/addDoctor').then((res) => {
@@ -257,8 +263,14 @@ export default {
     }
   },
   methods: {
-    open(id) {
+    open(id, doctor) {
       this.sendCheck.petId = id
+      this.sendCheckDialog = true
+    },
+    open1(id, doctor, appointId) {
+      this.sendCheck.petId = id
+      this.sendCheck.doctor = doctor !== null ? doctor : ''
+      this.sendCheck.appointId = appointId
       this.sendCheckDialog = true
     },
     submitCheck() {
@@ -276,6 +288,7 @@ export default {
           temp: pet.temp,
           visitCause: pet.do.check.join(', '),
           note: pet.problem,
+          appointId: pet.appointId === '' ? null : pet.appointId,
         }
 
         this.$axios
@@ -285,8 +298,6 @@ export default {
               this.loading = false
               this.alert = false
               this.sendCheckDialog = false
-              this.$refs.form.reset()
-              console.log(res)
             }, 500)
           })
           .catch((error) => {

@@ -2,6 +2,9 @@ export const state = () => ({
   prefixes: [],
   petGender: [],
   petType: [],
+  doctor: [],
+  visitType: [],
+  priority: [],
 })
 
 export const mutations = {
@@ -13,6 +16,15 @@ export const mutations = {
   },
   setType(state, type) {
     state.petType = type
+  },
+  setDoctor(state, doctor) {
+    state.doctor = doctor
+  },
+  setvsType(state, vsType) {
+    state.visitType = vsType
+  },
+  setPriority(state, priority) {
+    state.priority = priority
   },
 }
 
@@ -37,6 +49,27 @@ export const actions = {
     })
     commit('setType', type.results)
     return type.results
+  },
+  async addDoctor({ commit }) {
+    const doctor = await this.$axios.$get('/api/users?roleId=2', {
+      progress: false,
+    })
+    commit('setDoctor', doctor.results)
+    return doctor.results
+  },
+  async addVisitType({ commit }) {
+    const vsType = await this.$axios.$get('/api/master/visit-types', {
+      progress: false,
+    })
+    commit('setvsType', vsType.results)
+    return vsType.results
+  },
+  async addPriority({ commit }) {
+    const priority = await this.$axios.$get('/api/master/visit-priorities', {
+      progress: false,
+    })
+    commit('setPriority', priority.results)
+    return priority.results
   },
 }
 

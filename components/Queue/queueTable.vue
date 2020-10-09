@@ -3,7 +3,7 @@
     <v-data-table
       class="elevation-4 overflow-y-auto"
       :headers="headers"
-      :items="dataTable"
+      :items="dessert"
       disable-pagination
       hide-default-footer
       fixed-header
@@ -11,24 +11,27 @@
     >
       <template v-slot:[`item.id`]="{ item }">
         <div class="text-center">
-          {{ orderNum(dataTable, item.id) }}
+          {{ orderNum(dessert, item.id) }}
         </div>
+      </template>
+      <template v-slot:[`item.name`]="{ item }">
+        <div>{{ item.pet.owner.name }}</div>
       </template>
       <template v-slot:[`item.pet`]="{ item }">
         <div>{{ item.pet.name + ' (' + item.pet.type + ')' }}</div>
       </template>
       <template v-slot:[`item.time`]="{ item }">
-        <div>{{ $moment(item.status.time).fromNow() }}</div>
+        <div>{{ $moment(item.visitAt).fromNow() }}</div>
       </template>
       <template v-slot:[`item.important`]="{ item }">
-        <div>{{ item.status.important }}</div>
+        <div>{{ item.visitPriority.label }}</div>
       </template>
       <template v-slot:[`item.doctor`]="{ item }">
-        <div>{{ item.status.doctor }}</div>
+        <div>{{ item.doctor !== null ? item.doctor.name : '' }}</div>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <v-chip :color="getColor(item.status.status)" dark small label>
-          {{ item.status.status }}
+        <v-chip :color="getColor(item.visitStatus.id)" dark small label>
+          {{ item.visitStatus.label }}
         </v-chip>
       </template>
       <template v-slot:[`item.action`]="{ item }">
@@ -52,16 +55,27 @@
             </v-list-item>
             <v-divider></v-divider>
             <v-btn
-              v-for="btn in changeAction(item.status.status)"
+              v-for="btn in getActionMenu(
+                item.visitType.id,
+                item.visitStatus.id
+              )"
               :key="btn.text"
               class="cusblue2--text"
               :disabled="btn.disable"
               block
               text
               tile
-              @click="clickAction(item.id, item.status.status, btn.action)"
-              >{{ btn.text }}</v-btn
+              @click="
+                clickAction(
+                  item.visitType.id,
+                  item.visitStatus.id,
+                  btn.action,
+                  item.id
+                )
+              "
             >
+              {{ btn.text }}
+            </v-btn>
           </v-list>
         </v-menu>
       </template>
@@ -72,10 +86,10 @@
 <script>
 export default {
   props: {
-    selectedType: {
-      type: String,
-      required: true,
-    },
+    // selectedType: {
+    //   type: String,
+    //   required: true,
+    // },
     dessert: {
       default: null,
       type: Array,
@@ -128,16 +142,7 @@ export default {
     }
   },
   computed: {
-    // โชว์ข้อมูลในตารางตาม ประเภทการตรวจ
-    dataTable() {
-      const dataTable = []
-      for (const data in this.dessert) {
-        if (this.dessert[data].status.type === this.selectedType) {
-          dataTable.push(this.dessert[data])
-        }
-      }
-      return dataTable
-    },
+    //
   },
   methods: {
     orderNum(data, id) {
@@ -151,22 +156,48 @@ export default {
     },
     // ใช้เปลี่ยนสี Status
     getColor(status) {
-      if (status === 'กำลังตรวจ') return 'rgb(255, 191, 72)'
-      else if (status === 'รอผลตรวจ') return 'rgb(79, 155, 255)'
-      else if (status === 'รอชำระเงิน') return 'rgb(87, 243, 87)'
-      else return 'rgb(255, 98, 98)'
+      if (status === 1) return 'rgb(255, 98, 98)'
+      else if (status === 2) return 'rgb(255, 191, 72)'
+      else if (status === 3) return 'rgb(79, 155, 255)'
+      else if (status === 9) return 'rgb(255, 145, 98)'
+      else return 'rgb(87, 243, 87)'
     },
-    // getIcon (status) {
-    //   if (status === 'กำลังตรวจ') return 'mdi-alarm-light'
-    //   else if (status === 'รอผลตรวจ') return 'mdi-file-document'
-    //   else if (status === 'รอชำระเงิน') return 'mdi-cash-usd'
-    //   else return 'mdi-timelapse'
-    // },
-    clickAction(id, state, btn) {
-      switch (this.selectedType) {
-        case 'OPD':
+    getActionMenu(type, status) {
+      switch (type) {
+        case 1:
+          switch (status) {
+            case 1:
+              return this.actionBtn.OPD_Wait // 'OPD รอตรวจ'
+            case 2:
+              return this.actionBtn.OPD_Check // 'OPD ตรวจรักษา'
+            case 3:
+              return this.actionBtn.OPD_result // 'OPD รอผลตรวจ'
+            default:
+              return this.actionBtn.none // 'OPD รอชำระเงิน'
+          }
+        case 2:
+          switch (status) {
+            case 4:
+              return this.actionBtn.IPD_admit // 'IPD รายงานผล'
+            default:
+              return this.actionBtn.none // 'IPD รอชำระเงิน'
+          }
+        default:
+          switch (status) {
+            case 9:
+              return this.actionBtn.deposit // 'ฝากเลี้ยง ฝากเลี้ยง'
+            default:
+              console.log(status)
+              return this.actionBtn.none // 'ฝากเลี้ยง รอชำระเงิน'
+          }
+      }
+    },
+    clickAction(type, state, btn, id) {
+      switch (type) {
+        case 1:
           switch (state) {
-            case 'รอตรวจ':
+            // 'OPD รอตรวจ'
+            case 1:
               switch (btn) {
                 case 1:
                   this.$router.push('/queue/' + id + '/check')
@@ -175,7 +206,8 @@ export default {
                   alert('noooo')
               }
               break
-            case 'กำลังตรวจ':
+            // 'OPD ตรวจรักษา'
+            case 2:
               switch (btn) {
                 case 1:
                   alert('success')
@@ -184,7 +216,8 @@ export default {
                   alert('noooo')
               }
               break
-            case 'รอผลตรวจ':
+            // 'OPD รอผลตรวจ'
+            case 3:
               switch (btn) {
                 case 1:
                   alert('success')
@@ -193,6 +226,7 @@ export default {
                   alert('noooo')
               }
               break
+            // 'OPD รอชำระเงิน'
             default:
               switch (btn) {
                 case 1:
@@ -203,56 +237,30 @@ export default {
               }
           }
           break
-        case 'IPD':
-          if (state === 'Admit') {
+        case 2:
+          if (state === 4) {
             switch (btn) {
+              // 'IPD รายงานผล'
               case 1:
                 alert('success')
                 break
+              // 'IPD รอชำระเงิน'
               default:
                 alert('noooo')
             }
           }
           break
-        case 'ฝากเลี้ยง':
-          if (state === 'ฝากเลี้ยง') {
+        case 3:
+          if (state === 9) {
             switch (btn) {
+              // 'ฝากเลี้ยง ฝากเลี้ยง'
               case 1:
                 alert('success')
                 break
+              // 'ฝากเลี้ยง รอชำระเงิน'
               default:
                 alert('noooo')
             }
-          }
-      }
-    },
-    // เปลี่ยนปุ่ม Action ตามประเภทการตรวจ และสถานะ
-    changeAction(state) {
-      switch (this.selectedType) {
-        case 'OPD':
-          switch (state) {
-            case 'รอตรวจ':
-              return this.actionBtn.OPD_Wait
-            case 'กำลังตรวจ':
-              return this.actionBtn.OPD_Check
-            case 'รอผลตรวจ':
-              return this.actionBtn.OPD_result
-            default:
-              return this.actionBtn.none
-          }
-        case 'IPD':
-          switch (state) {
-            case 'Admit':
-              return this.actionBtn.IPD_admit
-            default:
-              return this.actionBtn.none
-          }
-        case 'ฝากเลี้ยง':
-          switch (state) {
-            case 'ฝากเลี้ยง':
-              return this.actionBtn.deposit
-            default:
-              return this.actionBtn.none
           }
       }
     },

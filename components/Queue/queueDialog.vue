@@ -55,13 +55,14 @@
                   ref="picker"
                   v-model="date"
                   color="cusblue"
-                  :max="new Date().toISOString().substr(0, 10)"
                   min="1950-01-01"
+                  locale="th"
                 ></v-date-picker>
               </v-menu>
             </v-col>
             <v-col cols="12">
               <v-text-field
+                v-model="ownerName"
                 color="cusblue"
                 background-color="white"
                 label="ชื่อ"
@@ -74,113 +75,138 @@
         <v-divider class="darker-divider"></v-divider>
 
         <v-card-text class="pa-0" style="height: 350px">
-          <v-menu
-            v-for="list in assignList"
-            :key="list.owner"
-            :offset-x="offset"
-            max-width="200"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-list-item
-                class="py-5 px-10"
-                link
-                v-bind="attrs"
-                style="border-bottom: 1px solid rgb(204, 204, 204)"
-                v-on="on"
-              >
-                <v-row align="center" justify="center" no-gutters>
-                  <v-col cols="3" class="font-weight-medium">เจ้าของ</v-col>
-                  <v-col cols="1" class="font-weight-medium text-center"
-                    >:</v-col
-                  >
-                  <v-col cols="8" class="font-weight-medium">{{
-                    list.owner
-                  }}</v-col>
+          <div v-if="appointQueue.length !== 0 && appointQueue !== []">
+            <v-menu
+              v-for="appoint in appointFilter"
+              :key="appoint.id"
+              :offset-x="offset"
+              max-width="200"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-list-item
+                  class="py-5 px-10"
+                  link
+                  v-bind="attrs"
+                  style="border-bottom: 1px solid rgb(204, 204, 204)"
+                  v-on="on"
+                >
+                  <v-row align="center" justify="center" no-gutters>
+                    <v-col cols="3" class="font-weight-medium">เจ้าของ</v-col>
+                    <v-col cols="1" class="font-weight-medium text-center"
+                      >:</v-col
+                    >
+                    <v-col cols="8" class="font-weight-medium">
+                      {{ appoint.pet.owner.name }}
+                    </v-col>
 
-                  <v-col cols="3">สัตว์เลี้ยง</v-col>
-                  <v-col cols="1" class="text-center">:</v-col>
-                  <v-col cols="8">{{ list.pet }}</v-col>
+                    <v-col cols="3">แพทย์</v-col>
+                    <v-col cols="1" class="text-center">:</v-col>
+                    <v-col cols="8">
+                      {{ appoint.doctor !== null ? appoint.doctor.name : '' }}
+                    </v-col>
 
-                  <v-col cols="3">นัดเพื่อ</v-col>
-                  <v-col cols="1" class="text-center">:</v-col>
-                  <v-col cols="8">{{ list.for }}</v-col>
+                    <v-col cols="3">สัตว์เลี้ยง</v-col>
+                    <v-col cols="1" class="text-center">:</v-col>
+                    <v-col cols="8">
+                      {{ appoint.pet.name + '(' + appoint.pet.type + ')' }}
+                    </v-col>
 
-                  <v-col cols="3">เวลา</v-col>
-                  <v-col cols="1" class="text-center">:</v-col>
-                  <v-col cols="8">{{ list.time }}</v-col>
-                </v-row>
-              </v-list-item>
-            </template>
+                    <v-col cols="3">นัดเพื่อ</v-col>
+                    <v-col cols="1" class="text-center">:</v-col>
+                    <v-col cols="8">{{ appoint.cause }}</v-col>
 
-            <v-list class="pa-0">
-              <div class="px-2 pt-3">
-                <h3>ยืนยันเข้ารับบริการ?</h3>
-                <v-divider></v-divider>
-                <v-card-actions class="pa-0 pt-2">
-                  <v-spacer></v-spacer>
-                  <v-btn color="cusblue2" text @click="dialog = false"
-                    >ยกเลิก</v-btn
-                  >
-                  <v-btn color="cusblue2" text @click="dialog = false"
-                    >ตกลง</v-btn
-                  >
-                </v-card-actions>
-              </div>
-            </v-list>
-          </v-menu>
+                    <v-col cols="3">เวลา</v-col>
+                    <v-col cols="1" class="text-center">:</v-col>
+                    <v-col cols="8">{{ appoint.appointTime }} น.</v-col>
+                  </v-row>
+                </v-list-item>
+              </template>
+
+              <v-list class="pa-0">
+                <div class="px-2 pt-3">
+                  <h3>ยืนยันเข้ารับบริการ?</h3>
+                  <v-divider></v-divider>
+                  <v-card-actions class="pa-0 pt-2">
+                    <v-spacer></v-spacer>
+                    <v-btn color="cusblue2" text @click="dialog = false">
+                      ยกเลิก
+                    </v-btn>
+                    <v-btn
+                      color="cusblue2"
+                      text
+                      @click="
+                        sendCheck(appoint.pet.id, appoint.doctor.id, appoint.id)
+                      "
+                    >
+                      ตกลง
+                    </v-btn>
+                  </v-card-actions>
+                </div>
+              </v-list>
+            </v-menu>
+          </div>
+
+          <v-sheet v-else height="100%" tile>
+            <v-row
+              class="fill-height"
+              align="center"
+              justify="center"
+              no-gutters
+            >
+              <span class="grey--text">Not Found Appoint</span>
+            </v-row>
+          </v-sheet>
         </v-card-text>
       </v-card>
     </v-dialog>
+    <sendcheckDialog ref="checkDialog" />
   </div>
 </template>
 
 <script>
+import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
 export default {
+  components: {
+    sendcheckDialog,
+  },
   data() {
     return {
       assignModal: false,
-      date: null,
       menuDate: false,
       offset: true,
-      assignList: [
-        {
-          owner: 'คนแรก',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-        {
-          owner: 'คนสอง',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-        {
-          owner: 'คนสาม',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-        {
-          owner: 'คนสี่',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-        {
-          owner: 'คนห้า',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-        {
-          owner: 'คนหก',
-          pet: 'สัตว์หนึ่ง (หมา)',
-          for: 'ฉัดวัคซีน',
-          time: '15.30 น.',
-        },
-      ],
+      date: null,
+      appointQueue: [],
+      ownerName: '',
     }
+  },
+  computed: {
+    appointFilter() {
+      return this.appointQueue.filter((appoint) => {
+        return appoint.pet.owner.name
+          .toLowerCase()
+          .includes(this.ownerName.toLowerCase())
+      })
+    },
+  },
+  watch: {
+    async date() {
+      const appoint = await this.$axios.$get(
+        `/api/appoints?date=${this.date}`,
+        { progress: false }
+      )
+      this.appointQueue = appoint.results
+    },
+  },
+  mounted() {
+    this.date = new Date().toISOString().substr(0, 10)
+  },
+  methods: {
+    sendCheck(id, doctor, appointId) {
+      this.assignModal = false
+      setTimeout(() => {
+        this.$refs.checkDialog.open1(id, doctor, appointId)
+      }, 150)
+    },
   },
 }
 </script>
