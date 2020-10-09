@@ -1,10 +1,24 @@
 <template>
   <div>
-    <v-dialog v-model="sendCheckDialog" max-width="700">
+    <v-dialog
+      v-model="sendCheckDialog"
+      max-width="700"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">ส่งตรวจ</h2>
+        <v-btn
+          class="mt-4"
+          icon
+          absolute
+          right
+          @click="sendCheckDialog = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="py-5 px-10">
+        <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <v-row dense>
               <v-col cols="6">
@@ -73,7 +87,7 @@
                   :rules="rules.temp"
                 ></v-text-field>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -82,7 +96,7 @@
                   label="ดูอาการ"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -91,7 +105,7 @@
                   label="ทำแผล"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -100,7 +114,7 @@
                   label="ฟังผลตรวจ Lab"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -109,7 +123,7 @@
                   label="ฉีดยา"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -118,7 +132,7 @@
                   label="ให้น้ำเกลือ"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6" sm="4">
                 <v-checkbox
                   v-model="sendCheck.do.check"
                   :disabled="loading"
@@ -146,12 +160,15 @@
                 </v-row>
               </v-col>
               <v-col cols="12">
-                <v-text-field
+                <v-textarea
                   v-model="sendCheck.problem"
                   :disabled="loading"
                   color="cusblue"
-                  label="สาเหตุการเข้ารับบริการ"
-                ></v-text-field>
+                  label="Note"
+                  auto-grow
+                  row-height="24"
+                  rows="1"
+                ></v-textarea>
               </v-col>
             </v-row>
             <v-alert

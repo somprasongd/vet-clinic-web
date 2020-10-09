@@ -1,10 +1,18 @@
 <template>
   <div>
-    <v-dialog v-model="appointDialog" max-width="800" scrollable>
+    <v-dialog
+      v-model="appointDialog"
+      max-width="800"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">ทำนัด</h2>
+        <v-btn class="mt-4" icon absolute right @click="appointDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="px-7">
+        <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <v-row align="center" justify="center">
               <v-col cols="12">
@@ -43,7 +51,7 @@
                   </template>
                 </v-select>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-menu
                   ref="menu"
                   v-model="menuDate"
@@ -94,7 +102,7 @@
                   ></v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-menu
                   ref="menu"
                   v-model="AppointTime"
@@ -194,9 +202,23 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="oldAppointDialog" max-width="500" scrollable>
+    <v-dialog
+      v-model="oldAppointDialog"
+      max-width="500"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">นัดหมายเก่า</h2>
+        <v-btn
+          class="mt-4"
+          icon
+          absolute
+          right
+          @click="oldAppointDialog = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
         <v-tabs class="pb-5" show-arrows grow hide-slider color="cusblue">
           <v-tab v-for="item in oldAppoint" :key="item.id">

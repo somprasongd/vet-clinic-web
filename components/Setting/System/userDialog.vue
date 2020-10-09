@@ -1,12 +1,20 @@
 <template>
   <div>
-    <v-dialog v-model="assignModal" max-width="700" scrollable>
+    <v-dialog
+      v-model="assignModal"
+      max-width="700"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">
           {{ addUser.id == '' ? 'เพิ่ม' : 'แก้ไข' }}
         </h2>
+        <v-btn class="mt-4" icon absolute right @click="assignModal = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="px-7 py-1">
+        <v-card-text>
           <v-row
             v-if="!addUser.id == ''"
             class="pt-2"

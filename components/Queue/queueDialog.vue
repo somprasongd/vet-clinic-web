@@ -18,7 +18,7 @@
       v-model="assignModal"
       max-width="450"
       scrollable
-      :fullscreen="this.$vuetify.breakpoint.smAndDown"
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
     >
       <v-card>
         <h2 class="pa-5 pb-2">ตารางนัดหมาย</h2>

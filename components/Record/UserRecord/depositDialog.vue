@@ -1,12 +1,20 @@
 <template>
-  <v-dialog v-model="depositDialog" max-width="800" scrollable>
+  <v-dialog
+    v-model="depositDialog"
+    max-width="800"
+    scrollable
+    :fullscreen="this.$vuetify.breakpoint.xsOnly"
+  >
     <v-card>
       <h2 class="pa-5 pb-2">ฝากเลี้ยง</h2>
+      <v-btn class="mt-4" icon absolute right @click="depositDialog = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       <v-divider class="darker-divider"></v-divider>
       <v-card-text class="px-7">
         <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
           <v-row align="center" justify="center">
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
               <v-menu
                 ref="menu"
                 v-model="menuDate"
@@ -42,7 +50,7 @@
                 ></v-date-picker>
               </v-menu>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
               <v-menu
                 ref="menu"
                 v-model="DepositTime"

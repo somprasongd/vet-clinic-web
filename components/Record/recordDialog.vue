@@ -1,16 +1,24 @@
 <template>
   <div>
-    <v-dialog v-model="assignModal" max-width="700" scrollable>
+    <v-dialog
+      v-model="assignModal"
+      max-width="700"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">
           {{ addCustomer.id ? 'แก้ไขข้อมูลลูกค้า' : 'เพิ่มข้อมูลลูกค้า' }}
         </h2>
+        <v-btn class="mt-4" icon absolute right @click="assignModal = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="py-5 px-10">
+        <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <div>
               <v-row dense>
-                <v-col cols="4">
+                <v-col cols="12" sm="4">
                   <v-select
                     v-model="addCustomer.prefix"
                     color="cusblue"
@@ -25,7 +33,7 @@
                     @keydown.enter="onEnter('f_name')"
                   ></v-select>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="12" sm="4">
                   <v-text-field
                     ref="f_name"
                     v-model="addCustomer.f_name"
@@ -37,7 +45,7 @@
                     @keydown.enter="onEnter('l_name')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="12" sm="4">
                   <v-text-field
                     ref="l_name"
                     v-model="addCustomer.l_name"
@@ -73,7 +81,7 @@
                     @keydown.enter="onEnter('email')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="12" sm="6">
                   <v-text-field
                     ref="email"
                     v-model="addCustomer.email"
@@ -85,7 +93,7 @@
                     @keydown.enter="onEnter('tel')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="6">
+                <v-col cols="12" sm="6">
                   <v-combobox
                     ref="tel"
                     v-model="addCustomer.tel"

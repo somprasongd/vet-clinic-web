@@ -1,16 +1,24 @@
 <template>
   <div>
-    <v-dialog v-model="assignModal" max-width="700" scrollable>
+    <v-dialog
+      v-model="assignModal"
+      max-width="700"
+      scrollable
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+    >
       <v-card>
         <h2 class="pa-5 pb-2">
           {{ addPet.id ? 'แก้ไขข้อมูลสัตว์เลี้ยง' : 'เพิ่มข้อมูลสัตว์เลี้ยง' }}
         </h2>
+        <v-btn class="mt-4" icon absolute right @click="assignModal = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
-        <v-card-text class="py-5 px-10">
+        <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <div>
               <v-row dense>
-                <v-col cols="6">
+                <v-col cols="12" sm="6">
                   <v-text-field
                     v-model="addPet.name"
                     :disabled="loading"
@@ -68,7 +76,7 @@
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="4" sm="2">
                   <v-text-field
                     ref="year"
                     v-model="addPet.bd_year"
@@ -79,7 +87,7 @@
                     @keydown.enter="onEnter('month')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="4" sm="2">
                   <v-text-field
                     ref="month"
                     v-model="addPet.bd_month"
@@ -90,7 +98,7 @@
                     @keydown.enter="onEnter('day')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="4" sm="2">
                   <v-text-field
                     ref="day"
                     v-model="addPet.bd_day"
@@ -101,7 +109,7 @@
                     @keydown.enter="onEnter('type')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6" sm="3">
                   <v-select
                     ref="type"
                     v-model="addPet.type"
@@ -114,7 +122,7 @@
                     @keydown.enter="onEnter('gender')"
                   ></v-select>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6" sm="3">
                   <v-text-field
                     ref="breed"
                     v-model="addPet.breed"
@@ -125,7 +133,7 @@
                     @keydown.enter="onEnter('scar')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6" sm="3">
                   <v-select
                     ref="gender"
                     v-model="addPet.gender"
@@ -138,7 +146,7 @@
                     @keydown.enter="onEnter('color')"
                   ></v-select>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6" sm="3">
                   <v-text-field
                     ref="color"
                     v-model="addPet.color"
