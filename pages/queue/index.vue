@@ -5,7 +5,7 @@
     <div class="custom-container">
       <queueTable :dessert="visitor" />
     </div>
-    <queueDialog />
+    <queueDialog @updateVisit="updateVisit" />
   </div>
 </template>
 
@@ -56,6 +56,10 @@ export default {
     },
     Doctor(select) {
       this.doctor = select
+    },
+    async updateVisit(val) {
+      const visit = await this.$axios.$get('/api/visits', { progress: false })
+      this.visit = visit.results
     },
   },
 }

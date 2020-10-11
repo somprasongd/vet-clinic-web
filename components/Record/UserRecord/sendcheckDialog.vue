@@ -315,6 +315,13 @@ export default {
               this.loading = false
               this.alert = false
               this.sendCheckDialog = false
+              // ยังไม่เสร็จ
+              if (pet.appointId !== '') {
+                this.$emit('updateAppoint', {
+                  appointId: pet.appointId,
+                  respone: res,
+                })
+              }
             }, 500)
           })
           .catch((error) => {

@@ -134,8 +134,12 @@
                     <v-btn
                       color="cusblue2"
                       text
-                      @click="
-                        sendCheck(appoint.pet.id, appoint.doctor.id, appoint.id)
+                      @click.stop="
+                        sendCheck(
+                          appoint.pet.id,
+                          appoint.doctor !== null ? appoint.doctor.id : '',
+                          appoint.id
+                        )
                       "
                     >
                       ตกลง
@@ -159,7 +163,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <sendcheckDialog ref="checkDialog" />
+    <sendcheckDialog ref="checkDialog" @updateAppoint="UpdateAppoint" />
   </div>
 </template>
 
@@ -206,6 +210,14 @@ export default {
       setTimeout(() => {
         this.$refs.checkDialog.open1(id, doctor, appointId)
       }, 150)
+    },
+    UpdateAppoint(val) {
+      // ยังไม่เสร็จ
+      const index = this.appointQueue.findIndex((appoint) => {
+        return appoint.id === val.appointId
+      })
+      this.appointQueue.splice(index, 1)
+      this.$emit('updateVisit', val.respone)
     },
   },
 }
