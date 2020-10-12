@@ -57,7 +57,7 @@
             </v-col>
           </v-row>
         </div>
-        <div v-if="$route.params.page == 'check'">
+        <div v-if="showbtn">
           <v-divider class="dash-divider hidden-md-and-down"></v-divider>
 
           <div class="px-3 pt-1 hidden-sm-and-down">
@@ -125,6 +125,11 @@ export default {
     dataTable: {
       default: null,
       type: Object,
+      required: false,
+    },
+    showbtn: {
+      type: Boolean,
+      default: false,
       required: false,
     },
   },

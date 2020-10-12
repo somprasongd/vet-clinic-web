@@ -200,7 +200,7 @@ export default {
             case 1:
               switch (btn) {
                 case 1:
-                  this.$router.push('/queue/' + id + '/check')
+                  this.$router.push('/queue/' + id)
                   break
                 default:
                   alert('noooo')

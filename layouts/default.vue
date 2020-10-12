@@ -21,10 +21,11 @@
         <v-tab class="font-weight-regular" to="/setting">ตั้งค่า</v-tab>
       </v-tabs>
       <v-tabs v-else dark show-arrows centered>
-        <v-tab class="font-weight-regular" to="/queue">คิว</v-tab>
+        <v-tab class="font-weight-regular" exact to="/queue">คิว</v-tab>
         <v-tab
           class="font-weight-regular"
-          :to="'/queue/' + this.$route.params.queue + '/check'"
+          exact
+          :to="'/queue/' + this.$route.params.queue + '/'"
           >ห้องตรวจ</v-tab
         >
         <v-tab
