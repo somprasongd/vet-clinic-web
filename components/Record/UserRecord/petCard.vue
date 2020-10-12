@@ -53,7 +53,7 @@
                         block
                         text
                         tile
-                        @click="petDead(pet.id, pet.death ? false : true)"
+                        @click="confirmDeath(pet.id, pet.death ? false : true)"
                       >
                         {{ pet.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
                       </v-btn>
@@ -210,6 +210,29 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="petDeath.petDeathDialog" max-width="290">
+      <v-card>
+        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
+        <v-card-text>
+          คุณแน่ใจหรือไม่ที่จะ
+          {{ petDeath.isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย' }} สัตว์เลี้ยงตัวนี้
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="red"
+            text
+            @click="petDead(petDeath.petId, petDeath.isDeath)"
+          >
+            ใช
+          </v-btn>
+          <v-btn color="grey" text @click="petDeath.petDeathDialog = false">
+            ไม่
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="alreadyHaveDialog.dialog" max-width="350">
       <v-card>
         <h2 class="pl-6 pt-3 pb-2">ต้องการส่งอีกครั้งหรือไม่?</h2>
@@ -272,6 +295,12 @@ export default {
         type: '',
         dialog: false,
       },
+
+      petDeath: {
+        petId: '',
+        isDeath: false,
+        petDeathDialog: false,
+      },
     }
   },
   methods: {
@@ -306,6 +335,13 @@ export default {
     },
     onClickApp(id) {
       this.$refs.appDialog.open(id)
+    },
+    confirmDeath(id, death) {
+      this.petDeath = {
+        petId: id,
+        petDeathDialog: true,
+        isDeath: death,
+      }
     },
     calcAge(date) {
       const nowDate = moment()
@@ -342,6 +378,7 @@ export default {
           const index = this.pets.findIndex((pet) => {
             return pet.id === id
           })
+          this.petDeath.petDeathDialog = false
           this.pets[index].death = state
         })
         .catch((err) => {
