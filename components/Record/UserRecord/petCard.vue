@@ -138,7 +138,9 @@
                 </v-col>
                 <v-col lg="12" sm="12" cols="12">
                   <span class="font-weight-medium">นัดหมายครั้งต่อไป :</span>
-                  <span class="font-weight-light">{{ 'pet.appoint' }}</span>
+                  <span class="font-weight-light">{{
+                    nextAppoint(pet.id)
+                  }}</span>
                 </v-col>
               </v-row>
             </v-col>
@@ -384,6 +386,15 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    },
+    async nextAppoint(id) {
+      try {
+        const date = await this.$axios.$get(`/api/appoints?petId=${id}&limit=1`)
+        console.log(date.results[0].appointDate)
+        return date.results[0].appointDate
+      } catch (e) {
+        console.log(e)
+      }
     },
   },
 }
