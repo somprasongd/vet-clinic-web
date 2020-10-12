@@ -40,7 +40,7 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="date"
+                    v-model="selectDate"
                     color="cusblue"
                     append-icon="mdi-calendar-month"
                     background-color="white"
@@ -168,7 +168,9 @@
 </template>
 
 <script>
+import moment from 'moment'
 import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
+
 export default {
   components: {
     sendcheckDialog,
@@ -184,6 +186,10 @@ export default {
     }
   },
   computed: {
+    selectDate() {
+      if (!this.date) return null
+      else return moment(this.date).format('DD/MM/YYYY')
+    },
     appointFilter() {
       return this.appointQueue.filter((appoint) => {
         return appoint.pet.owner.name
@@ -194,11 +200,15 @@ export default {
   },
   watch: {
     async date() {
-      const appoint = await this.$axios.$get(
-        `/api/appoints?date=${this.date}`,
-        { progress: false }
-      )
-      this.appointQueue = appoint.results
+      try {
+        const appoint = await this.$axios.$get(
+          `/api/appoints?date=${this.date}`,
+          { progress: false }
+        )
+        this.appointQueue = appoint.results
+      } catch (error) {
+        console.log(error)
+      }
     },
   },
   mounted() {
@@ -212,7 +222,6 @@ export default {
       }, 150)
     },
     UpdateAppoint(val) {
-      // ยังไม่เสร็จ
       const index = this.appointQueue.findIndex((appoint) => {
         return appoint.id === val.appointId
       })

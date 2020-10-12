@@ -34,7 +34,6 @@ export default {
     //   return this.$store.state.queue.customerQueue
     // },
     visitor() {
-      // ยังไม่เสร็จ
       return this.visit.filter((visit) => {
         if (this.doctor !== '') {
           if (visit.doctor !== null) {
