@@ -1,126 +1,156 @@
 <template>
-  <v-card class="elevation-4" max-height="100%">
-    <v-card-title class="pb-1 pt-3">
-      ข้อมูลเจ้าของสัตว์ และสัตว์เลี้ยง
-    </v-card-title>
+  <div>
+    <v-card class="elevation-4" max-height="100%">
+      <v-card-title class="pb-1 pt-3">
+        ข้อมูลเจ้าของสัตว์ และสัตว์เลี้ยง
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="dataTable.visitStatus.id === 1"
+          color="cusblue3"
+          icon
+          @click="startCheck(dataTable.id)"
+        >
+          <v-icon>mdi-check-circle</v-icon>
+        </v-btn>
+        <v-btn
+          v-if="dataTable.visitStatus.id === 1"
+          color="cusblue3"
+          icon
+          @click="openSendDocs(dataTable.doctor.name, dataTable.id)"
+        >
+          <v-icon>mdi-share-circle</v-icon>
+        </v-btn>
+      </v-card-title>
 
-    <v-divider class="darker-divider"></v-divider>
+      <v-divider class="darker-divider"></v-divider>
 
-    <div class="pa-4">
-      <v-row justify="center" align="center" dense>
-        <v-col cols="4"
-          ><v-img
-            :src="require('~/assets/profile/003-dog-1.svg')"
-            width="100"
-          ></v-img
-        ></v-col>
-        <v-col cols="8">
-          <v-row no-gutters class="font-weight-bold">
-            <v-col cols="5">ชื่อสัตว์เลี้ยง</v-col>
-            <v-col cols="1">:</v-col>
-            <v-col cols="6">Snow</v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="5">ประเภท</v-col>
-            <v-col cols="1">:</v-col>
-            <v-col cols="6">หมา</v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="5">เพศ</v-col>
-            <v-col cols="1">:</v-col>
-            <v-col cols="6">เมีย</v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="5">อายุ</v-col>
-            <v-col cols="1">:</v-col>
-            <v-col cols="6">5 ปี 8 เดือน</v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </div>
+      <div class="pa-4">
+        <v-row justify="center" align="center" dense>
+          <v-col cols="4"
+            ><v-img
+              :src="require('~/assets/profile/003-dog-1.svg')"
+              width="100"
+            ></v-img
+          ></v-col>
+          <v-col cols="8">
+            <v-row no-gutters class="font-weight-bold">
+              <v-col cols="5">ชื่อสัตว์เลี้ยง</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">{{ onePet.name }}</v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col cols="5">ประเภท</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">{{
+                onePet.type === undefined ? '' : onePet.type.label
+              }}</v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col cols="5">เพศ</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">{{
+                onePet.gender === undefined ? '' : onePet.gender.label
+              }}</v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col cols="5">อายุ</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">{{
+                onePet.birthDate === undefined ? '' : calcAge(onePet.birthDate)
+              }}</v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </div>
 
-    <v-expand-transition>
-      <div v-show="petCardHidden">
-        <v-divider class="dash-divider"></v-divider>
+      <v-expand-transition>
+        <div v-show="petCardHidden">
+          <v-divider class="dash-divider"></v-divider>
 
-        <div class="pa-4">
-          <v-row justify="center" align="center" dense>
-            <v-col cols="4"
-              ><v-img
-                :src="require('~/assets/profile/001-user.svg')"
-                width="100"
-              ></v-img
-            ></v-col>
-            <v-col cols="8">
-              <span class="font-weight-bold">คุณสมประสงค์ ดำยศ</span><br />
-              <span>เบอร์ติดต่อ : 098-112-4456</span>
-            </v-col>
-          </v-row>
-        </div>
-        <div v-if="showbtn">
-          <v-divider class="dash-divider hidden-md-and-down"></v-divider>
-
-          <div class="px-3 pt-1 hidden-sm-and-down">
-            <v-btn
-              v-for="btn in actionBtn"
-              :key="btn.index"
-              :to="btn.path"
-              class="cusblue3 font-weight-regular text-capitalize my-2"
-              block
-              depressed
-              dark
-              >{{ btn.text }}</v-btn
-            >
+          <div class="pa-4">
+            <v-row justify="center" align="center" dense>
+              <v-col cols="4">
+                <v-img
+                  :src="require('~/assets/profile/001-user.svg')"
+                  width="100"
+                >
+                </v-img>
+              </v-col>
+              <v-col cols="8">
+                <span class="font-weight-bold">{{ oneOwner.fullName }}</span>
+                <br />
+                <span>
+                  เบอร์ติดต่อ :
+                  {{ oneOwner.tels === undefined ? '' : oneOwner.tels[0] }}
+                </span>
+              </v-col>
+            </v-row>
           </div>
-        </div>
-        <div v-else>
-          <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
+          <div v-if="showbtn">
+            <v-divider class="dash-divider hidden-md-and-down"></v-divider>
 
-          <div class="hidden-sm-and-down">
-            <div class="pa-3">
-              <span class="font-weight-bold">Vital Sign</span>
-              <v-row
-                v-for="cardTb in loopOnce"
-                :key="cardTb.index"
-                class="text-left"
-                align="center"
-                justify="center"
-                no-gutters
+            <div class="px-3 pt-1 hidden-sm-and-down">
+              <v-btn
+                v-for="btn in actionBtn"
+                :key="btn.index"
+                :to="btn.path"
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
               >
-                <v-col class="font-weight-medium" cols="5">{{
-                  cardTb.header
-                }}</v-col>
-                <v-col cols="5">{{ cardTb.value }}</v-col>
-                <v-col cols="2">{{ cardTb.unit }}</v-col>
-              </v-row>
+                {{ btn.text }}
+              </v-btn>
             </div>
-
+          </div>
+          <div v-else>
             <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
-            <div class="pa-3">
-              <span class="font-weight-bold">DX (Differential Diagnosis)</span>
-              <div>
-                <textarea
-                  v-model="dataTable.DX"
-                  class="custom-textarea"
-                  :readonly="true"
-                />
+            <div class="hidden-sm-and-down">
+              <vsCard :visit-id="dataTable.id" :no-card="true" />
+
+              <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
+
+              <div class="pa-3">
+                <span class="font-weight-bold"
+                  >DX (Differential Diagnosis)</span
+                >
+                <div>
+                  <textarea
+                    v-model="dataTable.DX"
+                    class="custom-textarea"
+                    :readonly="true"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </v-expand-transition>
-    <v-divider class="dash-divider"></v-divider>
-    <v-btn color="cusblue2" block text @click="petCardHidden = !petCardHidden">
-      <v-icon v-show="petCardHidden == false">mdi-dots-horizontal</v-icon>
-      <v-icon v-show="petCardHidden == true">mdi-chevron-up</v-icon>
-    </v-btn>
-  </v-card>
+      </v-expand-transition>
+      <v-divider class="dash-divider"></v-divider>
+      <v-btn
+        color="cusblue2"
+        block
+        text
+        @click="petCardHidden = !petCardHidden"
+      >
+        <v-icon v-show="petCardHidden == false">mdi-dots-horizontal</v-icon>
+        <v-icon v-show="petCardHidden == true">mdi-chevron-up</v-icon>
+      </v-btn>
+    </v-card>
+    <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
+  </div>
 </template>
 
 <script>
+import moment from 'moment'
+import vsCard from '@/components/Queue/Check/Card/vsCard'
+import sendDoctorDialog from '@/components/Queue/sendDoctorDialog'
 export default {
+  components: {
+    vsCard,
+    sendDoctorDialog,
+  },
   props: {
     dataTable: {
       default: null,
@@ -136,6 +166,8 @@ export default {
   data() {
     return {
       // petCardHeight: '648',
+      oneOwner: '',
+      onePet: '',
       petCardHidden: !this.$vuetify.breakpoint.smAndDown,
       actionBtn: [
         {
@@ -150,62 +182,40 @@ export default {
       ],
     }
   },
-  computed: {
-    loopOnce() {
-      const detail = {
-        weight: { header: 'Weight', value: '', unit: 'Kg' },
-        temp: { header: 'Temp.', value: '', unit: 'F' },
-        bp: { header: 'BP', value: '', unit: 'bpm' },
-        r: { header: 'RR', value: '', unit: '' },
-      }
-
-      // this.findNotBlank(this.cardDetail)
-      detail.temp.value = this.TempNotBlank(this.dataTable.VS)
-      detail.r.value = this.RRNotBlank(this.dataTable.VS)
-      detail.bp.value =
-        this.SysNotBlank(this.dataTable.VS) +
-        '/' +
-        this.DiaNotBlank(this.dataTable.VS)
-      detail.weight.value = this.WeightNotBlank(this.dataTable.VS)
-
-      return detail
-    },
+  async created() {
+    const owner = await this.$axios.$get(
+      `/api/members?code=${this.dataTable.pet.owner.code}`,
+      { progress: false }
+    )
+    const pet = await this.$axios.$get(
+      `/api/pets?code=${this.dataTable.pet.code}`,
+      { progress: false }
+    )
+    this.oneOwner = owner.results[0]
+    this.onePet = pet.results[0]
   },
   methods: {
-    TempNotBlank(data) {
-      for (const num in data) {
-        if (data[num].Temp !== '') {
-          return data[num].Temp
-        }
-      }
+    calcAge(date) {
+      const nowDate = moment()
+      const pickDate = moment(date, 'YYYY-MM-DD')
+      const dateDiff = moment.duration(nowDate.diff(pickDate))
+      return dateDiff.years() + ' ปี ' + dateDiff.months() + ' เดือน '
     },
-    RRNotBlank(data) {
-      for (const num in data) {
-        if (data[num].R !== '') {
-          return data[num].R
-        }
-      }
+    openSendDocs(name, id) {
+      this.$refs.sendDoctor.open(name, id)
     },
-    SysNotBlank(data) {
-      for (const num in data) {
-        if (data[num].SysBp !== '') {
-          return data[num].SysBp
-        }
-      }
+    startCheck(id) {
+      this.$axios
+        .$patch(`/api/visits/${id}`, { visitStatusId: 2 }, { progress: false })
+        .then((res) => {
+          this.dataTable.visitStatus.id = 2
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
-    DiaNotBlank(data) {
-      for (const num in data) {
-        if (data[num].DiaBp !== '') {
-          return data[num].DiaBp
-        }
-      }
-    },
-    WeightNotBlank(data) {
-      for (const num in data) {
-        if (data[num].Weight !== '') {
-          return data[num].Weight
-        }
-      }
+    updateSend() {
+      this.$router.push('/queue')
     },
   },
 }

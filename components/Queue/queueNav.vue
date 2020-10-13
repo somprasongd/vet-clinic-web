@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       selectType: 1,
-      selectDoctor: '',
+      selectDoctor: this.defaultDoctor(),
       type: this.$store.state.form.visitType,
       doctor: this.$store.state.form.doctor,
       queueCount: '5',
@@ -107,6 +107,17 @@ export default {
         this.type = res
       })
     }
+  },
+  methods: {
+    defaultDoctor() {
+      if (
+        this.$store.getters.loggedInUser.roles.some((role) => {
+          return role.id === 2
+        })
+      )
+        return this.$store.getters.loggedInUser.id
+      else return ''
+    },
   },
 }
 </script>

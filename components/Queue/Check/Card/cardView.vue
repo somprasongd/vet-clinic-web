@@ -24,24 +24,7 @@
       <div v-show="isExpand" class="card-content">
         <v-divider class="darker-divider"></v-divider>
 
-        <div v-if="isTable" class="pt-3 pb-4 px-7">
-          <v-row
-            v-for="cardTb in loopOnce"
-            :key="cardTb.index"
-            class="text-left"
-            align="center"
-            justify="center"
-            dense
-          >
-            <v-col class="font-weight-medium" cols="5">{{
-              cardTb.header
-            }}</v-col>
-            <v-col cols="5">{{ cardTb.value }}</v-col>
-            <v-col cols="2">{{ cardTb.unit }}</v-col>
-          </v-row>
-        </div>
-
-        <div v-else>
+        <div>
           <Mentionable
             :keys="['@']"
             :items="items"
@@ -49,7 +32,11 @@
             insert-space
             @open="onOpen"
           >
-            <textarea v-model="textContents" :readonly="isEditing == false" />
+            <textarea
+              v-model="textContents"
+              placeholder="write something...."
+              :readonly="isEditing == false"
+            />
 
             <template #no-result>
               <div class="dim">No result</div>
@@ -64,9 +51,7 @@
           </Mentionable>
         </div>
 
-        <VsDialog v-if="isTable" :card-data="dataTable" />
-
-        <v-card-actions v-else class="customAction">
+        <v-card-actions class="customAction">
           <v-btn
             v-if="isEditing == false"
             color="cusblue2"
@@ -97,26 +82,15 @@
 
 <script>
 import { Mentionable } from 'vue-mention'
-import VsDialog from '@/components/Queue/Check/Card/VsDialog'
 
 export default {
   components: {
     Mentionable,
-    VsDialog,
   },
   props: {
     cardTitle: {
       type: String,
       required: true,
-    },
-    isTable: {
-      type: Boolean,
-      required: true,
-    },
-    dataTable: {
-      default: null,
-      type: Array,
-      required: false,
     },
     textContent: {
       default: null,
@@ -147,27 +121,6 @@ export default {
       ],
     }
   },
-  computed: {
-    loopOnce() {
-      const detail = {
-        weight: { header: 'Weight', value: '', unit: 'Kg' },
-        temp: { header: 'Temp.', value: '', unit: 'F' },
-        bp: { header: 'BP', value: '', unit: 'bpm' },
-        r: { header: 'RR', value: '', unit: '' },
-      }
-
-      // this.findNotBlank(this.cardDetail)
-      detail.temp.value = this.TempNotBlank(this.dataTable)
-      detail.r.value = this.RRNotBlank(this.dataTable)
-      detail.bp.value =
-        this.SysNotBlank(this.dataTable) +
-        '/' +
-        this.DiaNotBlank(this.dataTable)
-      detail.weight.value = this.WeightNotBlank(this.dataTable)
-
-      return detail
-    },
-  },
   methods: {
     onOpen(key) {
       this.items = key === '@' ? this.users : null
@@ -179,42 +132,6 @@ export default {
         .replace(/@+/g, ' ')
         .replace(/\n\s*\n/g, '\n')
         .replace(/[ \t\r]+/g, ' ')
-    },
-
-    TempNotBlank(data) {
-      for (const num in data) {
-        if (data[num].Temp !== '') {
-          return data[num].Temp
-        }
-      }
-    },
-    RRNotBlank(data) {
-      for (const num in data) {
-        if (data[num].R !== '') {
-          return data[num].R
-        }
-      }
-    },
-    SysNotBlank(data) {
-      for (const num in data) {
-        if (data[num].SysBp !== '') {
-          return data[num].SysBp
-        }
-      }
-    },
-    DiaNotBlank(data) {
-      for (const num in data) {
-        if (data[num].DiaBp !== '') {
-          return data[num].DiaBp
-        }
-      }
-    },
-    WeightNotBlank(data) {
-      for (const num in data) {
-        if (data[num].Weight !== '') {
-          return data[num].Weight
-        }
-      }
     },
   },
 }

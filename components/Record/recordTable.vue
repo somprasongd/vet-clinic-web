@@ -225,15 +225,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.bold-owner {
-  padding: 5px;
-  border-radius: 15px;
-}
-.bold-owner:hover {
-  background-color: rgb(212, 212, 212);
-  cursor: pointer;
-  transition: 0.5s;
-}
 .expanded-closing {
   border-bottom: none !important;
 }

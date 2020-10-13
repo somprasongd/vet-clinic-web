@@ -15,7 +15,14 @@
         </div>
       </template>
       <template v-slot:[`item.name`]="{ item }">
-        <div>{{ item.pet.owner.name }}</div>
+        <div class="font-weight-medium">
+          <nuxt-link
+            class="bold-owner text-decoration-none text-truncate"
+            :to="'/queue/' + item.id"
+            >{{ item.pet.owner.name }}
+            <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
+          >
+        </div>
       </template>
       <template v-slot:[`item.pet`]="{ item }">
         <div>{{ item.pet.name + ' (' + item.pet.type + ')' }}</div>
@@ -54,42 +61,81 @@
               <h4>Action</h4>
             </v-list-item>
             <v-divider></v-divider>
-            <v-btn
-              v-for="btn in getActionMenu(
-                item.visitType.id,
-                item.visitStatus.id
-              )"
-              :key="btn.text"
-              class="cusblue2--text"
-              :disabled="btn.disable"
-              block
-              text
-              tile
-              @click="
-                clickAction(
-                  item.visitType.id,
-                  item.visitStatus.id,
-                  btn.action,
-                  item.id
-                )
-              "
-            >
-              {{ btn.text }}
-            </v-btn>
+            <!-- OPD -->
+            <div v-if="item.visitType.id === 1">
+              <!-- รอตรวจ -->
+              <div v-if="item.visitStatus.id === 1">
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="startCheck(item.id)"
+                >
+                  เข้ารับการตรวจ
+                </v-btn>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="
+                    openSendDocs(
+                      item.doctor !== null ? item.doctor.name : 'none',
+                      item.id
+                    )
+                  "
+                >
+                  ส่งต่อ
+                </v-btn>
+                <v-btn class="cusblue2--text" block text tile>
+                  ยกเลิกการรักษา
+                </v-btn>
+              </div>
+              <!-- ตรวจรักษา -->
+              <div v-else-if="item.visitStatus.id === 2">
+                <v-btn class="cusblue2--text" block text tile>
+                  จบการรักษา
+                </v-btn>
+                <v-btn class="cusblue2--text" block text tile>
+                  ยกเลิกการรักษา
+                </v-btn>
+              </div>
+              <!-- รอผลตรวจ -->
+              <div v-else-if="item.visitStatus.id === 3">
+                <v-btn class="cusblue2--text" block text tile>
+                  เข้ารับการตรวจ
+                </v-btn>
+                <v-btn class="cusblue2--text" block text tile>
+                  จบการรักษา
+                </v-btn>
+              </div>
+              <!-- รอชำระเงิน -->
+              <div v-else>
+                <v-btn class="cusblue2--text" block text tile disabled>
+                  None
+                </v-btn>
+              </div>
+            </div>
+            <!-- IPD -->
+            <div v-else-if="item.visitType.id === 2"></div>
+            <!-- ฝากเลี้ยง -->
+            <div v-else></div>
           </v-list>
         </v-menu>
       </template>
     </v-data-table>
+    <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
   </div>
 </template>
 
 <script>
+import sendDoctorDialog from '@/components/Queue/sendDoctorDialog'
 export default {
+  components: {
+    sendDoctorDialog,
+  },
   props: {
-    // selectedType: {
-    //   type: String,
-    //   required: true,
-    // },
     dessert: {
       default: null,
       type: Array,
@@ -100,6 +146,7 @@ export default {
     return {
       offset: false,
       dialog: false,
+      sendDoctor: false,
       headers: [
         {
           text: 'ลำดับ',
@@ -116,35 +163,18 @@ export default {
         { text: 'สถานะ', value: 'status', align: 'left', sortable: false },
         { text: 'Action', value: 'action', align: 'center', sortable: false },
       ],
-      actionBtn: {
-        none: [{ text: 'None', action: 1, disable: true }],
-        OPD_Wait: [
-          { text: 'เข้ารับการตรวจ', action: 1 },
-          { text: 'ยกเลิกการรักษา', action: 0 },
-        ],
-        OPD_Check: [
-          { text: 'จบการรักษา', action: 1 },
-          { text: 'ยกเลิกการรักษา', action: 0 },
-        ],
-        OPD_result: [
-          { text: 'เข้ารับการตรวจ', action: 1 },
-          { text: 'จบการรักษา', action: 0 },
-        ],
-        IPD_admit: [
-          { text: 'จบการรักษา', action: 1 },
-          { text: 'ยกเลิกการรักษา', action: 0 },
-        ],
-        deposit: [
-          { text: 'รับกลับบ้าน', action: 1 },
-          { text: 'ยกเลิกฝากเลี้ยง', action: 0 },
-        ],
-      },
     }
   },
   computed: {
     //
   },
   methods: {
+    openSendDocs(name, id) {
+      this.$refs.sendDoctor.open(name, id)
+    },
+    updateSend(res) {
+      this.$emit('update', res)
+    },
     orderNum(data, id) {
       return (
         data
@@ -162,107 +192,15 @@ export default {
       else if (status === 9) return 'rgb(255, 145, 98)'
       else return 'rgb(87, 243, 87)'
     },
-    getActionMenu(type, status) {
-      switch (type) {
-        case 1:
-          switch (status) {
-            case 1:
-              return this.actionBtn.OPD_Wait // 'OPD รอตรวจ'
-            case 2:
-              return this.actionBtn.OPD_Check // 'OPD ตรวจรักษา'
-            case 3:
-              return this.actionBtn.OPD_result // 'OPD รอผลตรวจ'
-            default:
-              return this.actionBtn.none // 'OPD รอชำระเงิน'
-          }
-        case 2:
-          switch (status) {
-            case 4:
-              return this.actionBtn.IPD_admit // 'IPD รายงานผล'
-            default:
-              return this.actionBtn.none // 'IPD รอชำระเงิน'
-          }
-        default:
-          switch (status) {
-            case 9:
-              return this.actionBtn.deposit // 'ฝากเลี้ยง ฝากเลี้ยง'
-            default:
-              console.log(status)
-              return this.actionBtn.none // 'ฝากเลี้ยง รอชำระเงิน'
-          }
-      }
-    },
-    clickAction(type, state, btn, id) {
-      switch (type) {
-        case 1:
-          switch (state) {
-            // 'OPD รอตรวจ'
-            case 1:
-              switch (btn) {
-                case 1:
-                  this.$router.push('/queue/' + id)
-                  break
-                default:
-                  alert('noooo')
-              }
-              break
-            // 'OPD ตรวจรักษา'
-            case 2:
-              switch (btn) {
-                case 1:
-                  alert('success')
-                  break
-                default:
-                  alert('noooo')
-              }
-              break
-            // 'OPD รอผลตรวจ'
-            case 3:
-              switch (btn) {
-                case 1:
-                  alert('success')
-                  break
-                default:
-                  alert('noooo')
-              }
-              break
-            // 'OPD รอชำระเงิน'
-            default:
-              switch (btn) {
-                case 1:
-                  alert('success')
-                  break
-                default:
-                  alert('noooo')
-              }
-          }
-          break
-        case 2:
-          if (state === 4) {
-            switch (btn) {
-              // 'IPD รายงานผล'
-              case 1:
-                alert('success')
-                break
-              // 'IPD รอชำระเงิน'
-              default:
-                alert('noooo')
-            }
-          }
-          break
-        case 3:
-          if (state === 9) {
-            switch (btn) {
-              // 'ฝากเลี้ยง ฝากเลี้ยง'
-              case 1:
-                alert('success')
-                break
-              // 'ฝากเลี้ยง รอชำระเงิน'
-              default:
-                alert('noooo')
-            }
-          }
-      }
+    startCheck(id) {
+      this.$axios
+        .$patch(`/api/visits/${id}`, { visitStatusId: 2 })
+        .then((res) => {
+          this.$router.push(`/queue/${id}`)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
   },
 }

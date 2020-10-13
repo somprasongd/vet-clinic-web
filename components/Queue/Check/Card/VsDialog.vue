@@ -149,6 +149,12 @@
           height="80vh"
           fixed-header
         >
+          <template v-slot:[`item.date`]="{ item }">
+            {{ $moment(item.vitalSignAt).format('DD/MM/YYYY') }}
+          </template>
+          <template v-slot:[`item.time`]="{ item }">
+            {{ $moment(item.vitalSignAt).format('HH:mm:ss') }}
+          </template>
         </v-data-table>
 
         <v-card-actions>
@@ -195,15 +201,15 @@ export default {
       MeasureTime: false,
       Time: '',
       headers: [
-        { text: 'Date', value: 'Date', align: 'center' },
-        { text: 'Time', value: 'Time', align: 'center' },
-        { text: 'Temp', value: 'Temp', align: 'center' },
-        { text: 'R', value: 'R', align: 'center' },
-        { text: 'SysBp', value: 'SysBp', align: 'center' },
-        { text: 'DiaBp', value: 'DiaBp', align: 'center' },
-        { text: 'Weight', value: 'Weight', align: 'center' },
-        { text: 'PainScr', value: 'PainScr', align: 'center' },
-        { text: 'BCS', value: 'BCS', align: 'center' },
+        { text: 'Date', value: 'date', align: 'center' },
+        { text: 'Time', value: 'time', align: 'center' },
+        { text: 'Temp', value: 'temp', align: 'center' },
+        { text: 'R', value: 'rr', align: 'center' },
+        { text: 'SysBp', value: 'sys', align: 'center' },
+        { text: 'DiaBp', value: 'dia', align: 'center' },
+        { text: 'Weight', value: 'weight', align: 'center' },
+        { text: 'PainScr', value: 'painScore', align: 'center' },
+        { text: 'BCS', value: 'bcs', align: 'center' },
       ],
     }
   },

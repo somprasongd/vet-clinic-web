@@ -3,7 +3,7 @@
     <queueNav @selectType="Type" @selectDoctor="Doctor" />
 
     <div class="custom-container">
-      <queueTable :dessert="visitor" />
+      <queueTable :dessert="visitor" @update="updateVisit" />
     </div>
     <queueDialog @updateVisit="updateVisit" />
   </div>
@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       vsType: 1,
-      doctor: '',
+      doctor: this.defaultDoctor(),
     }
   },
   async asyncData({ $axios }) {
@@ -50,6 +50,15 @@ export default {
   },
 
   methods: {
+    defaultDoctor() {
+      if (
+        this.$store.getters.loggedInUser.roles.some((role) => {
+          return role.id === 2
+        })
+      )
+        return this.$store.getters.loggedInUser.id
+      else return ''
+    },
     Type(select) {
       this.vsType = select
     },
