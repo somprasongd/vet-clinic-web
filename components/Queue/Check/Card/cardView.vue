@@ -2,8 +2,11 @@
   <v-card class="my-1 mx-1" max-height="100%">
     <v-card-title class="pb-1 pt-3">
       {{ cardTitle }}
+      <v-chip v-if="loading" class="ma-2" color="primary" outlined pill x-small>
+        Saving
+      </v-chip>
       <v-chip
-        v-if="isEditing == true"
+        v-else-if="isEditing"
         class="ma-2"
         color="warning"
         outlined
@@ -34,6 +37,7 @@
           >
             <textarea
               v-model="textContents"
+              :disabled="loading"
               placeholder="write something...."
               :readonly="isEditing == false"
             />
@@ -52,8 +56,16 @@
         </div>
 
         <v-card-actions class="customAction">
+          <v-progress-circular
+            v-if="loading"
+            class="ma-2"
+            indeterminate
+            color="cusblue2"
+            :size="16"
+            :width="2"
+          ></v-progress-circular>
           <v-btn
-            v-if="isEditing == false"
+            v-else-if="isEditing == false"
             color="cusblue2"
             class="ma-0"
             text
@@ -70,7 +82,7 @@
             text
             fab
             x-small
-            @click=";(isEditing = false), (textContents = Format(textContents))"
+            @click="saveCard"
           >
             <v-icon>mdi-content-save</v-icon>
           </v-btn>
@@ -102,6 +114,7 @@ export default {
     return {
       isEditing: false,
       isExpand: !this.$vuetify.breakpoint.smAndDown,
+      loading: false,
 
       textContents: this.textContent,
       items: [],
@@ -132,6 +145,47 @@ export default {
         .replace(/@+/g, ' ')
         .replace(/\n\s*\n/g, '\n')
         .replace(/[ \t\r]+/g, ' ')
+    },
+    saveCard() {
+      this.isEditing = false
+      this.loading = true
+      this.textContents = this.Format(this.textContents)
+      const data = {}
+      switch (this.cardTitle) {
+        case 'CC (Chief Complaint)':
+          Object.assign(data, {
+            cc: this.textContents,
+          })
+          break
+        case 'HT (History Ranking)':
+          Object.assign(data, {
+            ht: this.textContents,
+          })
+          break
+        case 'PE (Physical Examination)':
+          Object.assign(data, {
+            pe: this.textContents,
+          })
+          break
+
+        default:
+          Object.assign(data, {
+            dx: this.textContents,
+          })
+          break
+      }
+      this.$axios
+        .$patch(`/api/visits/${this.$route.params.queue}`, data, {
+          progress: false,
+        })
+        .then((res) => {
+          setTimeout(() => {
+            this.loading = false
+          }, 500)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
   },
 }
