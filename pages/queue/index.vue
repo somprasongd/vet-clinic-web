@@ -3,7 +3,12 @@
     <queueNav @selectType="Type" @selectDoctor="Doctor" />
 
     <div class="custom-container">
-      <queueTable :dessert="visitor" @update="updateVisit" />
+      <queueTable
+        :dessert="visitor"
+        @update="updateVisit"
+        @delete="deleteQueue"
+        @updateStatus="updateVisit"
+      />
     </div>
     <queueDialog @updateVisit="updateVisit" />
   </div>
@@ -19,15 +24,15 @@ export default {
     queueTable,
     queueDialog,
   },
+  async asyncData({ $axios }) {
+    const visit = await $axios.$get('/api/visits', { progress: false })
+    return { visit: visit.results }
+  },
   data() {
     return {
       vsType: 1,
       doctor: this.defaultDoctor(),
     }
-  },
-  async asyncData({ $axios }) {
-    const visit = await $axios.$get('/api/visits')
-    return { visit: visit.results }
   },
   computed: {
     // customer() {
@@ -69,6 +74,22 @@ export default {
       const visit = await this.$axios.$get('/api/visits', { progress: false })
       this.visit = visit.results
     },
+    deleteQueue(id) {
+      const index = this.visit.findIndex((queue) => {
+        return queue.id === id
+      })
+      setTimeout(() => {
+        this.visit.splice(index, 1)
+      }, 200)
+    },
+    // updateStatus(val) {
+    //   const index = this.visit.findIndex((queue) => {
+    //     return queue.id === val.visitId
+    //   })
+    //   setTimeout(() => {
+    //     this.visit[index].visitStatus.id = val.visitStatusId
+    //   }, 200)
+    // },
   },
 }
 </script>

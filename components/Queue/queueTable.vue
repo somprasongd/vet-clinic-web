@@ -70,7 +70,7 @@
                   block
                   text
                   tile
-                  @click="startCheck(item.id)"
+                  @click="updateStatus(item.id, 2)"
                 >
                   เข้ารับการตรวจ
                 </v-btn>
@@ -88,25 +88,55 @@
                 >
                   ส่งต่อ
                 </v-btn>
-                <v-btn class="cusblue2--text" block text tile>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="confirmCancel(item.id)"
+                >
                   ยกเลิกการรักษา
                 </v-btn>
               </div>
               <!-- ตรวจรักษา -->
               <div v-else-if="item.visitStatus.id === 2">
-                <v-btn class="cusblue2--text" block text tile>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 3)"
+                >
                   จบการรักษา
                 </v-btn>
-                <v-btn class="cusblue2--text" block text tile>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="confirmCancel(item.id)"
+                >
                   ยกเลิกการรักษา
                 </v-btn>
               </div>
               <!-- รอผลตรวจ -->
               <div v-else-if="item.visitStatus.id === 3">
-                <v-btn class="cusblue2--text" block text tile>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 2)"
+                >
                   เข้ารับการตรวจ
                 </v-btn>
-                <v-btn class="cusblue2--text" block text tile>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 6)"
+                >
                   จบการรักษา
                 </v-btn>
               </div>
@@ -125,6 +155,23 @@
         </v-menu>
       </template>
     </v-data-table>
+
+    <v-dialog v-model="cancelQueueDialog" max-width="290">
+      <v-card>
+        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
+        <v-card-text> คุณแน่ใจหรือไม่ที่จะยกเลิกการรักษา </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red" text @click="updateStatus(cancelId, 8)">
+            ใช่
+          </v-btn>
+          <v-btn color="grey" text @click="petDeath.petDeathDialog = false">
+            ไม่
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
   </div>
 </template>
@@ -147,6 +194,10 @@ export default {
       offset: false,
       dialog: false,
       sendDoctor: false,
+
+      cancelQueueDialog: false,
+      cancelId: '',
+
       headers: [
         {
           text: 'ลำดับ',
@@ -192,11 +243,57 @@ export default {
       else if (status === 9) return 'rgb(255, 145, 98)'
       else return 'rgb(87, 243, 87)'
     },
-    startCheck(id) {
+    // startCheck(id) {
+    //   this.$axios
+    //     .$patch(`/api/visits/${id}`, { visitStatusId: 2 })
+    //     .then((res) => {
+    //       this.$router.push(`/queue/${id}`)
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
+    confirmCancel(id) {
+      this.cancelId = id
+      this.cancelQueueDialog = true
+    },
+    // cancelQueue(id) {
+    //   this.$axios
+    //     .$patch(`/api/visits/${id}`, { visitStatusId: 8 }, { progress: false })
+    //     .then((res) => {
+    //       this.$emit('delete', id)
+    //       this.cancelQueueDialog = false
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
+    // endCheck(id) {
+    //   this.$axios
+    //     .$patch(`/api/visits/${id}`, { visitStatusId: 3 }, { progress: false })
+    //     .then((res) => {
+    //       this.$emit('update', id)
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
+    updateStatus(id, status) {
       this.$axios
-        .$patch(`/api/visits/${id}`, { visitStatusId: 2 })
+        .$patch(
+          `/api/visits/${id}`,
+          { visitStatusId: status },
+          { progress: false }
+        )
         .then((res) => {
-          this.$router.push(`/queue/${id}`)
+          if (status === 2) {
+            this.$router.push(`/queue/${id}`)
+          } else if (status === 8) {
+            this.$emit('delete', id)
+            this.cancelQueueDialog = false
+          } else {
+            this.$emit('updateStatus', { visitId: id, visitStatusId: status })
+          }
         })
         .catch((error) => {
           console.log(error)
