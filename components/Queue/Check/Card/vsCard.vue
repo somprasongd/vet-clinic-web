@@ -88,13 +88,17 @@ export default {
           value: temp === null ? '-' : temp,
           unit: 'Kg',
         },
-        temp: { header: 'Temp.', value: rr === null ? '-' : rr, unit: 'F' },
+        temp: {
+          header: 'Temp.',
+          value: weight === null ? '-' : weight,
+          unit: 'F',
+        },
         bp: {
           header: 'BP',
           value: bp === null + '/' + null ? '-' : bp,
           unit: 'bpm',
         },
-        r: { header: 'RR', value: weight === null ? '-' : weight, unit: '' },
+        r: { header: 'RR', value: rr === null ? '-' : rr, unit: '' },
       }
     },
   },
@@ -107,35 +111,35 @@ export default {
   methods: {
     TempNotBlank(data) {
       for (const num in data) {
-        if (data[num].temp !== '') {
+        if (data[num].temp !== '' && data[num].temp !== null) {
           return data[num].temp
         }
       }
     },
     RRNotBlank(data) {
       for (const num in data) {
-        if (data[num].rr !== '') {
+        if (data[num].rr !== '' && data[num].rr !== null) {
           return data[num].rr
         }
       }
     },
     SysNotBlank(data) {
       for (const num in data) {
-        if (data[num].sys !== '') {
+        if (data[num].sys !== '' && data[num].sys !== null) {
           return data[num].sys
         }
       }
     },
     DiaNotBlank(data) {
       for (const num in data) {
-        if (data[num].dia !== '') {
+        if (data[num].dia !== '' && data[num].dia !== null) {
           return data[num].dia
         }
       }
     },
     WeightNotBlank(data) {
       for (const num in data) {
-        if (data[num].weight !== '') {
+        if (data[num].weight !== '' && data[num].weight !== null) {
           return data[num].weight
         }
       }

@@ -77,7 +77,9 @@
                 </v-img>
               </v-col>
               <v-col cols="8">
-                <span class="font-weight-bold">{{ oneOwner.fullName }}</span>
+                <span class="font-weight-bold">{{
+                  oneOwner.fullName === undefined ? '' : oneOwner.fullName
+                }}</span>
                 <br />
                 <span>
                   เบอร์ติดต่อ :
