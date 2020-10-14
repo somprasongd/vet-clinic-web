@@ -40,8 +40,20 @@ export default {
   },
   async asyncData({ $axios, params }) {
     const id = params.owner
-    const member = await $axios.$get(`/api/members/${id}`)
-    const pets = await $axios.$get(`/api/pets?ownerId=${id}&limit=0`)
+    const member = await $axios.$get(`/api/members/${id}`, { progress: false })
+    const pets = await $axios.$get(`/api/pets?ownerId=${id}&limit=0`, {
+      progress: false,
+    })
+    for (const pet in pets.results) {
+      const date = await $axios.$get(
+        `/api/appoints?petId=${pets.results[pet].id}&limit=1`,
+        { progress: false }
+      )
+      Object.assign(pets.results[pet], {
+        nextAppoint:
+          date.results.length === 0 ? '' : date.results[0].appointDate,
+      })
+    }
     return { oneMember: member, ownPets: pets.results }
   },
   data() {
@@ -67,6 +79,16 @@ export default {
       const pets = await this.$axios.$get(`/api/pets?ownerId=${id}&limit=0`, {
         progress: false,
       })
+      for (const pet in pets.results) {
+        const date = await this.$axios.$get(
+          `/api/appoints?petId=${pets.results[pet].id}&limit=1`,
+          { progress: false }
+        )
+        Object.assign(pets.results[pet], {
+          nextAppoint:
+            date.results.length === 0 ? '' : date.results[0].appointDate,
+        })
+      }
       this.ownPets = pets.results
     },
     delPet(id) {

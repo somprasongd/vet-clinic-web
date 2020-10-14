@@ -377,14 +377,14 @@ export default {
         this.$axios
           .$post('/api/appoints', sendAppoint)
           .then((res) => {
-            this.successSubmit(res)
+            this.successSubmit(res, sendAppoint.petId)
           })
           .catch((error) => {
             this.errorSubmit(error)
           })
       }
     },
-    successSubmit(res) {
+    successSubmit(res, id) {
       setTimeout(() => {
         this.loading = false
         this.alert = false
@@ -393,6 +393,7 @@ export default {
         this.sendAppoint.cause = ''
         this.sendAppoint.remark = ''
         this.$refs.form.resetValidation()
+        this.$emit('updateAppoint', { appointDate: res.appointDate, petId: id })
       }, 500)
     },
     errorSubmit(error) {

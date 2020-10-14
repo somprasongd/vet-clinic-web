@@ -138,9 +138,13 @@
                 </v-col>
                 <v-col lg="12" sm="12" cols="12">
                   <span class="font-weight-medium">นัดหมายครั้งต่อไป :</span>
-                  <span class="font-weight-light">{{
-                    nextAppoint(pet.id)
-                  }}</span>
+                  <span class="font-weight-light">
+                    {{
+                      pet.nextAppoint === ''
+                        ? ''
+                        : $moment(pet.nextAppoint).format('DD/MM/YYYY')
+                    }}
+                  </span>
                 </v-col>
               </v-row>
             </v-col>
@@ -193,7 +197,7 @@
         </div>
         <sendcheckDialog ref="checkDialog" />
         <depositDialog ref="depoDialog" />
-        <appointDialog ref="appDialog" />
+        <appointDialog ref="appDialog" @updateAppoint="updateAppoint" />
       </div>
 
       <div v-else class="text-center pa-15 grey--text">Not Found Pet</div>
@@ -277,11 +281,6 @@ export default {
     appointDialog,
   },
   props: {
-    // customer: {
-    //   default: null,
-    //   type: Object,
-    //   required: false,
-    // },
     pets: {
       default: null,
       type: Array,
@@ -387,13 +386,16 @@ export default {
           console.log(err)
         })
     },
-    async nextAppoint(id) {
-      try {
-        const date = await this.$axios.$get(`/api/appoints?petId=${id}&limit=1`)
-        console.log(date.results[0].appointDate)
-        return date.results[0].appointDate
-      } catch (e) {
-        console.log(e)
+    updateAppoint(val) {
+      const index = this.pets.findIndex((pet) => {
+        return pet.id === val.petId
+      })
+      if (this.pets[index].nextAppoint === '') {
+        this.pets[index].nextAppoint = val.appointDate
+      } else if (
+        moment(val.appointDate) < moment(this.pets[index].nextAppoint)
+      ) {
+        this.pets[index].nextAppoint = val.appointDate
       }
     },
   },
