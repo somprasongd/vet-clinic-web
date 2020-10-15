@@ -215,6 +215,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <confirmDialog ref="confirm" />
   </div>
 </template>
 
@@ -235,7 +236,11 @@
 
 <script>
 import moment from 'moment'
+import confirmDialog from '@/components/Items/confirmDialog'
 export default {
+  components: {
+    confirmDialog,
+  },
   props: {
     cardData: {
       default: null,
@@ -429,17 +434,32 @@ export default {
     },
     deleteVs(item) {
       const index = this.cardData.indexOf(item)
-      confirm('Are you sure you want to delete this item?') &&
-        this.$axios
-          .$delete(`/api/visits/${this.$route.params.queue}/vs/${item.id}`, {
-            progress: false,
-          })
-          .then((res) => {
-            this.cardData.splice(index, 1)
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+      this.dialogShow = false
+      this.$refs.confirm
+        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+          width: 290,
+          color: 'red',
+        })
+        .then((confirm) => {
+          this.$axios
+            .$delete(`/api/visits/${this.$route.params.queue}/vs/${item.id}`, {
+              progress: false,
+            })
+            .then((res) => {
+              setTimeout(() => {
+                this.dialogShow = true
+                this.cardData.splice(index, 1)
+              }, 200)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        })
+        .catch(() => {
+          setTimeout(() => {
+            this.dialogShow = true
+          }, 200)
+        })
     },
   },
 }
