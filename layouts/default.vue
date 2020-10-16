@@ -23,22 +23,26 @@
       <v-tabs v-else dark show-arrows centered>
         <v-tab class="font-weight-regular" exact to="/queue">คิว</v-tab>
         <v-tab
+          :disabled="this.$store.state.navTab.check"
           class="font-weight-regular"
           exact
           :to="'/queue/' + this.$route.params.queue + '/'"
           >ห้องตรวจ</v-tab
         >
         <v-tab
+          :disabled="this.$store.state.navTab.checkList"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/checklist'"
           >รายการสั่งตรวจ</v-tab
         >
         <v-tab
+          :disabled="this.$store.state.navTab.lab"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/lab'"
           >Lab</v-tab
         >
         <v-tab
+          :disabled="this.$store.state.navTab.xray"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/xray'"
           >X-ray</v-tab
@@ -87,7 +91,6 @@
         </v-menu>
       </v-toolbar-items>
     </v-app-bar>
-
     <!-- Content -->
     <v-main>
       <client-only>
@@ -122,9 +125,48 @@ export default {
       return avatar
     },
   },
+  watch: {
+    '$route.params.queue'(id) {
+      this.checkQueueStatus()
+    },
+  },
+  mounted() {
+    this.checkQueueStatus()
+  },
   methods: {
     logOut() {
       this.$auth.logout()
+    },
+    async checkQueueStatus() {
+      if (this.$route.params.queue) {
+        const visit = await this.$axios.$get(
+          `/api/visits/${this.$route.params.queue}`,
+          {
+            progress: false,
+          }
+        )
+        if (visit.visitStatus.id === 1)
+          this.$store.commit('setNavTab', {
+            check: false,
+            checkList: true,
+            lab: true,
+            xray: true,
+          })
+        else if (visit.visitStatus.id === 6)
+          this.$store.commit('setNavTab', {
+            check: true,
+            checkList: false,
+            lab: true,
+            xray: true,
+          })
+        else
+          this.$store.commit('setNavTab', {
+            check: false,
+            checkList: false,
+            lab: false,
+            xray: false,
+          })
+      }
     },
   },
 }

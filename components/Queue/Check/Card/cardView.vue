@@ -68,6 +68,7 @@
             v-else-if="isEditing == false"
             color="cusblue2"
             class="ma-0"
+            :disabled="disable"
             text
             fab
             x-small
@@ -79,6 +80,7 @@
             v-else
             color="cusblue2"
             class="ma-0"
+            :disabled="disable"
             text
             fab
             x-small
@@ -108,6 +110,11 @@ export default {
       default: null,
       type: String,
       required: false,
+    },
+    disable: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {

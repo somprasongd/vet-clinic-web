@@ -18,7 +18,11 @@
         <div class="font-weight-medium">
           <nuxt-link
             class="bold-owner text-decoration-none text-truncate"
-            :to="'/queue/' + item.id"
+            :to="
+              item.visitStatus.id === 6
+                ? '/queue/' + item.id + '/checklist'
+                : '/queue/' + item.id
+            "
             >{{ item.pet.owner.name }}
             <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
           >
@@ -107,16 +111,16 @@
                   tile
                   @click="updateStatus(item.id, 3)"
                 >
-                  จบการรักษา
+                  รอผลตรวจ
                 </v-btn>
                 <v-btn
                   class="cusblue2--text"
                   block
                   text
                   tile
-                  @click="confirmCancel(item.id)"
+                  @click="updateStatus(item.id, 6)"
                 >
-                  ยกเลิกการรักษา
+                  จบการรักษา
                 </v-btn>
               </div>
               <!-- รอผลตรวจ -->
@@ -126,9 +130,30 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 2)"
+                  @click="updateStatus(item.id, 4)"
                 >
-                  เข้ารับการตรวจ
+                  รายงานผล
+                </v-btn>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 6)"
+                >
+                  จบการรักษา
+                </v-btn>
+              </div>
+              <!-- รายงานผล -->
+              <div v-else-if="item.visitStatus.id === 4">
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 3)"
+                >
+                  รอผลตรวจ
                 </v-btn>
                 <v-btn
                   class="cusblue2--text"
@@ -142,8 +167,14 @@
               </div>
               <!-- รอชำระเงิน -->
               <div v-else>
-                <v-btn class="cusblue2--text" block text tile disabled>
-                  None
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="updateStatus(item.id, 7)"
+                >
+                  จบการรับบริการ
                 </v-btn>
               </div>
             </div>
@@ -240,6 +271,7 @@ export default {
       if (status === 1) return 'rgb(255, 98, 98)'
       else if (status === 2) return 'rgb(255, 191, 72)'
       else if (status === 3) return 'rgb(79, 155, 255)'
+      else if (status === 4) return 'rgb(214, 185, 81)'
       else if (status === 9) return 'rgb(255, 145, 98)'
       else return 'rgb(87, 243, 87)'
     },

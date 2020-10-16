@@ -1,28 +1,5 @@
 <template>
   <div>
-    <v-card-actions class="customAction-right">
-      <v-btn
-        color="cusblue2"
-        class="ma-0"
-        text
-        small
-        @click="dialogShow = true"
-      >
-        Show All
-      </v-btn>
-      <v-divider vertical></v-divider>
-      <v-btn
-        color="cusblue2"
-        class="ma-0"
-        text
-        fab
-        x-small
-        @click.stop="assignModalVS = true"
-      >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-card-actions>
-
     <v-dialog v-model="assignModalVS" max-width="600">
       <v-card>
         <h2 class="pa-5 pb-2">{{ VsTitle }}</h2>
@@ -320,6 +297,12 @@ export default {
     },
   },
   methods: {
+    openCreate() {
+      this.assignModalVS = true
+    },
+    openShow() {
+      this.dialogShow = true
+    },
     UpdateTime() {
       this.editedItem.date = moment().format('YYYY-MM-DD')
       this.editedItem.time = moment().format('HH:mm')

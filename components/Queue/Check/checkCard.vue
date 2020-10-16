@@ -23,23 +23,23 @@
                       <v-col cols="6">ความสำคัญ</v-col>
                       <v-col cols="1">:</v-col>
                       <v-col cols="5">{{
-                        dataTable.visitPriority.label
+                        visitData.visitPriority.label
                       }}</v-col>
                     </v-row>
                     <v-row dense>
                       <v-col cols="6">สาเหตุการเข้าตรวจ</v-col>
                       <v-col cols="1">:</v-col>
-                      <v-col cols="5">{{ dataTable.visitCause }}</v-col>
+                      <v-col cols="5">{{ visitData.visitCause }}</v-col>
                     </v-row>
                     <v-row dense>
                       <v-col cols="6">รายละเอียดเพิ่มเติม</v-col>
                       <v-col cols="1">:</v-col>
-                      <v-col cols="5">{{ dataTable.note }}</v-col>
+                      <v-col cols="5">{{ visitData.note }}</v-col>
                     </v-row>
                     <v-row dense>
                       <v-col cols="6">นัดหมายครั้งถัดไป</v-col>
                       <v-col cols="1">:</v-col>
-                      <v-col cols="5">{{ getAppoint(dataTable.pet.id) }}</v-col>
+                      <v-col cols="5">{{ getAppoint(visitData.pet.id) }}</v-col>
                     </v-row>
                   </v-col>
                 </v-row>
@@ -49,68 +49,44 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="6">
-        <vsCard :visit-id="dataTable.id" />
+        <vsCard
+          :visit-id="visitData.id"
+          :disable="visitData.visitStatus.id === 1"
+        />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.CC.title"
           :is-table="cardDetail.CC.table"
-          :text-content="dataTable.cc"
+          :text-content="visitData.cc"
+          :disable="visitData.visitStatus.id === 1"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.HT.title"
           :is-table="cardDetail.HT.table"
-          :text-content="dataTable.ht"
+          :text-content="visitData.ht"
+          :disable="visitData.visitStatus.id === 1"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.PE.title"
           :is-table="cardDetail.PE.table"
-          :text-content="dataTable.pe"
+          :text-content="visitData.pe"
+          :disable="visitData.visitStatus.id === 1"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.DX.title"
           :is-table="cardDetail.DX.table"
-          :text-content="dataTable.dx"
+          :text-content="visitData.dx"
+          :disable="visitData.visitStatus.id === 1"
         />
       </v-col>
     </v-row>
-    <v-speed-dial
-      v-model="fab"
-      class="hidden-md-and-up"
-      bottom
-      right
-      direction="top"
-      open-on-hover
-      fixed
-      transition="slide-y-reverse-transition"
-    >
-      <template v-slot:activator>
-        <v-btn v-model="fab" color="cusblue2" dark fab>
-          <v-icon v-if="fab">mdi-close</v-icon>
-          <v-icon v-else>mdi-dots-horizontal</v-icon>
-        </v-btn>
-      </template>
-      <v-btn
-        v-for="btn in actionBtn"
-        :key="btn.index"
-        :to="btn.path"
-        class="px-1"
-        rounded
-        left
-        depressed
-        dark
-        small
-        color="cusblue"
-      >
-        {{ btn.text }}
-      </v-btn>
-    </v-speed-dial>
   </div>
 </template>
 
@@ -125,7 +101,7 @@ export default {
     vsCard,
   },
   props: {
-    dataTable: {
+    visitData: {
       default: null,
       type: Object,
       required: false,
@@ -135,23 +111,10 @@ export default {
   data() {
     return {
       // petCardHeight: '648',
-      fab: false,
       checkInfo: !this.$vuetify.breakpoint.smAndDown,
 
       nextAppoint: '',
       vs: [],
-
-      actionBtn: [
-        {
-          text: 'ประวัติการรักษา',
-          path: '/history/' + this.$route.params.queue,
-        },
-        { text: 'ทำนัด', path: '/appoint/' + this.$route.params.queue },
-        { text: 'Admit', path: '/history/' + this.$route.params.queue },
-        { text: 'แจ้งตาย', path: '/history/' + this.$route.params.queue },
-        { text: 'แนบไฟล์ภาพ', path: '/insertImg/' + this.$route.params.queue },
-        { text: 'จบการรักษา', path: '/history/' + this.$route.params.queue },
-      ],
       cardDetail: {
         VS: {
           title: 'Vital Sign',

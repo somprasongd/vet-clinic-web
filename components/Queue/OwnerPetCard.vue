@@ -4,22 +4,56 @@
       <v-card-title class="pb-1 pt-3">
         ข้อมูลเจ้าของสัตว์ และสัตว์เลี้ยง
         <v-spacer></v-spacer>
-        <v-btn
-          v-if="dataTable.visitStatus.id === 1"
-          color="cusblue3"
-          icon
-          @click="startCheck(dataTable.id)"
-        >
-          <v-icon>mdi-check-circle</v-icon>
-        </v-btn>
-        <v-btn
-          v-if="dataTable.visitStatus.id === 1"
-          color="cusblue3"
-          icon
-          @click="openSendDocs(dataTable.doctor.name, dataTable.id)"
-        >
-          <v-icon>mdi-share-circle</v-icon>
-        </v-btn>
+        <v-menu v-if="visitData.visitStatus.id === 1" offset-y nudge-left="65">
+          <template v-slot:activator="{ on: menu, attrs }">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on: tooltip }">
+                <v-btn
+                  class="mx-1"
+                  color="cusblue3"
+                  width="20"
+                  height="20"
+                  v-bind="attrs"
+                  icon
+                  v-on="{ ...tooltip, ...menu }"
+                >
+                  <v-icon>mdi-check-circle</v-icon>
+                </v-btn>
+              </template>
+              <span>เข้ารับการตรวจ</span>
+            </v-tooltip>
+          </template>
+          <v-list class="pa-0">
+            <div class="px-2 pt-3">
+              <h3>เข้ารับการตรวจ?</h3>
+              <v-divider></v-divider>
+              <v-card-actions class="pa-0 pt-2">
+                <v-spacer></v-spacer>
+                <v-btn color="cusblue2" text> ยกเลิก </v-btn>
+                <v-btn color="cusblue2" text @click="startCheck(visitData.id)">
+                  ตกลง
+                </v-btn>
+              </v-card-actions>
+            </div>
+          </v-list>
+        </v-menu>
+        <v-tooltip v-if="visitData.visitStatus.id === 1" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              class="mx-1"
+              color="cusblue3"
+              width="20"
+              height="20"
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click="openSendDocs(visitData.doctor.name, visitData.id)"
+            >
+              <v-icon>mdi-share-circle</v-icon>
+            </v-btn>
+          </template>
+          <span>ส่งต่อ</span>
+        </v-tooltip>
       </v-card-title>
 
       <v-divider class="darker-divider"></v-divider>
@@ -36,27 +70,29 @@
             <v-row no-gutters class="font-weight-bold">
               <v-col cols="5">ชื่อสัตว์เลี้ยง</v-col>
               <v-col cols="1">:</v-col>
-              <v-col cols="6">{{ onePet.name }}</v-col>
+              <v-col cols="6">{{ petData.name }}</v-col>
             </v-row>
             <v-row no-gutters>
               <v-col cols="5">ประเภท</v-col>
               <v-col cols="1">:</v-col>
               <v-col cols="6">{{
-                onePet.type === undefined ? '' : onePet.type.label
+                petData.type === undefined ? '' : petData.type.label
               }}</v-col>
             </v-row>
             <v-row no-gutters>
               <v-col cols="5">เพศ</v-col>
               <v-col cols="1">:</v-col>
               <v-col cols="6">{{
-                onePet.gender === undefined ? '' : onePet.gender.label
+                petData.gender === undefined ? '' : petData.gender.label
               }}</v-col>
             </v-row>
             <v-row no-gutters>
               <v-col cols="5">อายุ</v-col>
               <v-col cols="1">:</v-col>
               <v-col cols="6">{{
-                onePet.birthDate === undefined ? '' : calcAge(onePet.birthDate)
+                petData.birthDate === undefined
+                  ? ''
+                  : calcAge(petData.birthDate)
               }}</v-col>
             </v-row>
           </v-col>
@@ -78,12 +114,12 @@
               </v-col>
               <v-col cols="8">
                 <span class="font-weight-bold">{{
-                  oneOwner.fullName === undefined ? '' : oneOwner.fullName
+                  ownerData.fullName === undefined ? '' : ownerData.fullName
                 }}</span>
                 <br />
                 <span>
                   เบอร์ติดต่อ :
-                  {{ oneOwner.tels === undefined ? '' : oneOwner.tels[0] }}
+                  {{ ownerData.tels === undefined ? '' : ownerData.tels[0] }}
                 </span>
               </v-col>
             </v-row>
@@ -93,38 +129,125 @@
 
             <div class="px-3 pt-1 hidden-sm-and-down">
               <v-btn
-                v-for="btn in actionBtn"
-                :key="btn.index"
-                :to="btn.path"
+                :to="'/history/' + this.$route.params.queue"
                 class="cusblue3 font-weight-regular text-capitalize my-2"
                 block
                 depressed
                 dark
               >
-                {{ btn.text }}
+                ประวัติการรักษา
+              </v-btn>
+              <v-btn
+                :to="'/appoint/' + this.$route.params.queue"
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+              >
+                ทำนัด
+              </v-btn>
+              <v-btn
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+                @click="admit($route.params.queue)"
+              >
+                Admit
+              </v-btn>
+              <v-btn
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+                @click="petDead(petData.id, !petData.death)"
+              >
+                {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
+              </v-btn>
+              <v-btn
+                :to="'/insertImg/' + this.$route.params.queue"
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+              >
+                แนบไฟล์ภาพ
+              </v-btn>
+              <div v-if="visitData.visitStatus.id === 2" class="mb-2">
+                <v-btn
+                  class="cusblue3 font-weight-regular text-capitalize"
+                  depressed
+                  width="49.25%"
+                  dark
+                  @click="endCheck($route.params.queue, 3)"
+                >
+                  รอผลตรวจ
+                </v-btn>
+                <v-btn
+                  class="cusblue3 font-weight-regular text-capitalize"
+                  depressed
+                  width="49.25%"
+                  dark
+                  @click="endCheck($route.params.queue, 6)"
+                >
+                  จบการรักษา
+                </v-btn>
+              </div>
+              <v-btn
+                v-else
+                class="cusblue3 font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+                @click="
+                  endCheck(
+                    $route.params.queue,
+                    visitData.visitStatus.id === 1 ? 8 : 6
+                  )
+                "
+              >
+                {{
+                  visitData.visitStatus.id === 1
+                    ? 'ยกเลิกการรักษา'
+                    : 'จบการรักษา'
+                }}
               </v-btn>
             </div>
           </div>
-          <div v-else>
+          <div v-else-if="showVsDx">
             <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
             <div class="hidden-sm-and-down">
-              <vsCard :visit-id="dataTable.id" :no-card="true" />
+              <vsCard :visit-id="visitData.id" :no-card="true" />
 
               <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
               <div class="pa-3">
-                <span class="font-weight-bold"
-                  >DX (Differential Diagnosis)</span
-                >
+                <span class="font-weight-bold">
+                  DX (Differential Diagnosis)
+                </span>
                 <div>
                   <textarea
-                    v-model="dataTable.DX"
+                    v-model="visitData.DX"
                     class="custom-textarea"
                     :readonly="true"
                   />
                 </div>
               </div>
+            </div>
+          </div>
+          <div v-else-if="showReportBtn && visitData.visitStatus.id === 3">
+            <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
+            <div class="px-3 my-2">
+              <v-btn
+                class="cusblue3 font-weight-regular text-capitalize"
+                depressed
+                block
+                dark
+                @click="endCheck($route.params.queue, 4)"
+              >
+                รายงานผล
+              </v-btn>
             </div>
           </div>
         </div>
@@ -141,6 +264,100 @@
       </v-btn>
     </v-card>
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
+    <confirmDialog ref="confirm" />
+
+    <!-- for mobile -->
+    <v-speed-dial
+      v-model="fab"
+      class="hidden-md-and-up"
+      bottom
+      right
+      direction="top"
+      open-on-hover
+      fixed
+      transition="slide-y-reverse-transition"
+    >
+      <template v-slot:activator>
+        <v-btn v-model="fab" color="cusblue2" dark fab>
+          <v-icon v-if="fab">mdi-close</v-icon>
+          <v-icon v-else>mdi-dots-horizontal</v-icon>
+        </v-btn>
+      </template>
+      <v-btn
+        :to="'/history/' + this.$route.params.queue"
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+      >
+        ประวัติการรักษา
+      </v-btn>
+      <v-btn
+        :to="'/appoint/' + this.$route.params.queue"
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+      >
+        ทำนัด
+      </v-btn>
+      <v-btn
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+        @click="admit($route.params.queue)"
+      >
+        Admit
+      </v-btn>
+      <v-btn
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+        @click="petDead(petData.id, !petData.death)"
+      >
+        {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
+      </v-btn>
+      <v-btn
+        :to="'/insertImg/' + this.$route.params.queue"
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+      >
+        แนบไฟล์ภาพ
+      </v-btn>
+      <v-btn
+        class="px-1"
+        rounded
+        left
+        depressed
+        dark
+        small
+        color="cusblue"
+        @click="
+          endCheck($route.params.queue, visitData.visitStatus.id === 1 ? 8 : 6)
+        "
+      >
+        {{ visitData.visitStatus.id === 1 ? 'ยกเลิกการรักษา' : 'จบการรักษา' }}
+      </v-btn>
+    </v-speed-dial>
   </div>
 </template>
 
@@ -148,13 +365,25 @@
 import moment from 'moment'
 import vsCard from '@/components/Queue/Check/Card/vsCard'
 import sendDoctorDialog from '@/components/Queue/sendDoctorDialog'
+import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     vsCard,
     sendDoctorDialog,
+    confirmDialog,
   },
   props: {
-    dataTable: {
+    visitData: {
+      default: null,
+      type: Object,
+      required: false,
+    },
+    ownerData: {
+      default: null,
+      type: Object,
+      required: false,
+    },
+    petData: {
       default: null,
       type: Object,
       required: false,
@@ -164,37 +393,22 @@ export default {
       default: false,
       required: false,
     },
+    showVsDx: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    showReportBtn: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   data() {
     return {
-      // petCardHeight: '648',
-      oneOwner: '',
-      onePet: '',
       petCardHidden: !this.$vuetify.breakpoint.smAndDown,
-      actionBtn: [
-        {
-          text: 'ประวัติการรักษา',
-          path: '/history/' + this.$route.params.queue,
-        },
-        { text: 'ทำนัด', path: '/appoint/' + this.$route.params.queue },
-        { text: 'Admit', path: '/history/' + this.$route.params.queue },
-        { text: 'แจ้งตาย', path: '/history/' + this.$route.params.queue },
-        { text: 'แนบไฟล์ภาพ', path: '/insertImg/' + this.$route.params.queue },
-        { text: 'จบการรักษา', path: '/history/' + this.$route.params.queue },
-      ],
+      fab: false,
     }
-  },
-  async created() {
-    const owner = await this.$axios.$get(
-      `/api/members?code=${this.dataTable.pet.owner.code}`,
-      { progress: false }
-    )
-    const pet = await this.$axios.$get(
-      `/api/pets?code=${this.dataTable.pet.code}`,
-      { progress: false }
-    )
-    this.oneOwner = owner.results[0]
-    this.onePet = pet.results[0]
   },
   methods: {
     calcAge(date) {
@@ -210,7 +424,13 @@ export default {
       this.$axios
         .$patch(`/api/visits/${id}`, { visitStatusId: 2 }, { progress: false })
         .then((res) => {
-          this.dataTable.visitStatus.id = 2
+          this.visitData.visitStatus.id = 2
+          this.$store.commit('setNavTab', {
+            check: false,
+            checkList: false,
+            lab: false,
+            xray: false,
+          })
         })
         .catch((error) => {
           console.log(error)
@@ -218,6 +438,76 @@ export default {
     },
     updateSend() {
       this.$router.push('/queue')
+    },
+    admit(id) {
+      this.$axios
+        .$patch(`/api/visits/${id}`, { visitTypeId: 2 }, { progress: false })
+        .then((res) => {
+          this.$router.push(`/queue`)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    endCheck(id, status) {
+      this.$refs.confirm
+        .open(
+          `ยืนยัน${
+            status === 8
+              ? 'ยกเลิกการรักษา'
+              : status === 3
+              ? 'การรอผลตรวจ'
+              : 'การจบการรักษา'
+          }?`,
+          `ต้องการยืนยัน${
+            status === 8
+              ? 'ยกเลิกการรักษา'
+              : status === 3
+              ? 'การรอผลตรวจ'
+              : 'การจบการรักษา'
+          }ใช่หรือไม่`,
+          {
+            width: 290,
+            color: status === 8 ? 'red' : status === 3 ? 'primary' : 'green',
+          }
+        )
+        .then((confirm) => {
+          this.$axios
+            .$patch(
+              `/api/visits/${id}`,
+              { visitStatusId: status },
+              { progress: false }
+            )
+            .then((res) => {
+              this.$router.push(`/queue`)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        })
+        .catch(() => {})
+    },
+    petDead(id, isDeath) {
+      this.$refs.confirm
+        .open(
+          'คุณแน่ใจหรือไม่?',
+          `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
+          {
+            width: 290,
+            color: 'red',
+          }
+        )
+        .then((confirm) => {
+          this.$axios
+            .$patch(`/api/pets/${id}`, { death: isDeath }, { progress: false })
+            .then((res) => {
+              this.petData.death = isDeath
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        })
+        .catch(() => {})
     },
   },
 }

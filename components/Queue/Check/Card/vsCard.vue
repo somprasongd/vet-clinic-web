@@ -47,7 +47,31 @@
               <v-col cols="2">{{ cardTb.unit }}</v-col>
             </v-row>
           </div>
-          <VsDialog :card-data="vs" />
+          <v-card-actions class="customAction-right">
+            <v-btn
+              color="cusblue2"
+              class="ma-0"
+              :disabled="disable"
+              text
+              small
+              @click.stop="openShow()"
+            >
+              Show All
+            </v-btn>
+            <v-divider vertical></v-divider>
+            <v-btn
+              color="cusblue2"
+              class="ma-0"
+              :disabled="disable"
+              text
+              fab
+              x-small
+              @click.stop="openCreate()"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <VsDialog ref="vsDialog" :card-data="vs" />
         </div>
       </v-expand-transition>
     </v-card>
@@ -65,6 +89,11 @@ export default {
     visitId: {
       type: Number,
       required: true,
+    },
+    disable: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -109,6 +138,12 @@ export default {
     this.vs = vs
   },
   methods: {
+    openCreate() {
+      this.$refs.vsDialog.openCreate()
+    },
+    openShow() {
+      this.$refs.vsDialog.openShow()
+    },
     TempNotBlank(data) {
       for (const num in data) {
         if (data[num].temp !== '' && data[num].temp !== null) {

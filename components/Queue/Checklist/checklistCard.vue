@@ -48,11 +48,27 @@
       </template>
 
       <template v-slot:[`footer`]>
-        <div
-          class="pa-3 font-weight-medium text-right"
-          style="border-top: 1px solid #dadada"
-        >
-          <span>ราคารวม : 500 บาท</span>
+        <div class="pa-1 text-right" style="border-top: 1px solid #dadada">
+          <v-btn
+            v-if="visitData.visitStatus.id === 2"
+            class="cusblue3 font-weight-regular text-capitalize float-left"
+            depressed
+            dark
+            @click="endCheck($route.params.queue, 3)"
+          >
+            รอผลตรวจ
+          </v-btn>
+          <v-btn
+            v-if="visitData.visitStatus.id === 6"
+            class="cusblue3 font-weight-regular text-capitalize"
+            depressed
+            dark
+          >
+            รับชำระเงิน
+          </v-btn>
+          <div v-else class="pa-2 font-weight-medium">
+            <span>ราคารวม : 500 บาท</span>
+          </div>
         </div>
       </template>
 
@@ -75,14 +91,24 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <confirmDialog ref="confirm" />
   </div>
 </template>
 
 <script>
 import checkListNav from '@/components/Queue/Checklist/checkListNav'
+import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     checkListNav,
+    confirmDialog,
+  },
+  props: {
+    visitData: {
+      default: null,
+      type: Object,
+      required: false,
+    },
   },
   data() {
     return {
@@ -239,6 +265,30 @@ export default {
         },
       ],
     }
+  },
+  methods: {
+    endCheck(id, status) {
+      this.$refs.confirm
+        .open(`ยืนยันการรอผลตรวจ?`, `ต้องการยืนยันการรอผลตรวจใช่หรือไม่`, {
+          width: 290,
+          color: 'primary',
+        })
+        .then((confirm) => {
+          this.$axios
+            .$patch(
+              `/api/visits/${id}`,
+              { visitStatusId: status },
+              { progress: false }
+            )
+            .then((res) => {
+              this.$router.push(`/queue`)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        })
+        .catch(() => {})
+    },
   },
 }
 </script>

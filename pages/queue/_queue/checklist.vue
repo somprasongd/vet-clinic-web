@@ -8,11 +8,16 @@
           md="4"
           lg="3"
         >
-          <OwnerPetCard :data-table="oneVisit" />
+          <OwnerPetCard
+            :show-vs-dx="true"
+            :visit-data="oneVisit"
+            :owner-data="oneOwner"
+            :pet-data="onePet"
+          />
         </v-col>
 
         <v-col cols="12" md="8" lg="9">
-          <checklistCard />
+          <checklistCard :visit-data="oneVisit" />
         </v-col>
       </v-row>
       <!-- <OwnerPetCard v-if="$route.params.page == 'check'" /> -->
@@ -31,11 +36,36 @@ export default {
     OwnerPetCard,
     checklistCard,
   },
+  async validate({ $axios, params, query, store }) {
+    const visit = await $axios.$get(`/api/visits/${params.queue}`, {
+      progress: false,
+    })
+    if (
+      visit.visitStatus.id === 1 ||
+      visit.visitStatus.id === 2 ||
+      visit.visitStatus.id === 3 ||
+      visit.visitStatus.id === 4 ||
+      visit.visitStatus.id === 6
+    )
+      return true
+    else return false
+  },
   async asyncData({ $axios, params }) {
     const visit = await $axios.$get(`/api/visits/${params.queue}`, {
       progress: false,
     })
-    return { oneVisit: visit }
+    const owner = await $axios.$get(
+      `/api/members?code=${visit.pet.owner.code}`,
+      { progress: false }
+    )
+    const pet = await $axios.$get(`/api/pets?code=${visit.pet.code}`, {
+      progress: false,
+    })
+    return {
+      oneVisit: visit,
+      oneOwner: owner.results[0],
+      onePet: pet.results[0],
+    }
   },
   data() {
     return {}
