@@ -82,30 +82,18 @@
       </div>
     </v-card>
 
-    <v-dialog v-model="memberDel" max-width="290">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-
-        <v-card-text> คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้ </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn color="red" text @click="deleteMember"> ลบ </v-btn>
-
-          <v-btn color="grey" text @click="memberDel = false"> ยกเลิก </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <recordDialog ref="updateMemberDialog" @update="sendMemberData" />
+    <confirmDialog ref="confirm" />
   </div>
 </template>
 
 <script>
 import recordDialog from '@/components/Record/recordDialog'
+import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     recordDialog,
+    confirmDialog,
   },
   props: {
     owner: {
@@ -116,19 +104,15 @@ export default {
   },
   data() {
     return {
-      memberDel: false,
       actionBtns: [
         { text: 'แก้ไขข้อมูล', action: this.updateMember },
-        { text: 'ลบข้อมูล', action: this.confirmDel },
+        { text: 'ลบข้อมูล', action: this.deleteMember },
       ],
     }
   },
   methods: {
     dashPhone(num) {
       return num.slice(0, 3) + '-' + num.slice(3, 6) + '-' + num.slice(6, 11)
-    },
-    confirmDel() {
-      this.memberDel = true
     },
     updateMember() {
       this.$refs.updateMemberDialog.open(this.owner)
@@ -137,14 +121,22 @@ export default {
       this.$emit('update', val)
     },
     deleteMember() {
-      this.$axios
-        .$delete(`/api/members/${this.$route.params.owner}`)
-        .then((res) => {
-          this.$router.push('/record')
+      this.$refs.confirm
+        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+          width: 290,
+          color: 'red',
         })
-        .catch((error) => {
-          console.log(error)
+        .then((confirm) => {
+          this.$axios
+            .$delete(`/api/members/${this.$route.params.owner}`)
+            .then((res) => {
+              this.$router.push('/record')
+            })
+            .catch((error) => {
+              console.log(error)
+            })
         })
+        .catch(() => {})
     },
   },
 }

@@ -53,7 +53,7 @@
                         block
                         text
                         tile
-                        @click="confirmDeath(pet.id, pet.death ? false : true)"
+                        @click="petDead(pet.id, pet.death ? false : true)"
                       >
                         {{ pet.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
                       </v-btn>
@@ -62,7 +62,7 @@
                         block
                         text
                         tile
-                        @click="callConfirm(pet.id)"
+                        @click="deletePet(pet.id)"
                       >
                         ลบข้อมูล
                       </v-btn>
@@ -195,77 +195,15 @@
           </v-row>
           <v-divider></v-divider>
         </div>
+        <!-- -------Dialog------ -->
         <sendcheckDialog ref="checkDialog" />
         <depositDialog ref="depoDialog" />
         <appointDialog ref="appDialog" @updateAppoint="updateAppoint" />
+        <confirmDialog ref="confirm" />
       </div>
 
       <div v-else class="text-center pa-15 grey--text">Not Found Pet</div>
     </v-card>
-
-    <!-- -------Dialog------ -->
-    <v-dialog v-model="petDel" max-width="290">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-        <v-card-text> คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้ </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="red" text @click="deletePet"> ลบ </v-btn>
-          <v-btn color="grey" text @click="petDel = false"> ยกเลิก </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="petDeath.petDeathDialog" max-width="290">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-        <v-card-text>
-          คุณแน่ใจหรือไม่ที่จะ
-          {{ petDeath.isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย' }} สัตว์เลี้ยงตัวนี้
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="red"
-            text
-            @click="petDead(petDeath.petId, petDeath.isDeath)"
-          >
-            ใช
-          </v-btn>
-          <v-btn color="grey" text @click="petDeath.petDeathDialog = false">
-            ไม่
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="alreadyHaveDialog.dialog" max-width="350">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">ต้องการส่งอีกครั้งหรือไม่?</h2>
-        <v-card-text>
-          สัตว์เลี้ยงตัวนี้ได้ถูก
-          {{ alreadyHaveDialog.type === 1 ? 'ส่งตรวจ' : 'ฝากเลี้ยง' }}
-          แล้วคุณต้องการส่งอีกครั้งหรือไม่
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="red"
-            text
-            @click="
-              alreadyHaveDialog.type === 1
-                ? confirmCheck(alreadyHaveDialog.id)
-                : confirmDepo(alreadyHaveDialog.id)
-            "
-          >
-            ใช่
-          </v-btn>
-          <v-btn color="grey" text @click="alreadyHaveDialog.dialog = false">
-            ไม่
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -273,12 +211,14 @@
 import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
 import depositDialog from '@/components/Record/UserRecord/depositDialog'
 import appointDialog from '@/components/Record/UserRecord/appointDialog'
+import confirmDialog from '@/components/Items/confirmDialog'
 import moment from 'moment'
 export default {
   components: {
     sendcheckDialog,
     depositDialog,
     appointDialog,
+    confirmDialog,
   },
   props: {
     pets: {
@@ -288,61 +228,11 @@ export default {
     },
   },
   data() {
-    return {
-      petDel: false,
-      delId: '',
-      alreadyHaveDialog: {
-        id: '',
-        type: '',
-        dialog: false,
-      },
-
-      petDeath: {
-        petId: '',
-        isDeath: false,
-        petDeathDialog: false,
-      },
-    }
+    return {}
   },
   methods: {
-    confirmCheck(id) {
-      this.alreadyHaveDialog.dialog = false
-      this.$refs.checkDialog.open(id)
-    },
-    async onClickCheck(id) {
-      const check = await this.$axios.$get(`/api/visits//is-visit/${id}`, {
-        progress: false,
-      })
-      if (check.status) {
-        this.alreadyHaveDialog.id = id
-        this.alreadyHaveDialog.type = 1
-        this.alreadyHaveDialog.dialog = true
-      } else this.$refs.checkDialog.open(id)
-    },
-
-    confirmDepo(id) {
-      this.alreadyHaveDialog.dialog = false
-      this.$refs.depoDialog.open(id)
-    },
-    async onClickDepo(id) {
-      const check = await this.$axios.$get(`/api/visits/is-daycare/${id}`, {
-        progress: false,
-      })
-      if (check.status) {
-        this.alreadyHaveDialog.id = id
-        this.alreadyHaveDialog.type = 2
-        this.alreadyHaveDialog.dialog = true
-      } else this.$refs.depoDialog.open(id)
-    },
     onClickApp(id) {
       this.$refs.appDialog.open(id)
-    },
-    confirmDeath(id, death) {
-      this.petDeath = {
-        petId: id,
-        petDeathDialog: true,
-        isDeath: death,
-      }
     },
     calcAge(date) {
       const nowDate = moment()
@@ -357,34 +247,88 @@ export default {
         ' วัน '
       )
     },
-    callConfirm(id) {
-      this.petDel = true
-      this.delId = id
-    },
-    deletePet() {
-      this.$axios
-        .$delete(`/api/pets/${this.delId}`)
-        .then((res) => {
-          this.$emit('del', this.delId)
-          this.petDel = false
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    petDead(id, state) {
-      this.$axios
-        .$patch(`/api/pets/${id}`, { death: state }, { progress: false })
-        .then((res) => {
-          const index = this.pets.findIndex((pet) => {
-            return pet.id === id
+    async onClickCheck(id) {
+      const check = await this.$axios.$get(`/api/visits//is-visit/${id}`, {
+        progress: false,
+      })
+      if (check.status) {
+        this.$refs.confirm
+          .open(
+            'ต้องการส่งอีกครั้งหรือไม่?',
+            'สัตว์เลี้ยงตัวนี้ได้ถูกฝากเลี้ยงแล้วคุณต้องการส่งอีกครั้งหรือไม่',
+            {
+              width: 350,
+              color: 'red',
+            }
+          )
+          .then((confirm) => {
+            this.$refs.checkDialog.open(id)
           })
-          this.petDeath.petDeathDialog = false
-          this.pets[index].death = state
+          .catch(() => {})
+      } else this.$refs.checkDialog.open(id)
+    },
+    async onClickDepo(id) {
+      const check = await this.$axios.$get(`/api/visits/is-daycare/${id}`, {
+        progress: false,
+      })
+      if (check.status) {
+        this.$refs.confirm
+          .open(
+            'ต้องการส่งอีกครั้งหรือไม่?',
+            'สัตว์เลี้ยงตัวนี้ได้ถูกส่งตรวจแล้วคุณต้องการส่งอีกครั้งหรือไม่',
+            {
+              width: 350,
+              color: 'red',
+            }
+          )
+          .then((confirm) => {
+            this.$refs.depoDialog.open(id)
+          })
+          .catch(() => {})
+      } else this.$refs.depoDialog.open(id)
+    },
+    deletePet(id) {
+      this.$refs.confirm
+        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+          width: 290,
+          color: 'red',
         })
-        .catch((err) => {
-          console.log(err)
+        .then((confirm) => {
+          this.$axios
+            .$delete(`/api/pets/${id}`)
+            .then((res) => {
+              this.$emit('del', id)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
         })
+        .catch(() => {})
+    },
+    petDead(id, isDeath) {
+      this.$refs.confirm
+        .open(
+          'คุณแน่ใจหรือไม่?',
+          `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
+          {
+            width: 290,
+            color: 'red',
+          }
+        )
+        .then((confirm) => {
+          this.$axios
+            .$patch(`/api/pets/${id}`, { death: isDeath }, { progress: false })
+            .then((res) => {
+              const index = this.pets.findIndex((pet) => {
+                return pet.id === id
+              })
+              this.pets[index].death = isDeath
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        })
+        .catch(() => {})
     },
     updateAppoint(val) {
       const index = this.pets.findIndex((pet) => {
