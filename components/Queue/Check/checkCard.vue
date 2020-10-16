@@ -57,33 +57,33 @@
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.CC.title"
-          :is-table="cardDetail.CC.table"
           :text-content="visitData.cc"
           :disable="visitData.visitStatus.id === 1"
+          :helper="cardDetail.CC.helper"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.HT.title"
-          :is-table="cardDetail.HT.table"
           :text-content="visitData.ht"
           :disable="visitData.visitStatus.id === 1"
+          :helper="cardDetail.HT.helper"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.PE.title"
-          :is-table="cardDetail.PE.table"
           :text-content="visitData.pe"
           :disable="visitData.visitStatus.id === 1"
+          :helper="cardDetail.PE.helper"
         />
       </v-col>
       <v-col cols="12" md="6">
         <cardView
           :card-title="cardDetail.DX.title"
-          :is-table="cardDetail.DX.table"
           :text-content="visitData.dx"
           :disable="visitData.visitStatus.id === 1"
+          :helper="cardDetail.DX.helper"
         />
       </v-col>
     </v-row>
@@ -116,31 +116,64 @@ export default {
       nextAppoint: '',
       vs: [],
       cardDetail: {
-        VS: {
-          title: 'Vital Sign',
-          table: true,
-        },
         CC: {
           title: 'CC (Chief Complaint)',
-          table: false,
+          helper:
+            this.$store.state.form.helper === null
+              ? []
+              : this.$store.state.form.helper.cc,
         },
         HT: {
           title: 'HT (History Ranking)',
-          table: false,
+          helper:
+            this.$store.state.form.helper === null
+              ? []
+              : this.$store.state.form.helper.ht,
         },
         PE: {
           title: 'PE (Physical Examination)',
-          table: false,
+          helper:
+            this.$store.state.form.helper === null
+              ? []
+              : this.$store.state.form.helper.pe,
         },
         DX: {
           title: 'DX (Differential Diagnosis)',
-          table: false,
+          helper:
+            this.$store.state.form.helper === null
+              ? []
+              : this.$store.state.form.helper.dx,
         },
       },
     }
   },
-  computed: {},
+  async mounted() {
+    if (this.$store.state.form.helper === null) {
+      const cc = await this.$axios.$get('/api/config/cc', { progress: false })
+      const ht = await this.$axios.$get('/api/config/ht', { progress: false })
+      const pe = await this.$axios.$get('/api/config/pe', { progress: false })
+      const dx = await this.$axios.$get('/api/config/dx', { progress: false })
+      this.$store.commit('form/setHelper', {
+        cc: this.formatArray(cc.results),
+        ht: this.formatArray(ht.results),
+        pe: this.formatArray(pe.results),
+        dx: this.formatArray(dx.results),
+      })
+      this.cardDetail.CC.helper = this.$store.state.form.helper.cc
+      this.cardDetail.HT.helper = this.$store.state.form.helper.ht
+      this.cardDetail.PE.helper = this.$store.state.form.helper.pe
+      this.cardDetail.DX.helper = this.$store.state.form.helper.dx
+    }
+  },
   methods: {
+    formatArray(array) {
+      return array.map((item) => {
+        return {
+          firstName: item.code,
+          value: item.label,
+        }
+      })
+    },
     getAppoint(id) {
       this.findNextAppoint(id)
       return this.nextAppoint

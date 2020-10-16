@@ -5,6 +5,7 @@ export const state = () => ({
   doctor: [],
   visitType: [],
   priority: [],
+  helper: null,
 })
 
 export const mutations = {
@@ -25,6 +26,9 @@ export const mutations = {
   },
   setPriority(state, priority) {
     state.priority = priority
+  },
+  setHelper(state, helper) {
+    state.helper = helper
   },
 }
 

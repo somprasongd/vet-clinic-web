@@ -49,7 +49,9 @@
             <template #item-@="{ item }">
               <div class="user">
                 {{ item.value }}
-                <span class="dim"> ({{ item.firstName }}) </span>
+                <span class="dim" style="opacity: 0.7">
+                  ({{ item.firstName }})
+                </span>
               </div>
             </template>
           </Mentionable>
@@ -116,6 +118,11 @@ export default {
       required: false,
       default: false,
     },
+    helper: {
+      type: Array,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -125,25 +132,25 @@ export default {
 
       textContents: this.textContent,
       items: [],
-      users: [
-        {
-          value: 'akryum',
-          firstName: 'Guillaume',
-        },
-        {
-          value: 'posva',
-          firstName: 'Eduardo',
-        },
-        {
-          value: 'atinux',
-          firstName: 'Sébastien',
-        },
-      ],
+      // users: [
+      //   {
+      //     value: 'akryum',
+      //     firstName: 'Guillaume',
+      //   },
+      //   {
+      //     value: 'posva',
+      //     firstName: 'Eduardo',
+      //   },
+      //   {
+      //     value: 'atinux',
+      //     firstName: 'Sébastien',
+      //   },
+      // ],
     }
   },
   methods: {
     onOpen(key) {
-      this.items = key === '@' ? this.users : null
+      this.items = key === '@' ? this.helper : null
     },
     Format(content) {
       // console.log(content)
