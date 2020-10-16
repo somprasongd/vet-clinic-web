@@ -52,7 +52,7 @@
                           class="ml-1"
                           icon
                           x-small
-                          @click="confirmDialog(item.id)"
+                          @click="deleteUser(item.id)"
                         >
                           <v-icon color="black">mdi-trash-can</v-icon>
                         </v-btn>
@@ -64,33 +64,18 @@
             </v-virtual-scroll>
           </div>
         </v-card>
-
-        <v-dialog v-model="confirmDel" max-width="290">
-          <v-card>
-            <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-
-            <v-card-text> คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้ </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-
-              <v-btn color="red" text @click="deleteUser(confirmID)">
-                ลบ
-              </v-btn>
-
-              <v-btn color="grey" text @click="confirmDel = false">
-                ยกเลิก
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-col>
     </v-row>
+    <confirmDialog ref="confirm" />
   </div>
 </template>
 
 <script>
+import confirmDialog from '@/components/Items/confirmDialog'
 export default {
+  components: {
+    confirmDialog,
+  },
   props: {
     alluser: {
       default: null,
@@ -101,11 +86,6 @@ export default {
   data() {
     return {
       search: '',
-      userList: this.alluser,
-      confirmDel: false,
-      newItemDialog: false,
-      listItem: null,
-      confirmID: null,
     }
   },
   computed: {
@@ -116,22 +96,25 @@ export default {
     },
   },
   methods: {
-    confirmDialog(id) {
-      this.confirmDel = true
-      this.confirmID = id
-    },
     deleteUser(id) {
-      this.confirmDel = false
-      this.$axios
-        .$delete(`/api/users/${id}`)
-        .then((response) => {
-          // this.$refs.form.reset()
-          // this.assignModal = false
-          this.$emit('removed', id)
+      this.$refs.confirm
+        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+          width: 290,
+          color: 'red',
         })
-        .catch((error) => {
-          console.log(error)
+        .then((confirm) => {
+          this.$axios
+            .$delete(`/api/users/${id}`, { progress: false })
+            .then((response) => {
+              // this.$refs.form.reset()
+              // this.assignModal = false
+              this.$emit('removed', id)
+            })
+            .catch((error) => {
+              console.log(error)
+            })
         })
+        .catch(() => {})
     },
   },
 }
