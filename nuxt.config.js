@@ -190,15 +190,7 @@ export default {
     height: '2px',
   },
   generate: {
-    routes: [
-      '/setting/hospital',
-      '/setting/users',
-      '/setting/Chief-Complaint',
-      '/setting/Differential-Diagnosis',
-      '/setting/History-Ranking',
-      '/setting/Physical-Examination',
-      '/setting/check',
-    ],
+    fallback: true,
   },
   // serverMiddleware: [
   //   {
