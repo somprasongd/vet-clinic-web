@@ -276,7 +276,7 @@ export default {
           remark: sendCustomer.other,
         }
         this.$axios
-          .$post('/api/members', sendData)
+          .$post('/api/members', sendData, { progress: false })
           .then((res) => {
             this.successSubmit(res)
           })
@@ -300,7 +300,9 @@ export default {
           remark: sendCustomer.other,
         }
         this.$axios
-          .$patch(`/api/members/${sendCustomer.id}`, sendData)
+          .$patch(`/api/members/${sendCustomer.id}`, sendData, {
+            progress: false,
+          })
           .then((res) => {
             this.updateubmit(res)
           })

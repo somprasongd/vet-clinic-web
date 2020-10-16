@@ -382,7 +382,7 @@ export default {
         }
         // console.log(sendPet)
         this.$axios
-          .$post('/api/pets', sendPet)
+          .$post('/api/pets', sendPet, { progress: false })
           .then((res) => {
             this.successSubmit(res)
           })
@@ -411,7 +411,7 @@ export default {
         }
         // console.log(sendPet)
         this.$axios
-          .$patch(`/api/pets/${pet.id}`, sendPet)
+          .$patch(`/api/pets/${pet.id}`, sendPet, { progress: false })
           .then((res) => {
             this.successSubmit(res)
           })

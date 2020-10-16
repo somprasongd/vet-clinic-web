@@ -375,7 +375,7 @@ export default {
           fromVisitId: null,
         }
         this.$axios
-          .$post('/api/appoints', sendAppoint)
+          .$post('/api/appoints', sendAppoint, { progress: false })
           .then((res) => {
             this.successSubmit(res, sendAppoint.petId)
           })

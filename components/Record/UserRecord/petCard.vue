@@ -295,7 +295,7 @@ export default {
         })
         .then((confirm) => {
           this.$axios
-            .$delete(`/api/pets/${id}`)
+            .$delete(`/api/pets/${id}`, { progress: false })
             .then((res) => {
               this.$emit('del', id)
             })

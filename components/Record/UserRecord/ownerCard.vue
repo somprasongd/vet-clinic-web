@@ -128,7 +128,9 @@ export default {
         })
         .then((confirm) => {
           this.$axios
-            .$delete(`/api/members/${this.$route.params.owner}`)
+            .$delete(`/api/members/${this.$route.params.owner}`, {
+              progress: false,
+            })
             .then((res) => {
               this.$router.push('/record')
             })

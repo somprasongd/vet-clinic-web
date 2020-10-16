@@ -309,7 +309,7 @@ export default {
         }
 
         this.$axios
-          .$post('/api/visits', sendPet)
+          .$post('/api/visits', sendPet, { progress: false })
           .then((res) => {
             setTimeout(() => {
               this.loading = false

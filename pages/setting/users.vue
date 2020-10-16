@@ -67,7 +67,7 @@ export default {
     }
   },
   mounted() {
-    this.$axios.get('/api/users').then((res) => {
+    this.$axios.get('/api/users', { progress: false }).then((res) => {
       this.allUser = res.data.results
     })
   },

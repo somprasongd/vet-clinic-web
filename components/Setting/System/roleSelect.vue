@@ -232,7 +232,9 @@ export default {
   },
   async created() {
     // ดัง role จาก api แล้ว loop ใส่ this.ranklist
-    const getRole = await this.$axios.$get('/api/master/user-roles')
+    const getRole = await this.$axios.$get('/api/master/user-roles', {
+      progress: false,
+    })
     const array = []
     for (const role of getRole.results) {
       array.push({

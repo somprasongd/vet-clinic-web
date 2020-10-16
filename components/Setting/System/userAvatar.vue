@@ -92,6 +92,7 @@ export default {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          progress: false,
         })
         .then((data) => {
           this.avatarSuccess(URL.createObjectURL(img))
@@ -103,7 +104,7 @@ export default {
     deleteProfile(id) {
       this.loadingAvatar = true
       this.$axios
-        .$delete(`/api/users/${id}/avatar`)
+        .$delete(`/api/users/${id}/avatar`, { progress: false })
         .then((data) => {
           // this.updateSuccess(response)
           this.avatarSuccess(require('~/assets/profile/defaultProfile.svg'))

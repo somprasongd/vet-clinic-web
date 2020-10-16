@@ -200,7 +200,7 @@ export default {
         }
         // console.log(sendDeposit)
         this.$axios
-          .$post('/api/visits/daycare', sendDeposit)
+          .$post('/api/visits/daycare', sendDeposit, { progress: false })
           .then((res) => {
             this.successSubmit(res)
           })

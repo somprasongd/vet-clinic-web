@@ -164,7 +164,9 @@ export default {
       return this.vs
     },
     async findVitalSign(id) {
-      const vs = await this.$axios.$get(`/api/visits/${id}/vs`)
+      const vs = await this.$axios.$get(`/api/visits/${id}/vs`, {
+        progress: false,
+      })
       this.vs = vs
     },
   },

@@ -326,14 +326,18 @@ export default {
         this.loading = true
         const userData = { ...this.addUser }
         this.$axios
-          .$post('/api/users', {
-            username: userData.username.toLowerCase(),
-            name: userData.name,
-            email: userData.email,
-            password: userData.password,
-            isAdmin: userData.isAdmin,
-            roles: userData.rank,
-          })
+          .$post(
+            '/api/users',
+            {
+              username: userData.username.toLowerCase(),
+              name: userData.name,
+              email: userData.email,
+              password: userData.password,
+              isAdmin: userData.isAdmin,
+              roles: userData.rank,
+            },
+            { progress: false }
+          )
           .then((response) => {
             setTimeout(() => {
               this.$refs.form.reset()
@@ -361,7 +365,7 @@ export default {
           roles: userData.rank,
         }
         this.$axios
-          .$put(`/api/users/${userData.id}`, sendData)
+          .$put(`/api/users/${userData.id}`, sendData, { progress: false })
           .then((response) => {
             // save success
             this.updateSuccess(response)
