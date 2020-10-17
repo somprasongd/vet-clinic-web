@@ -20,31 +20,33 @@
           md="9"
           lg="10"
         >
-          <Chief v-if="$route.params.tab == 'Chief-Complaint'" />
-          <Differential
-            v-else-if="$route.params.tab == 'Differential-Diagnosis'"
+          <help
+            :title="titleName"
+            :helper="helper"
+            @editHelper="editHelper"
+            @delete="delHelper"
           />
-          <History v-else-if="$route.params.tab == 'History-Ranking'" />
-          <Physical v-else-if="$route.params.tab == 'Physical-Examination'" />
-
-          <v-card v-else class="elevation-4 text-center" height="600">
-            <v-icon
-              class="gray--text text--disabled"
-              style="font-size: 80px; top: 40%"
-              >mdi-cog</v-icon
-            >
-          </v-card>
         </v-col>
       </v-row>
     </div>
-
+    <v-btn
+      :key="$nuxt.$route.path"
+      color="cusblue2"
+      fixed
+      fab
+      large
+      dark
+      bottom
+      right
+      @click.stop="addHelp"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
     <helpDialog
-      v-if="
-        $route.params.tab == 'Chief-Complaint' ||
-        $route.params.tab == 'Differential-Diagnosis' ||
-        $route.params.tab == 'History-Ranking' ||
-        $route.params.tab == 'Physical-Examination'
-      "
+      ref="helpDialog"
+      :all-helper="helper"
+      @add="addHelper"
+      @update="updateHelper"
     />
   </div>
 </template>
@@ -52,23 +54,96 @@
 <script>
 import settingNav from '@/components/Setting/settingNav'
 import settingTab from '@/components/Setting/settingTab'
-
-import Chief from '@/components/Setting/Helper/Chief-Complaint'
-import Differential from '@/components/Setting/Helper/Differential-Diagnosis'
-import History from '@/components/Setting/Helper/History-Ranking'
-import Physical from '@/components/Setting/Helper/Physical-Examination'
-
-import helpDialog from '@/components/Setting/Helper/Template/helpDialog'
+import help from '@/components/Setting/Helper/helpTemplate'
+import helpDialog from '@/components/Setting/Helper/helpDialog'
 
 export default {
   components: {
     settingNav,
     settingTab,
-    Chief,
-    Differential,
-    History,
-    Physical,
+    help,
     helpDialog,
+  },
+  validate({ params }) {
+    if (
+      params.tab === 'Chief-Complaint' ||
+      params.tab === 'Differential-Diagnosis' ||
+      params.tab === 'History-Ranking' ||
+      params.tab === 'Physical-Examination'
+    )
+      return true
+    else return false
+  },
+  async asyncData({ $axios, params }) {
+    const helper = await $axios.$get(
+      `/api/config/${
+        params.tab === 'Chief-Complaint'
+          ? 'cc'
+          : params.tab === 'Differential-Diagnosis'
+          ? 'dx'
+          : params.tab === 'History-Ranking'
+          ? 'ht'
+          : 'pe'
+      }`,
+      { progress: false }
+    )
+    return { helper: helper.results }
+  },
+  data() {
+    return {}
+  },
+  computed: {
+    titleName() {
+      if (this.$route.params.tab === 'Chief-Complaint') return 'Chief Complaint'
+      else if (this.$route.params.tab === 'Differential-Diagnosis')
+        return 'Differential Diagnosis'
+      else if (this.$route.params.tab === 'History-Ranking')
+        return 'History Ranking'
+      else return 'Physical Examination'
+    },
+  },
+  methods: {
+    addHelp() {
+      this.$refs.helpDialog.open(null)
+    },
+    editHelper(id) {
+      const index = this.helper.findIndex((help) => {
+        return help.id === id
+      })
+      this.$refs.helpDialog.open(this.helper[index])
+    },
+    addHelper(val) {
+      this.helper.push(val)
+    },
+    updateHelper(val) {
+      const index = this.helper.findIndex((help) => {
+        return help.id === val.id
+      })
+      this.helper.splice(index, 1, val)
+    },
+    delHelper(id) {
+      this.$axios
+        .$delete(
+          `/api/config/${
+            this.$route.params.tab === 'Chief-Complaint'
+              ? 'cc'
+              : this.$route.params.tab === 'Differential-Diagnosis'
+              ? 'dx'
+              : this.$route.params.tab === 'History-Ranking'
+              ? 'ht'
+              : 'pe'
+          }/${id}`
+        )
+        .then((res) => {
+          const index = this.helper.findIndex((help) => {
+            return help.id === id
+          })
+          this.helper.splice(index, 1)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
   },
 }
 </script>
