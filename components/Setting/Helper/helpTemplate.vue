@@ -23,41 +23,47 @@
           <div class="px-7 py-5">
             <v-card-title class="pa-0 px-3 py-1"> List </v-card-title>
             <v-divider></v-divider>
-            <v-list class="pa-0 px-5">
-              <v-list-item v-for="help in filterHelper" :key="help.index">
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ help.label }}
-                    <span class="text--secondary">({{ help.code }})</span>
-                  </v-list-item-title>
-                </v-list-item-content>
+            <v-virtual-scroll
+              :items="filterHelper"
+              :item-height="50"
+              height="400  "
+            >
+              <template v-slot="{ item }">
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.label }}
+                      <span class="text--secondary">({{ item.code }})</span>
+                    </v-list-item-title>
+                  </v-list-item-content>
 
-                <v-list-item-action>
-                  <v-row no-gutters>
-                    <v-col cols="6">
-                      <v-btn
-                        class="mr-1"
-                        icon
-                        x-small
-                        @click.stop="editHelper(help.id)"
-                      >
-                        <v-icon color="black">mdi-pencil</v-icon>
-                      </v-btn>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-btn
-                        class="ml-1"
-                        icon
-                        x-small
-                        @click.stop="delHelper(help.id)"
-                      >
-                        <v-icon color="black">mdi-trash-can</v-icon>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+                  <v-list-item-action>
+                    <v-row no-gutters>
+                      <v-col cols="6">
+                        <v-btn
+                          class="mr-1"
+                          icon
+                          x-small
+                          @click.stop="editHelper(item.id)"
+                        >
+                          <v-icon color="black">mdi-pencil</v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-btn
+                          class="ml-1"
+                          icon
+                          x-small
+                          @click.stop="delHelper(item.id)"
+                        >
+                          <v-icon color="black">mdi-trash-can</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-list-item-action>
+                </v-list-item>
+              </template>
+            </v-virtual-scroll>
           </div>
         </v-card>
       </v-col>
