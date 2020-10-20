@@ -79,13 +79,19 @@
 
 <script>
 export default {
+  props: {
+    queueCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+  },
   data() {
     return {
       selectType: 1,
       selectDoctor: this.defaultDoctor(),
       type: this.$store.state.form.visitType,
       doctor: this.$store.state.form.doctor,
-      queueCount: '5',
     }
   },
   watch: {

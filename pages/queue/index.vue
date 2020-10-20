@@ -1,6 +1,10 @@
 <template>
   <div>
-    <queueNav @selectType="Type" @selectDoctor="Doctor" />
+    <queueNav
+      :queue-count="visit.length"
+      @selectType="Type"
+      @selectDoctor="Doctor"
+    />
 
     <div class="custom-container">
       <queueTable
