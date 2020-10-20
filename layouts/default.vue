@@ -27,26 +27,30 @@
           class="font-weight-regular"
           exact
           :to="'/queue/' + this.$route.params.queue + '/'"
-          >ห้องตรวจ</v-tab
         >
+          ห้องตรวจ
+        </v-tab>
         <v-tab
           :disabled="this.$store.state.navTab.checkList"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/checklist'"
-          >รายการสั่งตรวจ</v-tab
         >
+          รายการสั่งตรวจ
+        </v-tab>
         <v-tab
           :disabled="this.$store.state.navTab.lab"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/lab'"
-          >Lab</v-tab
         >
+          Lab
+        </v-tab>
         <v-tab
           :disabled="this.$store.state.navTab.xray"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/xray'"
-          >X-ray</v-tab
         >
+          X-ray
+        </v-tab>
       </v-tabs>
 
       <!-- Name and Logout Dropdown -->
@@ -54,7 +58,7 @@
         <!-- Logout Dropdown -->
         <v-menu transition="slide-y-transition" offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" text width="250px" v-on="on">
+            <v-btn v-bind="attrs" text max-width="250px" v-on="on">
               <!-- Name -->
               <v-avatar
                 class="mr-3"
@@ -152,7 +156,7 @@ export default {
             lab: true,
             xray: true,
           })
-        else if (visit.visitStatus.id === 6)
+        else if (visit.visitStatus.id === 6 || visit.visitStatus.id === 9)
           this.$store.commit('setNavTab', {
             check: true,
             checkList: false,

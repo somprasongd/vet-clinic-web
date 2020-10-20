@@ -19,7 +19,7 @@
           <nuxt-link
             class="bold-owner text-decoration-none text-truncate"
             :to="
-              item.visitStatus.id === 6
+              item.visitStatus.id === 6 || item.visitStatus.id === 9
                 ? '/queue/' + item.id + '/checklist'
                 : '/queue/' + item.id
             "
@@ -74,7 +74,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 2)"
+                  @click="updateStatus(item.id, 2, item.visitStatus.id)"
                 >
                   เข้ารับการตรวจ
                 </v-btn>
@@ -97,7 +97,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 8)"
+                  @click="updateStatus(item.id, 8, item.visitStatus.id)"
                 >
                   ยกเลิกการรักษา
                 </v-btn>
@@ -109,7 +109,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 3)"
+                  @click="updateStatus(item.id, 3, item.visitStatus.id)"
                 >
                   รอผลตรวจ
                 </v-btn>
@@ -118,7 +118,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 6)"
+                  @click="updateStatus(item.id, 6, item.visitStatus.id)"
                 >
                   จบการรักษา
                 </v-btn>
@@ -130,7 +130,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 4)"
+                  @click="updateStatus(item.id, 4, item.visitStatus.id)"
                 >
                   รายงานผล
                 </v-btn>
@@ -139,7 +139,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 6)"
+                  @click="updateStatus(item.id, 6, item.visitStatus.id)"
                 >
                   จบการรักษา
                 </v-btn>
@@ -151,7 +151,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 3)"
+                  @click="updateStatus(item.id, 3, item.visitStatus.id)"
                 >
                   รอผลตรวจ
                 </v-btn>
@@ -160,7 +160,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 6)"
+                  @click="updateStatus(item.id, 6, item.visitStatus.id)"
                 >
                   จบการรักษา
                 </v-btn>
@@ -172,7 +172,7 @@
                   block
                   text
                   tile
-                  @click="updateStatus(item.id, 7)"
+                  @click="updateStatus(item.id, 7, item.visitStatus.id)"
                 >
                   จบการรับบริการ
                 </v-btn>
@@ -181,7 +181,26 @@
             <!-- IPD -->
             <div v-else-if="item.visitType.id === 2"></div>
             <!-- ฝากเลี้ยง -->
-            <div v-else></div>
+            <div v-else>
+              <v-btn
+                class="cusblue2--text"
+                block
+                text
+                tile
+                @click="backHome(item.id, item.visitAt)"
+              >
+                รับกลับบ้าน
+              </v-btn>
+              <v-btn
+                class="cusblue2--text"
+                block
+                text
+                tile
+                @click="updateStatus(item.id, 8, item.visitStatus.id)"
+              >
+                ยกเลิก
+              </v-btn>
+            </div>
           </v-list>
         </v-menu>
       </template>
@@ -235,6 +254,10 @@ export default {
     //
   },
   methods: {
+    backHome(id, date) {
+      console.log(id)
+      console.log(date)
+    },
     openSendDocs(name, id) {
       this.$refs.sendDoctor.open(name, id)
     },
@@ -259,7 +282,7 @@ export default {
       else if (status === 9) return 'rgb(255, 145, 98)'
       else return 'rgb(87, 243, 87)'
     },
-    updateStatus(id, status) {
+    updateStatus(id, status, statId) {
       this.$refs.confirm
         .open(
           `ยืนยัน${
@@ -271,6 +294,8 @@ export default {
               ? 'การรายงานผล'
               : status === 7
               ? 'การจบการรับบริการ'
+              : status === 8 && statId === 9
+              ? 'ยกเลิกการฝาก'
               : status === 8
               ? 'ยกเลิกการรักษา'
               : 'การจบการรักษา'
@@ -284,6 +309,8 @@ export default {
               ? 'การรายงานผล'
               : status === 7
               ? 'การจบการรับบริการ'
+              : status === 8 && statId === 9
+              ? 'ยกเลิกการฝากเลี้ยง'
               : status === 8
               ? 'ยกเลิกการรักษา'
               : 'การจบการรักษา'
