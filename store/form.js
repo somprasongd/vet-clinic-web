@@ -6,6 +6,8 @@ export const state = () => ({
   visitType: [],
   priority: [],
   helper: null,
+  itemGroup: [],
+  labGroup: [],
 })
 
 export const mutations = {
@@ -29,6 +31,12 @@ export const mutations = {
   },
   setHelper(state, helper) {
     state.helper = helper
+  },
+  setItemGroup(state, item) {
+    state.itemGroup = item
+  },
+  setlabGroup(state, lab) {
+    state.labGroup = lab
   },
 }
 
@@ -74,6 +82,20 @@ export const actions = {
     })
     commit('setPriority', priority.results)
     return priority.results
+  },
+  async addItemGroup({ commit }) {
+    const item = await this.$axios.$get('/api/master/item-groups', {
+      progress: false,
+    })
+    commit('setItemGroup', item.results)
+    return item.results
+  },
+  async addlabGroup({ commit }) {
+    const lab = await this.$axios.$get('/api/master/item-lab-groups', {
+      progress: false,
+    })
+    commit('setlabGroup', lab.results)
+    return lab.results
   },
 }
 
