@@ -47,7 +47,12 @@
               icon
               v-bind="attrs"
               v-on="on"
-              @click="openSendDocs(visitData.doctor.name, visitData.id)"
+              @click="
+                openSendDocs(
+                  visitData.doctor === null ? '' : visitData.doctor.name,
+                  visitData.id
+                )
+              "
             >
               <v-icon>mdi-share-circle</v-icon>
             </v-btn>
