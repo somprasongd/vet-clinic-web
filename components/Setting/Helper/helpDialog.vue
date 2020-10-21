@@ -40,7 +40,16 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="cusblue2--text text-none" text>Cancel</v-btn>
+          <v-btn
+            class="cusblue2--text text-none"
+            text
+            @click="assignModal = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn class="cusblue2--text text-none" text @click="newItem">
+            New
+          </v-btn>
           <v-btn
             :disabled="!valid || loading"
             class="cusblue2--text text-none"
@@ -105,15 +114,19 @@ export default {
   watch: {
     assignModal(val) {
       if (val === false) {
-        this.helper = {
-          id: '',
-          code: '',
-          label: '',
-        }
+        this.newItem()
       }
     },
   },
   methods: {
+    newItem() {
+      this.helper = {
+        id: '',
+        code: '',
+        label: '',
+      }
+      this.$refs.form.resetValidation()
+    },
     open(data) {
       if (data !== null) {
         this.helper = {
@@ -129,11 +142,14 @@ export default {
     checkDuplicate(val) {
       if (this.helper.id === '') {
         return !this.allHelper.some((helper) => {
-          return helper.code === val
+          return helper.code.toLowerCase() === val.toLowerCase()
         })
       } else {
         return !this.allHelper.some((helper) => {
-          return helper.code === val && helper.code !== this.helper.code
+          return (
+            helper.code.toLowerCase() === val.toLowerCase() &&
+            helper.code !== this.helper.code
+          )
         })
       }
     },
