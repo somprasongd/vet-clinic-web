@@ -9,7 +9,7 @@
           <userAvatar
             :avatars="hospital.logo.url"
             :delete-img="false"
-            size="180"
+            :size="180"
             @getId="updateImg"
           />
         </div>
