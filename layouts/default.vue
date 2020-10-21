@@ -1,8 +1,17 @@
 <template>
   <v-app style="font-family: 'Kanit', sans-serif">
-    <v-app-bar class="cusblue" dark dense app flat>
+    <v-app-bar
+      :class="`cusblue ${this.$vuetify.breakpoint.smAndDown ? 'pr-7' : ''}`"
+      dark
+      dense
+      app
+      flat
+    >
       <!-- Logo -->
-      <v-toolbar-title class="hidden-sm-and-down">
+      <v-app-bar-nav-icon v-if="this.$vuetify.breakpoint.mdOnly" class="pa-2">
+        <v-img :src="require('~/assets/logo.svg')" width="20"></v-img>
+      </v-app-bar-nav-icon>
+      <v-toolbar-title v-else-if="this.$vuetify.breakpoint.lgAndUp">
         <v-img :src="require('~/assets/logo.png')" width="150"></v-img>
       </v-toolbar-title>
 
@@ -54,6 +63,37 @@
       </v-tabs>
 
       <!-- Name and Logout Dropdown -->
+      <v-menu transition="slide-y-transition" offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-bind="attrs"
+            class="hidden-md-and-up"
+            icon
+            depressed
+            v-on="on"
+          >
+            <!-- Name -->
+            <v-avatar size="35" style="border: 1px solid #3894b3">
+              <v-img
+                :src="avatarImg"
+                :lazy-src="require('~/assets/profile/defaultProfile.svg')"
+              ></v-img>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-list class="text-center" dense>
+          <v-list-item
+            v-for="item in userDrop"
+            :key="item.title"
+            @click="logOut"
+          >
+            <v-list-item-title>
+              <v-icon>{{ item.icon }}</v-icon>
+              {{ item.title }}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-toolbar-items class="hidden-sm-and-down" style="max-width: 250px">
         <!-- Logout Dropdown -->
         <v-menu transition="slide-y-transition" offset-y>
