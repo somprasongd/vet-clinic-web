@@ -14,6 +14,7 @@
             :key="item.index"
             link
             :to="item.link"
+            exact
           >
             <v-icon class="mr-3" color="cusblue3" x-small>mdi-record</v-icon>
             <v-list-item-content>
@@ -41,10 +42,11 @@
                   :key="list.index"
                   link
                   :to="list.link"
+                  exact
                 >
-                  <v-icon class="mr-3" color="cusblue3" x-small
-                    >mdi-record</v-icon
-                  >
+                  <v-icon class="mr-3" color="cusblue3" x-small>
+                    mdi-record
+                  </v-icon>
                   <v-list-item-content>
                     {{ list.name }}
                   </v-list-item-content>
@@ -67,7 +69,7 @@ export default {
         {
           title: 'ระบบ',
           list: [
-            { name: 'สถานพยาบาล', link: '/setting/hospital' },
+            { name: 'สถานพยาบาล', link: '/setting/' },
             { name: 'ผู้ใช้งาน', link: '/setting/users' },
           ],
         },

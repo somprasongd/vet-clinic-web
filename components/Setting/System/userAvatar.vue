@@ -1,6 +1,11 @@
 <template>
-  <div class="userAvatar elevation-2">
-    <v-avatar class="avatarImg" size="120" @click="onClickAvatar">
+  <div class="userAvatar">
+    <v-avatar
+      class="avatarImg elevation-2"
+      :size="size"
+      style="border: 5px solid white"
+      @click="onClickAvatar"
+    >
       <v-img
         :src="userAvatar"
         :lazy-src="require('~/assets/profile/defaultProfile.svg')"
@@ -36,6 +41,7 @@
       @change="onFilePicked"
     />
     <v-btn
+      v-if="deleteImg"
       class="del-avatar pa-3"
       color="red"
       fab
@@ -53,12 +59,23 @@ export default {
   props: {
     avatarid: {
       type: Number,
-      required: true,
+      required: false,
+      default: null,
     },
     avatars: {
       type: String,
       default: '',
       required: false,
+    },
+    deleteImg: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    size: {
+      type: Number,
+      required: false,
+      default: 130,
     },
   },
   data() {
@@ -88,14 +105,19 @@ export default {
       formData.append('avatar', img)
 
       this.$axios
-        .$post(`/api/users/${id}/avatar`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          progress: false,
-        })
+        .$post(
+          `/api/${id === null ? 'upload/avatar' : `users/${id}/avatar`}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            progress: false,
+          }
+        )
         .then((data) => {
           this.avatarSuccess(URL.createObjectURL(img))
+          this.$emit('getId', data.id)
         })
         .catch((error) => {
           this.avatarError(error)
@@ -133,15 +155,15 @@ export default {
 <style lang="scss" scoped>
 .userAvatar {
   position: relative;
-  background: #ffffff;
-  width: 130px;
-  height: 130px;
-  border-top-left-radius: 100%;
-  border-top-right-radius: 100%;
-  border-bottom-left-radius: 100%;
-  border-bottom-right-radius: 100%;
-  text-align: center;
-  line-height: 127px;
+  // background: #ffffff;
+  // width: 130px;
+  // height: 130px;
+  // border-top-left-radius: 100%;
+  // border-top-right-radius: 100%;
+  // border-bottom-left-radius: 100%;
+  // border-bottom-right-radius: 100%;
+  // text-align: center;
+  // line-height: 127px;
   .avatarImg {
     background: white;
   }

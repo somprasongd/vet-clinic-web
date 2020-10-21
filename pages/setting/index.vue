@@ -20,13 +20,7 @@
           md="9"
           lg="10"
         >
-          <v-card class="elevation-4 text-center" height="600">
-            <v-icon
-              class="gray--text text--disabled"
-              style="font-size: 80px; top: 40%"
-              >mdi-cog</v-icon
-            >
-          </v-card>
+          <hospitalForm :hospital="hospital" />
         </v-col>
       </v-row>
     </div>
@@ -36,10 +30,16 @@
 <script>
 import settingNav from '@/components/Setting/settingNav'
 import settingTab from '@/components/Setting/settingTab'
+import hospitalForm from '@/components/Setting/System/hospitalForm'
 export default {
   components: {
     settingNav,
     settingTab,
+    hospitalForm,
+  },
+  async asyncData({ $axios }) {
+    const hospital = await $axios.$get('/api/config/site')
+    return { hospital }
   },
 }
 </script>
