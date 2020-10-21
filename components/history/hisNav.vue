@@ -1,5 +1,5 @@
 <template>
-  <v-row class="cusblue1 px-10" align="center" justify="center" dense>
+  <v-row class="cusblue1 second-nav1" align="center" justify="center" dense>
     <v-col cols="12" md="6">
       <h1 class="font-weight-medium">ประวัติการรักษา</h1>
     </v-col>

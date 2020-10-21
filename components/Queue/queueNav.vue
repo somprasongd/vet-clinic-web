@@ -1,7 +1,9 @@
 <template>
   <v-card color="grey lighten-4" flat tile>
     <v-row
-      class="second-nav cusblue1"
+      :class="`second-nav cusblue1 ${
+        this.$vuetify.breakpoint.xsOnly ? 'pb-2' : ''
+      }`"
       height="55"
       align="center"
       justify="center"
