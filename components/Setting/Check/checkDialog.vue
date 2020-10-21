@@ -44,6 +44,7 @@
                 </v-col>
                 <v-col cols="6">
                   <v-checkbox
+                    v-if="itemData.itemGroup === 3"
                     v-model="itemData.isSet"
                     :disabled="editing || loading"
                     label="Lab ชุด"
@@ -140,14 +141,17 @@
                     label="Frequency"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="6">
-                  <v-text-field
+                <v-col cols="12">
+                  <v-textarea
                     v-model="checkData.caution"
                     :disabled="loading1"
                     :rules="rules1.caution"
                     color="cusblue"
                     label="Caution"
-                  ></v-text-field>
+                    auto-grow
+                    row-height="24"
+                    rows="1"
+                  ></v-textarea>
                 </v-col>
               </v-row>
               <div v-else-if="itemData.itemGroup === 3">
@@ -611,7 +615,7 @@ export default {
           label: item.name,
           cost: item.cost,
           price: item.price,
-          isSet: item.isSet,
+          isSet: item.itemGroup === 3 ? item.isSet : false,
           itemGroupId: item.itemGroup,
         }
         this.$axios
@@ -711,7 +715,7 @@ export default {
           label: item.name,
           cost: item.cost,
           price: item.price,
-          isSet: item.isSet,
+          isSet: item.itemGroup === 3 ? item.isSet : false,
           itemGroupId: item.itemGroup,
         }
         this.$axios
