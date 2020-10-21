@@ -225,15 +225,18 @@
             <div class="hidden-sm-and-down">
               <vsCard :visit-id="visitData.id" :no-card="true" />
 
-              <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
+              <v-divider
+                v-if="visitData.dx !== ''"
+                class="dash-divider hidden-sm-and-down"
+              ></v-divider>
 
-              <div class="pa-3">
+              <div v-if="visitData.dx !== ''" class="pa-3">
                 <span class="font-weight-bold">
                   DX (Differential Diagnosis)
                 </span>
                 <div>
                   <textarea
-                    v-model="visitData.DX"
+                    v-model="visitData.dx"
                     class="custom-textarea"
                     :readonly="true"
                   />
