@@ -3,48 +3,67 @@
     <v-data-table
       class="elevation-4"
       :headers="headers"
-      :items="desserts"
+      :items="orderItem"
       disable-pagination
       hide-default-footer
       height="calc(100vh - 210px)"
       fixed-header
       :hide-default-header="this.$vuetify.breakpoint.xsOnly"
     >
-      <!-- <template v-slot:[`item.num`]="{ item }">
-            <v-text-field
-                class="short-textfild"
-                v-model="item.num"
-                solo
-                dense
-                hide-details
-                flat
-            ></v-text-field>
-        </template> -->
-      <template v-slot:[`item.num`]="props">
-        <!-- @save=""
-            @cancel=""
-            @open=""
-            @close="" -->
-        <v-edit-dialog :return-value.sync="props.item.num">
+      <template v-slot:[`item.qty`]="props">
+        <v-edit-dialog
+          :return-value.sync="props.item.qty"
+          @save="saveQTY(props.item.id, props.item.qty)"
+        >
           <span class="cusblue--text">
-            {{ props.item.num }}
+            {{ props.item.qty }}
           </span>
           <template v-slot:input>
             <v-text-field
-              v-model="props.item.num"
+              v-model="props.item.qty"
+              :rules="rules"
               label="Edit"
               single-line
               counter
+              @keypress="isNumber($event)"
             ></v-text-field>
           </template>
         </v-edit-dialog>
       </template>
 
-      <template v-slot:[`item.action`]>
-        <v-btn icon x-small><v-icon>mdi-pencil</v-icon></v-btn>
-        <v-btn icon x-small @click="confirmDel = true"
-          ><v-icon>mdi-trash-can</v-icon></v-btn
+      <template v-slot:[`item.price`]="props">
+        <v-edit-dialog
+          :return-value.sync="props.item.price"
+          @save="savePrice(props.item.id, props.item.price)"
         >
+          <span class="cusblue--text">
+            {{ props.item.price }}
+          </span>
+          <template v-slot:input>
+            <v-text-field
+              v-model="props.item.price"
+              :rules="rules"
+              label="Edit"
+              single-line
+              counter
+              @keypress="isNumber($event)"
+            ></v-text-field>
+          </template>
+        </v-edit-dialog>
+      </template>
+
+      <template v-slot:[`item.action`]="{ item }">
+        <v-btn
+          v-if="item.typeId === 1"
+          icon
+          x-small
+          @click="openDrugDialog(item.id)"
+        >
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn icon x-small @click="delOrder(item.id)">
+          <v-icon>mdi-trash-can</v-icon>
+        </v-btn>
       </template>
 
       <template v-slot:[`footer`]>
@@ -67,40 +86,28 @@
             รับชำระเงิน
           </v-btn>
           <div v-else class="pa-2 font-weight-medium">
-            <span>ราคารวม : 500 บาท</span>
+            <span>ราคารวม : {{ sumPrice }} บาท</span>
           </div>
         </div>
       </template>
 
       <template v-slot:top>
-        <checkListNav />
+        <checkListNav @add="addOrder" />
       </template>
     </v-data-table>
-    <v-dialog v-model="confirmDel" max-width="290">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-
-        <v-card-text> คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้ </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn color="red" text @click="confirmDel = false"> ลบ </v-btn>
-
-          <v-btn color="grey" text @click="confirmDel = false"> ยกเลิก </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <drugDialog ref="drugDialog" />
     <confirmDialog ref="confirm" />
   </div>
 </template>
 
 <script>
 import checkListNav from '@/components/Queue/Checklist/checkListNav'
+import drugDialog from '@/components/Queue/Checklist/drugDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     checkListNav,
+    drugDialog,
     confirmDialog,
   },
   props: {
@@ -109,6 +116,11 @@ export default {
       type: Object,
       required: false,
     },
+    orderItem: {
+      type: Array,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -116,21 +128,21 @@ export default {
       headers: [
         {
           text: 'รายการ',
-          value: 'list',
+          value: 'itemLabel',
           align: 'left',
           width: '180',
           sortable: false,
         },
         {
           text: 'ประเภท',
-          value: 'type',
+          value: 'typeLabel',
           align: 'center',
           width: '',
           sortable: false,
         },
         {
           text: 'จำนวน',
-          value: 'num',
+          value: 'qty',
           align: 'center',
           width: '',
           sortable: false,
@@ -157,116 +169,80 @@ export default {
           sortable: false,
         },
       ],
-      desserts: [
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXXx',
-          type: 'ยา',
-          num: '10',
-          unit: 'เม็ด',
-          price: '50',
-        },
-      ],
+      qty: '',
+      rules: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
     }
   },
+  computed: {
+    sumPrice() {
+      let sum = 0
+      this.orderItem.map((item) => {
+        return (sum += item.price * item.qty)
+      })
+      return sum
+    },
+  },
   methods: {
+    openDrugDialog(id) {
+      this.$refs.drugDialog.open(id)
+    },
+    addOrder(res) {
+      this.$emit('add', res)
+    },
+    isNumber($event) {
+      const keyCode = $event.keyCode ? $event.keyCode : $event.which
+      if (keyCode < 48 || keyCode > 57) {
+        $event.preventDefault()
+      }
+    },
+    delOrder(id) {
+      this.$refs.confirm
+        .open(`คุณแน่ใจหรือไม่?`, `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`, {
+          width: 290,
+          color: 'red',
+        })
+        .then((confirm) => {
+          this.$axios
+            .$delete(`/api/visits/${this.$route.params.queue}/orders/${id}`, {
+              progress: false,
+            })
+            .then((res) => {
+              this.$emit('delete', id)
+            })
+            .catch((error) => {
+              alert(error)
+            })
+        })
+        .catch(() => {})
+    },
+    saveQTY(id, value) {
+      const sendQTY = {
+        qty: value,
+      }
+      this.$axios
+        .$patch(
+          `/api/visits/${this.$route.params.queue}/orders/${id}`,
+          sendQTY,
+          { progress: false }
+        )
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    savePrice(id, value) {
+      const sendPrice = {
+        price: value,
+      }
+      this.$axios
+        .$patch(
+          `/api/visits/${this.$route.params.queue}/orders/${id}`,
+          sendPrice,
+          { progress: false }
+        )
+        .catch((error) => {
+          alert(error)
+        })
+    },
     endCheck(id, status) {
       this.$refs.confirm
         .open(`ยืนยันการรอผลตรวจ?`, `ต้องการยืนยันการรอผลตรวจใช่หรือไม่`, {

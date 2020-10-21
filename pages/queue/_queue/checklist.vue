@@ -17,7 +17,12 @@
         </v-col>
 
         <v-col cols="12" md="8" lg="9">
-          <checklistCard :visit-data="oneVisit" />
+          <checklistCard
+            :visit-data="oneVisit"
+            :order-item="order"
+            @add="addOrder"
+            @delete="delOrder"
+          />
         </v-col>
       </v-row>
       <!-- <OwnerPetCard v-if="$route.params.page == 'check'" /> -->
@@ -52,24 +57,50 @@ export default {
     else return false
   },
   async asyncData({ $axios, params }) {
-    const visit = await $axios.$get(`/api/visits/${params.queue}`, {
-      progress: false,
-    })
-    const owner = await $axios.$get(
-      `/api/members?code=${visit.pet.owner.code}`,
-      { progress: false }
-    )
-    const pet = await $axios.$get(`/api/pets?code=${visit.pet.code}`, {
-      progress: false,
-    })
-    return {
-      oneVisit: visit,
-      oneOwner: owner.results[0],
-      onePet: pet.results[0],
+    try {
+      const visit = await $axios.$get(`/api/visits/${params.queue}`, {
+        progress: false,
+      })
+      const owner = await $axios.$get(
+        `/api/members?code=${visit.pet.owner.code}`,
+        { progress: false }
+      )
+      const pet = await $axios.$get(`/api/pets?code=${visit.pet.code}`, {
+        progress: false,
+      })
+      const order = await $axios.$get(`/api/visits/${params.queue}/orders`, {
+        progress: false,
+      })
+      return {
+        oneVisit: visit,
+        oneOwner: owner.results[0],
+        onePet: pet.results[0],
+        order: order.results,
+      }
+    } catch (error) {
+      alert(error)
     }
   },
   data() {
     return {}
+  },
+  methods: {
+    async addOrder(data) {
+      // this.order.push(data)
+      const order = await this.$axios.$get(
+        `/api/visits/${this.$route.params.queue}/orders`,
+        {
+          progress: false,
+        }
+      )
+      this.order = order.results
+    },
+    delOrder(id) {
+      const index = this.order.findIndex((order) => {
+        return order.id === id
+      })
+      this.order.splice(index, 1)
+    },
   },
 }
 </script>

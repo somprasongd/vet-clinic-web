@@ -3,9 +3,14 @@
     <v-row class="px-5" align="center" justify="center" dense>
       <v-col md="2" cols="5">
         <v-select
+          v-model="select"
           class="rounded-lg"
+          :items="type"
+          item-text="label"
+          item-value="id"
+          item-color="cusblue"
+          :menu-props="{ closeOnContentClick: true }"
           label="ประเภท"
-          :items="doct"
           light
           filled
           rounded
@@ -13,8 +18,26 @@
           dense
           flat
           hide-details
-        ></v-select>
+        >
+          <template v-slot:prepend-item>
+            <v-list-item
+              :style="select === null ? 'background-color: #e2f5fc' : ''"
+              ripple
+              @click="select = null"
+            >
+              <v-list-item-content>
+                <v-list-item-title
+                  :class="select === null ? 'cusblue--text' : ''"
+                >
+                  ทั้งหมด
+                </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider class="mt-2"></v-divider>
+          </template>
+        </v-select>
       </v-col>
+
       <v-col md="10" cols="7">
         <v-row no-gutters>
           <v-col cols="8" md="10">
@@ -22,8 +45,8 @@
               v-model="value"
               class="rounded-lg"
               :items="items"
-              item-text="name"
-              item-value="name"
+              item-text="label"
+              item-value="id"
               item-color="cusblue2"
               :search-input.sync="search"
               :loading="loading"
@@ -36,7 +59,7 @@
               flat
               hide-details
               hide-no-data
-              @change="showModal"
+              @change="selectedItem"
               @focus="value = null"
             >
               <template v-slot:append>
@@ -51,7 +74,7 @@
                 <template>
                   <v-list-item-content>
                     <v-list-item-title
-                      v-text="data.item.name"
+                      v-text="data.item.label"
                     ></v-list-item-title>
                   </v-list-item-content>
                 </template>
@@ -69,104 +92,10 @@
               dense
               flat
               hide-details
+              @keypress="isNumber($event)"
             ></v-text-field>
           </v-col>
         </v-row>
-
-        <v-dialog v-model="assignModal" max-width="600" scrollable>
-          <v-card>
-            <h2 class="pa-5 pb-2">เพิ่มรายการ</h2>
-            <v-divider></v-divider>
-
-            <div class="pa-8">
-              <v-row align="center" justify="center">
-                <v-col cols="6">รายการ : {{ addData.nameList }}</v-col>
-                <v-col cols="6">ประเภท : {{ addData.type }}</v-col>
-                <v-col cols="6">
-                  <v-row align="center" justify="center">
-                    <v-col cols="3">
-                      <span>จำนวน</span>
-                    </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        v-model="addData.num"
-                        class="short-textfilds"
-                        solo
-                        dense
-                        hide-details
-                        flat
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="3">
-                      <span>เม็ด</span>
-                    </v-col>
-                  </v-row>
-                </v-col>
-                <v-col cols="6">
-                  <v-row align="center" justify="center" no-gutters>
-                    <v-col cols="5">
-                      <span>ราคาต่อหน่วย</span>
-                    </v-col>
-                    <v-col cols="5">
-                      <v-text-field
-                        v-model="addData.num"
-                        class="short-textfilds"
-                        solo
-                        dense
-                        hide-details
-                        flat
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="2">
-                      <span>บาท</span>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="addData.instr"
-                    label="Instruction"
-                    color="cusblue2"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="addData.dose"
-                    label="Dose"
-                    color="cusblue2"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="addData.freq"
-                    label="Frequency"
-                    color="cusblue2"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="addData.caution"
-                    label="Caution"
-                    color="cusblue2"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </div>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="cusblue2" text @click="assignModal = false"
-                >ยกเลิก</v-btn
-              >
-
-              <v-btn color="cusblue2" text @click="assignModal = false"
-                >บันทึก</v-btn
-              >
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-col>
     </v-row>
     <v-divider></v-divider>
@@ -177,64 +106,97 @@
 export default {
   data() {
     return {
-      doct: ['เม็ด', 'น้ำ'],
-      count: 1,
-      loading: false,
+      type: this.$store.state.form.itemGroup,
+      select: null,
+      // search: '',
+
+      timeout: null,
       items: [],
       search: null,
       value: null,
-      drug: [
-        { name: 'kkkk', type: 'เม็ด' },
-        { name: 'www', type: 'น้ำ' },
-        { name: 'kkss', type: 'เม็ด' },
-        { name: 'kwkkk', type: 'เม็ด' },
-        { name: 'wfww', type: 'น้ำ' },
-        { name: 'kwkss', type: 'เม็ด' },
-        { name: 'kkfkk', type: 'เม็ด' },
-        { name: 'wwww', type: 'น้ำ' },
-        { name: 'kfkss', type: 'เม็ด' },
-        { name: 'kwkkk', type: 'เม็ด' },
-        { name: 'wfww', type: 'น้ำ' },
-        { name: 'kwkss', type: 'เม็ด' },
-      ],
+      loading: false,
 
-      assignModal: false,
-      addData: {
-        nameList: '',
-        type: '',
-        num: '',
-        price: '',
-        instr: '',
-        dose: '',
-        freq: '',
-        caution: '',
-      },
+      count: 1,
     }
   },
   watch: {
     search(val) {
-      val && val !== this.value && this.querySelections(val)
-    },
-    assignModal() {
-      if (this.assignModal === false) this.count = 1
-    },
-  },
-  methods: {
-    showModal() {
-      if (this.value != null) {
-        this.assignModal = true
-        this.addData.nameList = this.value.name
-        this.addData.type = this.value.type
-      }
-    },
-    querySelections(v) {
-      this.loading = true
-      // Simulated ajax query
-      setTimeout(() => {
-        this.items = this.drug
-        this.loading = false
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        if (val !== '') {
+          this.querySelections(val)
+        } else {
+          this.items = []
+          this.loading = false
+        }
       }, 500)
     },
+  },
+  mounted() {
+    if (this.$store.state.form.itemGroup.length === 0) {
+      this.$store.dispatch('form/addItemGroup').then((res) => {
+        this.type = res
+      })
+    }
+  },
+  methods: {
+    querySelections(v) {
+      this.loading = true
+
+      this.$axios
+        .$get(
+          `/api/config/items?label=${v}${
+            this.select !== null ? `&itemGroupId=${this.select}` : ''
+          }`,
+          {
+            progress: false,
+          }
+        )
+        .then((res) => {
+          this.items = res.results
+          this.loading = false
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    selectedItem() {
+      // if (this.value.itemGroup.id === 1) {
+      //   this.showModal()
+      // } else {
+      //   console.log('not Drug')
+      // }
+      const order = { ...this.value }
+      const count = parseInt(this.count)
+      const sendOrder = {
+        itemId: order.id,
+        qty: count,
+      }
+      this.$axios
+        .$post(`/api/visits/${this.$route.params.queue}/orders`, sendOrder, {
+          progress: false,
+        })
+        .then((res) => {
+          this.$emit('add', res)
+          this.count = 1
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    isNumber($event) {
+      const keyCode = $event.keyCode ? $event.keyCode : $event.which
+      if (keyCode < 48 || keyCode > 57) {
+        $event.preventDefault()
+      }
+    },
+    // showModal() {
+    //   if (this.value != null) {
+    //     this.assignModal = true
+    //     this.addData.nameList = this.value.label
+    //     this.addData.type = this.value.itemGroup.label
+    //   }
+    // },
   },
 }
 </script>
