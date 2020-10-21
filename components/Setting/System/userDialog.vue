@@ -148,8 +148,17 @@
             text
             :disabled="loading"
             @click="assignModal = false"
-            >Cancel</v-btn
           >
+            Cancel
+          </v-btn>
+          <v-btn
+            class="cusblue2--text text-none"
+            text
+            :disabled="loading"
+            @click="newItem"
+          >
+            New
+          </v-btn>
           <v-btn
             class="cusblue2--text text-none"
             text
@@ -261,16 +270,20 @@ export default {
     assignModal() {
       if (this.assignModal === false) {
         setTimeout(() => {
-          this.defaultRole = null
-          this.$refs.form.reset()
-          this.alert = false
-          this.addUser.id = ''
-          this.avatar = ''
+          this.newItem()
         }, 150)
       }
     },
   },
   methods: {
+    newItem() {
+      this.defaultRole = null
+      this.$refs.form.reset()
+      this.alert = false
+      this.addUser.id = ''
+      this.addUser.username = ''
+      this.avatar = ''
+    },
     roleError(bool) {
       this.valid = !bool
     },
