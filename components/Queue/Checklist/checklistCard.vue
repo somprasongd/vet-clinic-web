@@ -1,14 +1,13 @@
 <template>
   <div>
     <v-data-table
-      class="elevation-4"
+      class="elevation-4 hidden-header"
       :headers="headers"
       :items="orderItem"
       disable-pagination
       hide-default-footer
       height="calc(100vh - 210px)"
       fixed-header
-      :hide-default-header="this.$vuetify.breakpoint.xsOnly"
     >
       <template v-slot:[`item.qty`]="props">
         <v-edit-dialog
@@ -268,3 +267,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.hidden-header .v-data-table-header-mobile {
+  position: absolute;
+  visibility: hidden;
+}
+</style>
