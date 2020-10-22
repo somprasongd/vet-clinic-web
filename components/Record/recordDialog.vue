@@ -229,7 +229,7 @@ export default {
     open(val) {
       this.assignModal = true
       if (this.$route.params.owner) {
-        console.log(val)
+        // console.log(val)
         this.addCustomer = {
           id: val.id,
           prefix: val.prefixId || 1,

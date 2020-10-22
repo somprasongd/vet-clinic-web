@@ -188,8 +188,8 @@ export default {
           date.count === 0
             ? ''
             : moment(date.results[0].appointDate).format('DD/MM/YYYY')
-      } catch (e) {
-        console.log(e)
+      } catch (error) {
+        alert(error)
       }
     },
     getVitalSign(id) {
