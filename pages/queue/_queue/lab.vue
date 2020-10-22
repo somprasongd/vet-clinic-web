@@ -17,7 +17,7 @@
         </v-col>
 
         <v-col cols="12" md="8" lg="9">
-          <labCard />
+          <labCard :lab-item="lab" />
         </v-col>
       </v-row>
       <!-- <OwnerPetCard v-if="$route.params.page == 'check'" /> -->
@@ -59,10 +59,14 @@ export default {
     const pet = await $axios.$get(`/api/pets?code=${visit.pet.code}`, {
       progress: false,
     })
+    const lab = await $axios.$get(`/api/visits/${params.queue}/results/lab`, {
+      progress: false,
+    })
     return {
       oneVisit: visit,
       oneOwner: owner.results[0],
       onePet: pet.results[0],
+      lab: lab.datas,
     }
   },
   data() {
