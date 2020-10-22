@@ -146,7 +146,7 @@ export default {
       this.$axios
         .$get(
           `/api/config/items?label=${v}${
-            this.select !== null ? `&itemGroupId=${this.select}` : ''
+            this.select !== null ? `&groupId=${this.select}` : ''
           }`,
           {
             progress: false,
