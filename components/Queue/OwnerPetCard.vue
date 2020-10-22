@@ -170,7 +170,7 @@
                 {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
               </v-btn>
               <v-btn
-                :to="'/insertImg/' + this.$route.params.queue"
+                :to="'/queue/' + this.$route.params.queue + '/insertImg'"
                 class="cusblue3 font-weight-regular text-capitalize my-2"
                 block
                 depressed
@@ -340,7 +340,7 @@
         {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
       </v-btn>
       <v-btn
-        :to="'/insertImg/' + this.$route.params.queue"
+        :to="'/queue/' + this.$route.params.queue + '/insertImg'"
         class="px-1"
         rounded
         left

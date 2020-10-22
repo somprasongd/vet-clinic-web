@@ -8,6 +8,7 @@ export const state = () => ({
   helper: null,
   itemGroup: [],
   labGroup: [],
+  mediaType: [],
 })
 
 export const mutations = {
@@ -37,6 +38,9 @@ export const mutations = {
   },
   setlabGroup(state, lab) {
     state.labGroup = lab
+  },
+  setMedia(state, media) {
+    state.mediaType = media
   },
 }
 
@@ -96,6 +100,13 @@ export const actions = {
     })
     commit('setlabGroup', lab.results)
     return lab.results
+  },
+  async addMedia({ commit }) {
+    const media = await this.$axios.$get('/api/master/media-types', {
+      progress: false,
+    })
+    commit('setlabGroup', media.results)
+    return media.results
   },
 }
 

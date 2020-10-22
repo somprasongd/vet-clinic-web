@@ -14,20 +14,60 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
     <div id="painterro" ref="paint"></div>
+
     <v-dialog v-model="assignModal" max-width="500" scrollable>
       <v-card>
         <h2 class="pa-5 pb-2">อัพโหลดไฟล์</h2>
         <v-divider class="darker-divider"></v-divider>
         <v-card-text class="px-7">
           <div class="preview-img">
-            <v-img class="pa-3" :src="uploadImg" height="300" contain></v-img>
+            <v-img
+              class="pa-3"
+              :src="addImg.previewImg"
+              height="300"
+              contain
+            ></v-img>
           </div>
-          <v-text-field color="cusblue" label="รายละเอียด"></v-text-field>
+          <v-select
+            v-model="addImg.type"
+            :disabled="loading"
+            class="rounded-lg"
+            :items="type"
+            item-text="label"
+            item-value="id"
+            item-color="cusblue"
+            label="ประเภท"
+          >
+          </v-select>
+          <v-textarea
+            v-model="addImg.description"
+            :disabled="loading"
+            color="cusblue"
+            label="รายละเอียด"
+            auto-grow
+            row-height="24"
+            rows="1"
+          ></v-textarea>
         </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="cusblue2--text text-none" text>บันทึก</v-btn>
+          <v-btn
+            :disabled="loading"
+            class="cusblue2--text text-none"
+            text
+            @click="submitImg"
+          >
+            <v-progress-circular
+              v-show="loading"
+              class="mr-2"
+              indeterminate
+              color="cusblue2"
+              :size="15"
+              :width="2"
+            ></v-progress-circular>
+            บันทึก
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -43,11 +83,34 @@ export default {
     return {
       assignModal: false,
       painterro: null,
-      uploadImg:
-        'https://img.wongnai.com/p/256x256/2019/12/17/0166201f723943989a21210575ef1f15.jpg',
+      type: this.$store.state.form.mediaType,
+      loading: false,
+      addImg: {
+        img: '',
+        previewImg: '',
+        description: '',
+        type: 1,
+      },
     }
   },
+  watch: {
+    assignModal(val) {
+      if (val === false) {
+        this.addImg = {
+          img: '',
+          previewImg: '',
+          description: '',
+          type: 1,
+        }
+      }
+    },
+  },
   mounted() {
+    if (this.$store.state.form.mediaType.length === 0) {
+      this.$store.dispatch('form/addMedia').then((res) => {
+        this.type = res
+      })
+    }
     Vue.nextTick(() => {
       this.painterro = Painterro({
         id: 'painterro',
@@ -61,12 +124,8 @@ export default {
           hoverControlContent: 'rgb(211, 211, 211)',
         },
         saveHandler: (image, done) => {
-          // const type = 'image/png'
-          // const file = new File([image.asBlob(type)], 'file.png', {
-          //   type: 'image/png',
-          // })
-          // this.add_file(file) // do something with file e.g. upload to server
-          this.uploadImg = image.asDataURL() // preview base 64
+          this.addImg.img = image
+          this.addImg.previewImg = image.asDataURL() // preview base 64
           done(true) // done and hide painterro
           this.assignModal = true
         },
@@ -76,6 +135,36 @@ export default {
   methods: {
     openDialog() {
       this.painterro.show()
+    },
+    submitImg() {
+      this.loading = true
+      const addImg = { ...this.addImg }
+      const type = 'image/png'
+      const file = new File([addImg.img.asBlob(type)], 'file.png', {
+        type: 'image/png',
+      })
+      const formData = new FormData()
+      formData.append('image', file)
+      formData.append('description', addImg.description)
+      formData.append('typeId', addImg.type)
+
+      this.$axios
+        .$post(`/api/visits/${this.$route.params.queue}/images`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          progress: false,
+        })
+        .then((data) => {
+          setTimeout(() => {
+            this.$emit('add', data)
+            this.loading = false
+            this.assignModal = false
+          }, 500)
+        })
+        .catch((error) => {
+          alert(error)
+        })
     },
   },
 }

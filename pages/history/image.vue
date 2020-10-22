@@ -9,7 +9,7 @@
 
 <script>
 import hisNav from '@/components/history/hisNav'
-import imgCard from '@/components/insertImg/image'
+import imgCard from '@/components/Queue/insertImg/image'
 export default {
   components: {
     hisNav,

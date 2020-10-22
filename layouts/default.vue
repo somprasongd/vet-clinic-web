@@ -29,7 +29,14 @@
         <v-tab class="font-weight-regular" to="/report">รายงาน</v-tab>
         <v-tab class="font-weight-regular" to="/setting">ตั้งค่า</v-tab>
       </v-tabs>
-      <v-tabs v-else dark show-arrows centered>
+
+      <v-tabs
+        v-else
+        dark
+        show-arrows
+        centered
+        :hide-slider="$nuxt.$route.path === '/queue/67/insertImg'"
+      >
         <v-tab class="font-weight-regular" exact to="/queue">คิว</v-tab>
         <v-tab
           :disabled="this.$store.state.navTab.check"

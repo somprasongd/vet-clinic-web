@@ -2,14 +2,16 @@
   <v-hover v-slot:default="{ hover }">
     <v-card
       :elevation="hover ? 12 : 2"
-      class="mb-4 mx-2"
+      class="mb-4 mx-2 overflow-auto"
       min-width="282"
       width="282"
+      height="270"
     >
       <v-img
         v-ripple
         class="img-cus"
-        :src="url"
+        :lazy-src="img.media.url_thumbnail_sm"
+        :src="img.media.url"
         height="180px"
         @click="$emit('imgclick', keys)"
       >
@@ -25,12 +27,20 @@
         </v-row>
       </v-img>
 
-      <v-card-title> {{ imgtitle }} </v-card-title>
+      <v-card-title> {{ img.description }} </v-card-title>
 
-      <v-card-subtitle> {{ imgdate }} </v-card-subtitle>
-      <v-btn v-if="delbtn" class="mb-2" bottom right absolute icon
-        ><v-icon>mdi-close</v-icon></v-btn
+      <v-card-subtitle> {{ getType(img.typeId) }} </v-card-subtitle>
+      <v-btn
+        v-if="delbtn"
+        class="mb-2"
+        bottom
+        right
+        absolute
+        icon
+        @click="$emit('delete', img.id)"
       >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
     </v-card>
   </v-hover>
 </template>
@@ -42,22 +52,34 @@ export default {
       type: Number,
       required: true,
     },
-    url: {
-      type: String,
-      required: true,
-    },
-    imgtitle: {
-      type: String,
-      required: true,
-    },
-    imgdate: {
-      type: String,
+    img: {
+      type: Object,
       required: true,
     },
     delbtn: {
       default: false,
       type: Boolean,
       required: false,
+    },
+  },
+  data() {
+    return {
+      type: this.$store.state.form.mediaType,
+    }
+  },
+  mounted() {
+    if (this.$store.state.form.mediaType.length === 0) {
+      this.$store.dispatch('form/addMedia').then((res) => {
+        this.type = res
+      })
+    }
+  },
+  methods: {
+    getType(id) {
+      if (this.type.length !== 0) {
+        const index = this.type.findIndex((type) => type.id === id)
+        return this.type[index].label
+      }
     },
   },
 }
