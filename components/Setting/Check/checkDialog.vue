@@ -27,7 +27,7 @@
                     label="ชื่อ"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="6">
+                <v-col :cols="itemData.itemGroup === 3 ? '4' : '6'">
                   <v-select
                     v-model="itemData.itemGroup"
                     :rules="rules.itemGroup"
@@ -42,9 +42,8 @@
                   >
                   </v-select>
                 </v-col>
-                <v-col cols="6">
+                <v-col v-if="itemData.itemGroup === 3" cols="2">
                   <v-checkbox
-                    v-if="itemData.itemGroup === 3"
                     v-model="itemData.isSet"
                     :disabled="editing || loading"
                     label="Lab ชุด"
@@ -52,7 +51,15 @@
                   >
                   </v-checkbox>
                 </v-col>
-
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="itemData.unit"
+                    :disabled="loading"
+                    :rules="rules.unit"
+                    color="cusblue"
+                    label="หน่วย"
+                  ></v-text-field>
+                </v-col>
                 <v-col cols="6">
                   <v-text-field
                     v-model="itemData.cost"
@@ -121,15 +128,6 @@
                     :rules="rules1.dose"
                     color="cusblue"
                     label="Dose"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="checkData.unit"
-                    :disabled="loading1"
-                    :rules="rules1.unit"
-                    color="cusblue"
-                    label="Unit"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -286,15 +284,6 @@
                       >
                       </v-text-field>
                     </v-col>
-                    <v-col cols="6">
-                      <v-text-field
-                        v-model="checkData.labUnit"
-                        :disabled="loading1"
-                        :rules="rules1.labUnit"
-                        color="cusblue"
-                        label="หน่วย"
-                      ></v-text-field>
-                    </v-col>
                   </v-row>
                 </div>
               </div>
@@ -387,6 +376,7 @@ export default {
         code: '',
         name: '',
         itemGroup: 1,
+        unit: '',
         cost: '',
         price: '',
         isSet: false,
@@ -395,7 +385,6 @@ export default {
         // drug
         instruction: '',
         dose: '',
-        unit: '',
         frequency: '',
         caution: '',
         remark: '',
@@ -405,7 +394,6 @@ export default {
         normalStr: '',
         normalMin: '',
         normalMax: '',
-        labUnit: '',
       },
       rules: {
         code: [
@@ -418,6 +406,10 @@ export default {
           (v) => (v && v.length <= 50) || 'ไม่ควรกรอกข้อความเกิน 50 ตัวอักษร',
         ],
         itemGroup: [(v) => !!v || 'กรุณาเลือกประเภท'],
+        unit: [
+          (v) => !!v || 'กรุณากรอกหน่วย',
+          (v) => (v && v.length <= 100) || 'ไม่ควรกรอกหน่วยเกิน 100 ตัวอักษร',
+        ],
         cost: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
         price: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
       },
@@ -428,10 +420,6 @@ export default {
           (v) => (v && v.length <= 100) || 'ไม่ควรกรอกคำแนะนำเกิน 100 ตัวอักษร',
         ],
         dose: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
-        unit: [
-          (v) => !!v || 'กรุณากรอกหน่วย',
-          (v) => (v && v.length <= 100) || 'ไม่ควรกรอกหน่วยเกิน 100 ตัวอักษร',
-        ],
         frequency: [
           (v) => !!v || 'กรุณากรอกความถี่',
           (v) => (v && v.length <= 100) || 'ไม่ควรกรอกความถี่เกิน 100 ตัวอักษร',
@@ -454,10 +442,6 @@ export default {
         normalMax: [
           (v) =>
             (v && /^[0-9.]*$/.test(v)) || 'กรุณากรอกตัวเลขหรือทศนิยมเท่านั้น',
-        ],
-        labUnit: [
-          (v) => !!v || 'กรุณากรอกหน่วย',
-          (v) => (v && v.length <= 100) || 'ไม่ควรกรอกหน่วยเกิน 100 ตัวอักษร',
         ],
       },
     }
@@ -500,6 +484,7 @@ export default {
           code: editItem.code,
           name: editItem.label,
           itemGroup: editItem.itemGroup.id,
+          unit: editItem.unit,
           cost: editItem.cost,
           price: editItem.price,
           isSet: editItem.isSet,
@@ -516,7 +501,6 @@ export default {
                 // drug
                 instruction: res.instruction,
                 dose: res.dose,
-                unit: res.unit,
                 frequency: res.frequency,
                 caution: res.caution,
                 remark: res.remark,
@@ -526,13 +510,12 @@ export default {
                 normalStr: '',
                 normalMin: '',
                 normalMax: '',
-                labUnit: '',
               }
               this.changeToCreate = false
             })
             .catch((error) => {
               this.changeToCreate = true
-              console.log(error)
+              alert(error)
             })
         } else if (editItem.itemGroup.id === 3 && editItem.isSet === false) {
           this.$axios
@@ -544,7 +527,6 @@ export default {
                 // drug
                 instruction: '',
                 dose: '',
-                unit: '',
                 frequency: '',
                 caution: '',
                 remark: '',
@@ -554,7 +536,6 @@ export default {
                 normalStr: res.normalStr,
                 normalMin: res.normalMin,
                 normalMax: res.normalMax,
-                labUnit: res.unit,
               }
               this.changeToCreate = false
             })
@@ -617,6 +598,7 @@ export default {
           price: item.price,
           isSet: item.itemGroup === 3 ? item.isSet : false,
           itemGroupId: item.itemGroup,
+          unit: item.unit,
         }
         this.$axios
           .$post('/api/config/items', sendItem, { progress: false })
@@ -650,10 +632,8 @@ export default {
               isSet: this.itemData.isSet,
             }
           : this.res
-        console.log(item)
         if (item.itemGroupId === 1) {
           const drug = {
-            unit: data.unit,
             dose: data.dose,
             caution: data.caution,
             frequency: data.frequency,
@@ -681,13 +661,11 @@ export default {
                   resultType: data.resultType,
                   normalMin: data.normalMin,
                   normalMax: data.normalMax,
-                  unit: data.labUnit,
                 }
               : {
                   groupId: data.groupId,
                   resultType: data.resultType,
                   normalStr: data.normalStr,
-                  unit: data.labUnit,
                 }
           this.$axios
             .$post(`/api/config/items/${item.id}/labs`, lab, {
@@ -717,6 +695,7 @@ export default {
           price: item.price,
           isSet: item.itemGroup === 3 ? item.isSet : false,
           itemGroupId: item.itemGroup,
+          unit: item.unit,
         }
         this.$axios
           .$put(`/api/config/items/${item.id}`, sendItem, { progress: false })
@@ -737,10 +716,8 @@ export default {
         this.loading1 = true
         const data = { ...this.checkData }
         const item = this.itemData
-        console.log(this.changeToCreate)
         if (item.itemGroup === 1) {
           const drug = {
-            unit: data.unit,
             dose: data.dose,
             caution: data.caution,
             frequency: data.frequency,
@@ -768,13 +745,11 @@ export default {
                   resultType: data.resultType,
                   normalMin: data.normalMin,
                   normalMax: data.normalMax,
-                  unit: data.labUnit,
                 }
               : {
                   groupId: data.groupId,
                   resultType: data.resultType,
                   normalStr: data.normalStr,
-                  unit: data.labUnit,
                 }
           this.$axios
             .$put(`/api/config/items/${item.id}/labs`, lab, {
@@ -829,6 +804,7 @@ export default {
         code: '',
         name: '',
         itemGroup: 1,
+        unit: '',
         cost: '',
         price: '',
         isSet: false,
@@ -837,7 +813,6 @@ export default {
         // drug
         instruction: '',
         dose: '',
-        unit: '',
         frequency: '',
         caution: '',
         remark: '',
@@ -847,7 +822,6 @@ export default {
         normalStr: '',
         normalMin: '',
         normalMax: '',
-        labUnit: '',
       }
       this.res = null
       this.subLab = []
