@@ -382,7 +382,7 @@ export default {
           }, 200)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
     updateVs() {
@@ -412,7 +412,7 @@ export default {
           }, 200)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
     deleteVs(item) {
@@ -435,7 +435,7 @@ export default {
               }, 200)
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {

@@ -441,7 +441,7 @@ export default {
           })
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
     updateSend() {
@@ -454,7 +454,7 @@ export default {
           this.$router.push(`/queue`)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
     endCheck(id, status) {
@@ -509,7 +509,7 @@ export default {
               this.$router.push(`/queue`)
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {})
@@ -531,7 +531,7 @@ export default {
               this.petData.death = isDeath
             })
             .catch((err) => {
-              console.log(err)
+              alert(err)
             })
         })
         .catch(() => {})

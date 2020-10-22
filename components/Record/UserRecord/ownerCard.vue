@@ -137,7 +137,7 @@ export default {
               this.$router.push('/record')
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {})

@@ -300,7 +300,7 @@ export default {
               this.$emit('del', id)
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {})
@@ -325,7 +325,7 @@ export default {
               this.pets[index].death = isDeath
             })
             .catch((err) => {
-              console.log(err)
+              alert(err)
             })
         })
         .catch(() => {})

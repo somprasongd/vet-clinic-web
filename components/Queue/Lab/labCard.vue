@@ -145,7 +145,7 @@ export default {
           { progress: false }
         )
         .then((res) => {
-          console.log(res)
+          // console.log(res)
           const index = this.labItem.findIndex((lab) => lab.id === res.id)
           this.labItem[index].interpretLevel = res.interpretLevel
           this.labItem[index].interpret = res.interpret

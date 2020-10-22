@@ -207,7 +207,7 @@ export default {
         )
         this.appointQueue = appoint.results
       } catch (error) {
-        console.log(error)
+        alert(error)
       }
     },
   },

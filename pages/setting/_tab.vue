@@ -141,7 +141,7 @@ export default {
           this.helper.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
   },

@@ -77,7 +77,7 @@ export default {
           this.item.splice(index, 1)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
   },

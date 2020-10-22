@@ -72,7 +72,7 @@ export default {
           { progress: false }
         )
         .then((res) => {
-          console.log(res)
+          // console.log(res)
         })
         .catch((error) => {
           alert(error)

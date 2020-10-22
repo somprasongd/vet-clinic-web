@@ -111,7 +111,7 @@ export default {
               this.$emit('removed', id)
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {})

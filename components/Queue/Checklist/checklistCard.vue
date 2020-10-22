@@ -259,7 +259,7 @@ export default {
               this.$router.push(`/queue`)
             })
             .catch((error) => {
-              console.log(error)
+              alert(error)
             })
         })
         .catch(() => {})

@@ -198,7 +198,7 @@ export default {
           }, 500)
         })
         .catch((error) => {
-          console.log(error)
+          alert(error)
         })
     },
   },
