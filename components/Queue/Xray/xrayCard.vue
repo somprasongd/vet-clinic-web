@@ -3,34 +3,17 @@
     <v-data-table
       class="elevation-4"
       :headers="headers"
-      :items="desserts"
+      :items="xrayItem"
       disable-pagination
       hide-default-footer
       fixed-header
       height="calc(100vh - 110px)"
     >
-      <!-- <template v-slot:[`item.result`]="{ item }">
-                <v-row no-gutters>
-                    <v-col cols="9" sm="10" lg="11">
-                        <v-text-field
-                            class="long-textfild pr-3"
-                            v-model="item.result"
-                            solo
-                            dense
-                            hide-details
-                            flat
-                        >
-                        </v-text-field>
-                    </v-col>
-                    <v-col cols="3" sm="2" lg="1">
-                        <v-btn class="text-none" color="cusblue3" dark>Save</v-btn>
-                    </v-col>
-                </v-row>
-                
-            </template> -->
-
       <template v-slot:[`item.result`]="props">
-        <v-edit-dialog :return-value.sync="props.item.result">
+        <v-edit-dialog
+          :return-value.sync="props.item.result"
+          @save="saveResult(props.item.id, props.item.result)"
+        >
           <span class="cusblue--text">
             {{ props.item.result }}
           </span>
@@ -50,12 +33,19 @@
 
 <script>
 export default {
+  props: {
+    xrayItem: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+  },
   data() {
     return {
       headers: [
         {
           text: 'รายการ',
-          value: 'list',
+          value: 'label',
           align: 'left',
           width: '250',
           sortable: false,
@@ -68,74 +58,26 @@ export default {
           sortable: false,
         },
       ],
-      desserts: [
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-        {
-          list: 'XXXXXXXXXXXXXXXX',
-          result: '20',
-        },
-      ],
     }
+  },
+  methods: {
+    saveResult(id, value) {
+      const result = {
+        result: value,
+      }
+      this.$axios
+        .$patch(
+          `/api/visits/${this.$route.params.queue}/results/xray/${id}`,
+          result,
+          { progress: false }
+        )
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
   },
 }
 </script>

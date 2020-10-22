@@ -17,7 +17,7 @@
         </v-col>
 
         <v-col cols="12" md="8" lg="9">
-          <xrayCard />
+          <xrayCard :xray-item="xray" />
         </v-col>
       </v-row>
       <!-- <OwnerPetCard v-if="$route.params.page == 'check'" /> -->
@@ -59,10 +59,14 @@ export default {
     const pet = await $axios.$get(`/api/pets?code=${visit.pet.code}`, {
       progress: false,
     })
+    const xray = await $axios.$get(`/api/visits/${params.queue}/results/xray`, {
+      progress: false,
+    })
     return {
       oneVisit: visit,
       oneOwner: owner.results[0],
       onePet: pet.results[0],
+      xray: xray.datas,
     }
   },
   data() {
