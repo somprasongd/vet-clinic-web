@@ -5,6 +5,7 @@ body {
 
 /* width */
 ::-webkit-scrollbar {
+  height: 5px;
   width: 5px;
 }
 
@@ -198,6 +199,7 @@ body {
 
 .v-data-table .v-data-table__wrapper {
   &::-webkit-scrollbar {
+    height: 7px;
     width: 7px;
   }
   &::-webkit-scrollbar-thumb {
@@ -219,6 +221,7 @@ body {
     outline: none;
   }
   &::-webkit-scrollbar {
+    height: 5px;
     width: 5px;
   }
   &::-webkit-scrollbar-thumb {
