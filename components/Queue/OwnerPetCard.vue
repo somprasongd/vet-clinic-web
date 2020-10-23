@@ -134,7 +134,7 @@
 
             <div class="px-3 pt-1 hidden-sm-and-down">
               <v-btn
-                :to="'/history/' + this.$route.params.queue"
+                :to="'/history/' + petData.id"
                 class="cusblue3 font-weight-regular text-capitalize my-2"
                 block
                 depressed
@@ -292,7 +292,7 @@
         </v-btn>
       </template>
       <v-btn
-        :to="'/history/' + this.$route.params.queue"
+        :to="'/history/' + petData.id"
         class="px-1"
         rounded
         left

@@ -21,9 +21,14 @@
       <div v-show="isExpand">
         <v-divider class="darker-divider"></v-divider>
 
-        <div class="pa-5" :style="hideTag ? '' : 'padding:10px'">
+        <div
+          v-if="content !== null && content !== ''"
+          class="pa-5"
+          :style="hideTag ? '' : 'padding:10px'"
+        >
           {{ content }}
         </div>
+        <div v-else class="text-center pa-5 text--secondary">No data</div>
       </div>
     </v-expand-transition>
   </v-card>

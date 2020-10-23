@@ -1,49 +1,75 @@
 <template>
   <div>
     <div class="px-5 py-3 font-weight-medium">
-      <span v-if="showPrint"> 12/19/2019 DX : xxxxxxxxxxxxxxxxxxxx </span>
+      <div v-if="showPrint" class="overflow-auto">
+        <span>
+          {{ $moment(visit.visitAt).format('DD/MM/YYYY') }}
+        </span>
+        <span>DX : {{ visit.dx }}</span>
+      </div>
       <div v-else style="text-align: center">
         <h3>
-          12/19/2019<br />
-          DX : xxxxxxxxxxxxxxxxxxxx
+          {{ $moment(visit.visitAt).format('DD/MM/YYYY') }}<br />
+          DX : {{ visit.dx }}
         </h3>
       </div>
-      <v-btn v-if="showPrint" color="cusblue2" icon to="/history/image"
-        ><v-icon>mdi-image-area</v-icon></v-btn
+      <v-btn
+        v-if="showPrint"
+        color="cusblue2"
+        icon
+        @click="$emit('showimg', visit.id)"
       >
-      <v-btn v-if="showPrint" color="cusblue2" text @click="print"
-        ><v-icon>mdi-printer</v-icon>Print</v-btn
-      >
+        <v-icon>mdi-image-area</v-icon>
+      </v-btn>
+      <v-btn v-if="showPrint" color="cusblue2" text @click="print">
+        <v-icon>mdi-printer</v-icon>Print
+      </v-btn>
     </div>
 
     <hisCardTable
       :hide-tag="showPrint"
       :title="vsTitle"
       :heads="vsHead"
-      :bodys="vsBody"
-    />
-    <hisCard :hide-tag="showPrint" :title="ccTitle" :content="ccContent" />
-    <hisCard :hide-tag="showPrint" :title="htTitle" :content="htContent" />
-    <hisCard :hide-tag="showPrint" :title="peTitle" :content="peContent" />
-    <hisCard :hide-tag="showPrint" :title="dxTitle" :content="dxContent" />
+      :bodys="vs"
+    >
+      <template v-slot:body>
+        <tr v-for="item in vs" :key="item.index">
+          <td>{{ $moment(item.vitalSignAt).format('DD/MM/YYYY') }}</td>
+          <td>{{ item.temp }}</td>
+          <td>
+            {{ item.bcs !== null ? item.bcs : '' }}
+            {{ item.bcs !== null || item.dia !== null ? '/' : '' }}
+            {{ item.dia !== null ? item.dia : '' }}
+          </td>
+          <td>{{ item.weight }}</td>
+        </tr>
+      </template>
+    </hisCardTable>
+    <hisCard :hide-tag="showPrint" :title="ccTitle" :content="visit.cc" />
+    <hisCard :hide-tag="showPrint" :title="htTitle" :content="visit.ht" />
+    <hisCard :hide-tag="showPrint" :title="peTitle" :content="visit.pe" />
+    <hisCard :hide-tag="showPrint" :title="dxTitle" :content="visit.dx" />
     <hisCardTable
       :hide-tag="showPrint"
       :title="labTitle"
       :heads="labHead"
-      :bodys="labBody"
+      :bodys="lab"
     >
       <template v-slot:body>
-        <tr v-for="lab in labBody" :key="lab.index">
-          <td>{{ lab.LabName }}</td>
-          <td>{{ lab.Result }}</td>
-          <td>{{ lab.Unit }}</td>
-          <td>{{ lab.Reference }}</td>
-          <td>{{ toStat(lab.Status) }}</td>
+        <tr v-for="item in lab" :key="item.index">
+          <td>{{ item.label }}</td>
+          <td>{{ item.result }}</td>
+          <td>{{ item.unit }}</td>
+          <td>{{ item.resultType }}</td>
+          <td>{{ item.interpret }}</td>
           <td>
-            <v-row no-gutters>
-              <v-col cols="4"> รายงานผล </v-col>
+            <v-row
+              v-if="/^[0-9]*$/.test(item.result) && item.result !== ''"
+              no-gutters
+            >
+              <!-- <v-col cols="4"> รายงานผล </v-col> -->
               <v-col>
-                <labResult :num="lab.Status" />
+                <labResult :num="item.interpretLevel" />
               </v-col>
             </v-row>
           </td>
@@ -54,14 +80,29 @@
       :hide-tag="showPrint"
       :title="xrayTitle"
       :heads="xrayHead"
-      :bodys="xrayBody"
-    />
+      :bodys="xray"
+    >
+      <template v-slot:body>
+        <tr v-for="item in xray" :key="item.index">
+          <td>{{ item.label }}</td>
+          <td>{{ item.result }}</td>
+        </tr>
+      </template>
+    </hisCardTable>
     <hisCardTable
       :hide-tag="showPrint"
       :title="orderTitle"
       :heads="orderHead"
-      :bodys="orderBody"
-    />
+      :bodys="order"
+    >
+      <template v-slot:body>
+        <tr v-for="item in order" :key="item.index">
+          <td>{{ item.itemLabel }}</td>
+          <td>{{ item.qty }}</td>
+          <td>{{ item.price }}</td>
+        </tr>
+      </template>
+    </hisCardTable>
   </div>
 </template>
 
@@ -92,34 +133,43 @@ export default {
     hisCardTable,
     labResult,
   },
+  props: {
+    visit: {
+      type: Object,
+      required: true,
+    },
+    vs: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+    lab: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+    xray: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+    order: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+  },
   data() {
     return {
       showPrint: true,
 
       vsTitle: 'Vital Sign',
       vsHead: ['Date time', 'Temp', 'BP', 'Weight'],
-      vsBody: [
-        ['12:07', '100', '99', '10'],
-        ['12:07', '100', '99', '10'],
-        ['12:07', '100', '99', '10'],
-        ['12:07', '100', '99', '10'],
-      ],
 
       ccTitle: 'CC (Chief Complaint)',
-      ccContent:
-        'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum eveniet quaerat libero. Quae voluptas sint odit dicta tempora nihil quam quidem quasi blanditiis eaque. Fuga sequi delectus iure voluptate temporibus?',
-
       htTitle: 'HT (History Ranking)',
-      htContent:
-        'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum eveniet quaerat libero. Quae voluptas sint odit dicta tempora nihil quam quidem quasi blanditiis eaque. Fuga sequi delectus iure voluptate temporibus?',
-
       peTitle: 'PE (Physical Examination)',
-      peContent:
-        'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum eveniet quaerat libero. Quae voluptas sint odit dicta tempora nihil quam quidem quasi blanditiis eaque. Fuga sequi delectus iure voluptate temporibus?',
-
       dxTitle: 'DX (Differential Diagnosis)',
-      dxContent:
-        'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laborum eveniet quaerat libero. Quae voluptas sint odit dicta tempora nihil quam quidem quasi blanditiis eaque. Fuga sequi delectus iure voluptate temporibus?',
 
       labTitle: 'Lab',
       labHead: [
@@ -130,72 +180,15 @@ export default {
         'Interpret',
         'Status',
       ],
-      labBody: [
-        {
-          LabName: 'WBC (l01)',
-          Result: '12121',
-          Unit: 'ml/da/erw',
-          Reference: '5-20',
-          Status: 5,
-        },
-        {
-          LabName: 'WBC (l01)',
-          Result: '12121',
-          Unit: 'ml/da/erw',
-          Reference: '5-20',
-          Status: 5,
-        },
-        {
-          LabName: 'WBC (l01)',
-          Result: '12121',
-          Unit: 'ml/da/erw',
-          Reference: '5-20',
-          Status: 5,
-        },
-        {
-          LabName: 'WBC (l01)',
-          Result: '12121',
-          Unit: 'ml/da/erw',
-          Reference: '5-20',
-          Status: 4,
-        },
-      ],
 
       xrayTitle: 'Xray',
       xrayHead: ['Xray Name', 'Result'],
-      xrayBody: [
-        ['xray ท้อง(x01)', 'asdasqqqqqq'],
-        ['xray ท้อง(x01)', 'asdas'],
-        ['xray ท้อง(x01)', 'asdas'],
-        ['xray ท้อง(x01)', 'asdas'],
-      ],
 
       orderTitle: 'Order',
       orderHead: ['Order Name', 'QTY', 'Price'],
-      orderBody: [
-        ['WBC (l01)', '1', '50'],
-        ['xray ท้อง(x01)', '1', '50'],
-      ],
     }
   },
   methods: {
-    toStat(num) {
-      switch (num) {
-        case 1:
-          return 'Low'
-        case 2:
-          return 'Nomal Low'
-        case 3:
-          return 'Nomal'
-        case 4:
-          return 'Nomal High'
-        case 5:
-          return 'High'
-        default:
-          // console.log(num)
-          break
-      }
-    },
     print() {
       this.showPrint = false
 

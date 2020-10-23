@@ -21,25 +21,7 @@
       <div v-show="isExpand">
         <v-divider class="darker-divider"></v-divider>
 
-        <div>
-          <!-- <table class="custable" width="100%">
-                       <thead align="left">
-                           <tr>
-                            <th v-for="head in heads" :key="head.index">{{ head }}</th>
-                           </tr>
-                       </thead>
-                       <tbody align="left">
-
-                           <slot name="body">
-                            <tr v-for="body in bodys" :key="body.index">
-                                <td v-for="item in body" :key="item.index">
-                                    {{ item }}
-                                </td>
-                            </tr>
-                           </slot>
-
-                       </tbody>
-                   </table> -->
+        <div v-if="bodys !== null && bodys !== [] && bodys.length !== 0">
           <v-simple-table class="custable px-5" dense>
             <template v-slot:default>
               <thead>
@@ -61,7 +43,7 @@
               </thead>
               <tbody>
                 <slot name="body">
-                  <tr v-for="body in bodys" :key="body.index">
+                  <!-- <tr v-for="body in bodys" :key="body.index">
                     <td
                       v-for="item in body"
                       :key="item.index"
@@ -69,12 +51,13 @@
                     >
                       {{ item }}
                     </td>
-                  </tr>
+                  </tr> -->
                 </slot>
               </tbody>
             </template>
           </v-simple-table>
         </div>
+        <div v-else class="text-center pa-5 text--secondary">No data</div>
       </div>
     </v-expand-transition>
   </v-card>
