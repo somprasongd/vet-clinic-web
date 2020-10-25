@@ -77,6 +77,11 @@ export default {
       required: false,
       default: 130,
     },
+    typeAvatar: {
+      type: String,
+      required: false,
+      default: 'users',
+    },
   },
   data() {
     return {
@@ -106,7 +111,9 @@ export default {
 
       this.$axios
         .$post(
-          `/api/${id === null ? 'upload/avatar' : `users/${id}/avatar`}`,
+          `/api/${
+            id === null ? 'upload/avatar' : `${this.typeAvatar}/${id}/avatar`
+          }`,
           formData,
           {
             headers: {
@@ -121,18 +128,20 @@ export default {
         })
         .catch((error) => {
           this.avatarError(error)
+          alert(error)
         })
     },
     deleteProfile(id) {
       this.loadingAvatar = true
       this.$axios
-        .$delete(`/api/users/${id}/avatar`, { progress: false })
+        .$delete(`/api/${this.typeAvatar}/${id}/avatar`, { progress: false })
         .then((data) => {
           // this.updateSuccess(response)
           this.avatarSuccess(require('~/assets/profile/defaultProfile.svg'))
         })
         .catch((error) => {
           this.avatarError(error)
+          alert(error)
         })
     },
     avatarSuccess(img) {

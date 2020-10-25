@@ -65,12 +65,11 @@
 
       <div class="pa-4">
         <v-row justify="center" align="center" dense>
-          <v-col cols="4"
-            ><v-img
-              :src="require('~/assets/profile/003-dog-1.svg')"
-              width="100"
-            ></v-img
-          ></v-col>
+          <v-col cols="4">
+            <v-avatar size="100">
+              <v-img :src="getPetAvartar(petData.id)" width="100"></v-img>
+            </v-avatar>
+          </v-col>
           <v-col cols="8">
             <v-row no-gutters class="font-weight-bold">
               <v-col cols="5">ชื่อสัตว์เลี้ยง</v-col>
@@ -111,11 +110,12 @@
           <div class="pa-4">
             <v-row justify="center" align="center" dense>
               <v-col cols="4">
-                <v-img
-                  :src="require('~/assets/profile/001-user.svg')"
-                  width="100"
-                >
-                </v-img>
+                <v-avatar size="100">
+                  <v-img
+                    :src="getOwnerAvartar(ownerData.id)"
+                    width="100"
+                  ></v-img>
+                </v-avatar>
               </v-col>
               <v-col cols="8">
                 <span class="font-weight-bold">{{
@@ -419,6 +419,12 @@ export default {
     }
   },
   methods: {
+    getPetAvartar(id) {
+      return `${process.env.apiUrl}/api/pets/${id}/avatar`
+    },
+    getOwnerAvartar(id) {
+      return `${process.env.apiUrl}/api/members/${id}/avatar`
+    },
     calcAge(date) {
       const nowDate = moment()
       const pickDate = moment(date, 'YYYY-MM-DD')

@@ -8,11 +8,13 @@
           <v-col lg="1" md="2" sm="3" cols="4">
             <v-row no-gutters>
               <v-col cols="12">
-                <v-avatar size="100">
-                  <v-img
-                    :src="require('~/assets/profile/001-user.svg')"
-                  ></v-img>
-                </v-avatar>
+                <userAvatar
+                  :avatarid="owner.id"
+                  :avatars="avatar"
+                  type-avatar="members"
+                  :size="100"
+                  :delete-img="false"
+                />
               </v-col>
               <v-col cols="12">
                 <v-menu offset-y nudge-left="80">
@@ -92,10 +94,12 @@
 <script>
 import recordDialog from '@/components/Record/recordDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
+import userAvatar from '@/components/Setting/System/userAvatar'
 export default {
   components: {
     recordDialog,
     confirmDialog,
+    userAvatar,
   },
   props: {
     owner: {
@@ -106,6 +110,7 @@ export default {
   },
   data() {
     return {
+      avatar: `${process.env.apiUrl}/api/members/${this.owner.id}/avatar`,
       actionBtns: [
         { text: 'แก้ไขข้อมูล', action: this.updateMember },
         { text: 'ลบข้อมูล', action: this.deleteMember },

@@ -22,7 +22,11 @@
             align="center"
             no-gutters
           >
-            <userAvatar :avatarid="addUser.id" :avatars="avatar" />
+            <userAvatar
+              :avatarid="addUser.id"
+              :avatars="avatar"
+              type-avatar="users"
+            />
             <div class="col-12 text-center">
               <h1 class="my-4">{{ addUser.username }}</h1>
               <v-divider></v-divider>

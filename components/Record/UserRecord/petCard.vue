@@ -10,11 +10,13 @@
             <v-col lg="1" md="2" cols="6">
               <v-row>
                 <v-col class="text-center" cols="12">
-                  <v-avatar size="100">
-                    <v-img
-                      :src="require('~/assets/profile/003-dog-1.svg')"
-                    ></v-img>
-                  </v-avatar>
+                  <userAvatar
+                    :avatarid="pet.id"
+                    :avatars="getPetAvatar(pet.id)"
+                    type-avatar="pets"
+                    :size="100"
+                    :delete-img="false"
+                  />
                 </v-col>
                 <v-col class="text-center" cols="12">
                   <v-menu offset-y nudge-left="80">
@@ -212,6 +214,7 @@ import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
 import depositDialog from '@/components/Record/UserRecord/depositDialog'
 import appointDialog from '@/components/Record/UserRecord/appointDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
+import userAvatar from '@/components/Setting/System/userAvatar'
 import moment from 'moment'
 export default {
   components: {
@@ -219,6 +222,7 @@ export default {
     depositDialog,
     appointDialog,
     confirmDialog,
+    userAvatar,
   },
   props: {
     pets: {
@@ -231,6 +235,9 @@ export default {
     return {}
   },
   methods: {
+    getPetAvatar(id) {
+      return `${process.env.apiUrl}/api/pets/${id}/avatar`
+    },
     onClickApp(id) {
       this.$refs.appDialog.open(id)
     },
