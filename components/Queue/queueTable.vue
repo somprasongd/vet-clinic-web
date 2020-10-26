@@ -65,8 +65,8 @@
               <h4>Action</h4>
             </v-list-item>
             <v-divider></v-divider>
-            <!-- OPD -->
-            <div v-if="item.visitType.id === 1">
+            <!-- OPD & IPD -->
+            <div v-if="item.visitType.id === 1 || item.visitType.id === 2">
               <!-- รอตรวจ -->
               <div v-if="item.visitStatus.id === 1">
                 <v-btn
@@ -178,8 +178,6 @@
                 </v-btn>
               </div>
             </div>
-            <!-- IPD -->
-            <div v-else-if="item.visitType.id === 2"></div>
             <!-- ฝากเลี้ยง -->
             <div v-else>
               <v-btn
