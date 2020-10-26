@@ -9,6 +9,7 @@ export const state = () => ({
   itemGroup: [],
   labGroup: [],
   mediaType: [],
+  appointType: [],
 })
 
 export const mutations = {
@@ -41,6 +42,9 @@ export const mutations = {
   },
   setMedia(state, media) {
     state.mediaType = media
+  },
+  setappointType(state, type) {
+    state.appointType = type
   },
 }
 
@@ -107,6 +111,13 @@ export const actions = {
     })
     commit('setlabGroup', media.results)
     return media.results
+  },
+  async addappointType({ commit }) {
+    const type = await this.$axios.$get('/api/master/appoint-types', {
+      progress: false,
+    })
+    commit('setappointType', type.results)
+    return type.results
   },
 }
 

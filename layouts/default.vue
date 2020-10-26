@@ -35,7 +35,11 @@
         dark
         show-arrows
         centered
-        :hide-slider="$nuxt.$route.path === '/queue/67/insertImg'"
+        :hide-slider="
+          $nuxt.$route.path ===
+            `/queue/${this.$route.params.queue}/insertImg` ||
+          $nuxt.$route.path === `/queue/${this.$route.params.queue}/appoint`
+        "
       >
         <v-tab class="font-weight-regular" exact to="/queue">คิว</v-tab>
         <v-tab

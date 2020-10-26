@@ -145,6 +145,15 @@
                   row-height="24"
                   rows="1"
                 ></v-textarea>
+                <v-chip
+                  v-for="type in appointType"
+                  :key="type.id"
+                  class="mx-1"
+                  small
+                  @click="addText(type.label)"
+                >
+                  {{ type.label }}
+                </v-chip>
               </v-col>
               <v-col cols="12">
                 <v-textarea
@@ -290,6 +299,7 @@ export default {
       menuDate: false,
       AppointDate: false,
       AppointTime: false,
+      appointType: this.$store.state.form.appointType,
       doctor: this.$store.state.form.doctor,
       plusBtn: [
         { text: '+3', value: 3 },
@@ -332,6 +342,11 @@ export default {
         this.doctor = res
       })
     }
+    if (this.$store.state.form.appointType.length === 0) {
+      this.$store.dispatch('form/addappointType').then((res) => {
+        this.appointType = res
+      })
+    }
   },
   methods: {
     async open(id) {
@@ -349,6 +364,9 @@ export default {
       } else {
         this.appointDialog = true
       }
+    },
+    addText(text) {
+      this.sendAppoint.cause = this.sendAppoint.cause + text
     },
     showAddDialog() {
       this.oldAppointDialog = false
@@ -372,7 +390,10 @@ export default {
           appointTime: appoint.appointTime,
           cause: appoint.cause,
           remark: appoint.remark,
-          fromVisitId: null,
+          fromVisitId:
+            this.$route.params.queue !== undefined
+              ? parseInt(this.$route.params.queue)
+              : null,
         }
         this.$axios
           .$post('/api/appoints', sendAppoint, { progress: false })

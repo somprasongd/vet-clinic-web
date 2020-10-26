@@ -143,7 +143,7 @@
                 ประวัติการรักษา
               </v-btn>
               <v-btn
-                :to="'/appoint/' + this.$route.params.queue"
+                :to="'/queue/' + this.$route.params.queue + '/appoint'"
                 class="cusblue3 font-weight-regular text-capitalize my-2"
                 block
                 depressed
@@ -304,7 +304,7 @@
         ประวัติการรักษา
       </v-btn>
       <v-btn
-        :to="'/appoint/' + this.$route.params.queue"
+        :to="'/queue/' + this.$route.params.queue + '/appoint'"
         class="px-1"
         rounded
         left
