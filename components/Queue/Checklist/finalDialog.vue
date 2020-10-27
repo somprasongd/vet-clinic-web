@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="assignModal" max-width="600" scrollable>
       <v-card>
-        <h2 class="pa-5 pb-2">สรุปยอด</h2>
+        <span class="pa-5 pb-2">สรุปยอด</span>
         <v-divider></v-divider>
 
         <v-card class="my-3 mx-7">
@@ -107,10 +107,73 @@
             </v-form> -->
       </v-card>
     </v-dialog>
+    <div v-if="showPrint" id="printMe" class="text-center">
+      <div class="bill">
+        <span>ใบเสร็จ</span>
+        <br />
+        <span>{{ receiptDetail.clinicName }}</span>
+        <br />
+        <span>
+          {{ receiptDetail.branchName + ' ' + receiptDetail.branchNo }}
+        </span>
+        <br />
+        <span>{{ receiptDetail.address }}</span>
+        <br />
+        <span>{{ receiptDetail.phone }}</span>
+        <br />
+        <span>{{ receiptDetail.receiptNumber }}</span>
+        <br />
+
+        <v-row
+          v-for="item in order"
+          :key="item.name"
+          align="center"
+          justify="space-between"
+          dense
+        >
+          <v-col cols="6">{{
+            item.itemLabel + ' ( x' + item.qty + ' )'
+          }}</v-col>
+          <v-col cols="6">{{ item.price }} บาท</v-col>
+        </v-row>
+
+        <span>
+          {{ 'จำนวนรายการ ' + receiptDetail.qty + ' รายการ' }}
+        </span>
+        <br />
+        <span> {{ 'ราคา ' + receiptDetail.price + ' บาท' }} </span>
+        <span>
+          <br />
+          {{ 'ส่วนลด ' + receiptDetail.discount + ' บาท' }}
+        </span>
+        <br />
+        <span>
+          {{ 'รวม ' + receiptDetail.finalPrice + ' บาท' }}
+        </span>
+        <br />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
+import VueHtmlToPaper from 'vue-html-to-paper'
+const options = {
+  name: '_blank',
+  specs: [
+    'fullscreen=yes',
+    'titlebar=yes',
+    'scrollbars=yes',
+    'width=1000,height=600',
+  ],
+  styles: [
+    '/receipt.css',
+    'https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css',
+    'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css',
+  ],
+}
+Vue.use(VueHtmlToPaper, options)
 export default {
   data() {
     return {
@@ -122,6 +185,8 @@ export default {
       recieve: 0,
       bank: [1000, 500, 100, 50, 20, 10, 5, 2, 1],
       valid: false,
+      showPrint: false,
+      receiptDetail: null,
     }
   },
   computed: {
@@ -177,16 +242,33 @@ export default {
     },
     checkout(id) {
       if (this.valid) {
+        const detail = {
+          qty: this.order.length,
+          price: this.sumPrice,
+          discount: this.reduce,
+          finalPrice: this.reducePrice,
+        }
         this.$axios
-          .$post(`/api/pos/${id}/receipt`, { progress: false })
+          .$post(`/api/pos/${id}/receipt`, detail, { progress: false })
           .then((res) => {
             this.assignModal = false
+            this.receiptDetail = res
+            this.print()
             this.$emit('updateState', 'success')
           })
           .catch((error) => {
             alert(error)
           })
       }
+    },
+    print() {
+      this.showPrint = true
+      this.$nextTick(() => {
+        this.$htmlToPaper('printMe', null, () => {
+          // console.warn('done')
+          this.showPrint = false
+        })
+      })
     },
   },
 }

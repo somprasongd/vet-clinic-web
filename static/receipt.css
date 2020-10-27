@@ -1,0 +1,14 @@
+@media print {
+  @page {
+    size: 58 3276mm;
+    margin: 0mm;
+  }
+}
+.bill {
+  width: 300px;
+  text-align: center;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid black;
+}
