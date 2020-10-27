@@ -15,7 +15,7 @@
         </div>
       </template>
       <template v-slot:[`item.name`]="{ item }">
-        <div class="font-weight-medium">
+        <div v-if="item.visitStatus.id !== 6" class="font-weight-medium">
           <nuxt-link
             class="bold-owner text-decoration-none text-truncate"
             :to="
@@ -24,9 +24,10 @@
                 : '/queue/' + item.id
             "
             >{{ item.pet.owner.name }}
-            <v-icon color="cusblue2" small>mdi-chevron-right</v-icon></nuxt-link
-          >
+            <v-icon color="cusblue2" small>mdi-chevron-right</v-icon>
+          </nuxt-link>
         </div>
+        <div v-else>{{ item.pet.owner.name }}</div>
       </template>
       <template v-slot:[`item.pet`]="{ item }">
         <div>{{ item.pet.name + ' (' + item.pet.type + ')' }}</div>
@@ -167,6 +168,15 @@
               </div>
               <!-- รอชำระเงิน -->
               <div v-else>
+                <v-btn
+                  class="cusblue2--text"
+                  block
+                  text
+                  tile
+                  @click="discharge(item.id)"
+                >
+                  รับชำระเงิน
+                </v-btn>
                 <v-btn
                   class="cusblue2--text"
                   block
@@ -344,6 +354,24 @@ export default {
                   visitStatusId: status,
                 })
               }
+            })
+            .catch((error) => {
+              alert(error)
+            })
+        })
+        .catch(() => {})
+    },
+    discharge(id) {
+      this.$refs.confirm
+        .open(`ยืนยันการจบการรับชำระ?`, `ต้องการยืนยันรับชำระเงินใช่หรือไม่`, {
+          width: 300,
+          color: 'green',
+        })
+        .then((confirm) => {
+          this.$axios
+            .$patch(`/api/visits/${id}/status/discharge`, { progress: false })
+            .then((res) => {
+              this.$router.push('/pos/' + res.id)
             })
             .catch((error) => {
               alert(error)

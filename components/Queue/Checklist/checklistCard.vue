@@ -66,27 +66,89 @@
       </template>
 
       <template v-slot:[`footer`]>
-        <div class="pa-1 text-right" style="border-top: 1px solid #dadada">
-          <v-btn
-            v-if="visitData.visitStatus.id === 2"
-            class="cusblue3 font-weight-regular text-capitalize float-left"
-            depressed
-            dark
-            @click="endCheck($route.params.queue, 3)"
-          >
-            รอผลตรวจ
-          </v-btn>
-          <v-btn
-            v-if="visitData.visitStatus.id === 6"
+        <div
+          v-if="$route.params.posid !== undefined"
+          class="pa-2"
+          style="border-top: 1px solid #dadada"
+        >
+          <v-row no-gutters align="center" justify="space-between">
+            <v-btn
+              v-if="posData.state === 'active'"
+              class="cusblue3 font-weight-regular text-capitalize"
+              depressed
+              dark
+              @click="updateState($route.params.posid, 'pending')"
+            >
+              พักรายการ
+            </v-btn>
+            <v-btn
+              v-else-if="posData.state === 'pending'"
+              class="cusblue3 font-weight-regular text-capitalize"
+              depressed
+              dark
+              @click="updateState($route.params.posid, 'active')"
+            >
+              ยกเลิกพักรายการ
+            </v-btn>
+            <v-btn
+              v-else-if="posData.state === 'success'"
+              class="cusblue3 font-weight-regular text-capitalize"
+              depressed
+              dark
+              @click="updateState($route.params.posid, 'active')"
+            >
+              ยกเลิกสังรายการ
+            </v-btn>
+            <v-spacer></v-spacer>
+            <div class="font-weight-medium" style="display: inline-block">
+              <span>ราคารวม : {{ sumPrice }} บาท</span>
+              <v-btn
+                v-if="posData.state === 'active'"
+                class="cusblue3 font-weight-regular text-capitalize ml-2"
+                depressed
+                dark
+                @click="finalDialog($route.params.posid)"
+              >
+                สรุปยอด
+              </v-btn>
+              <!-- <v-btn
+              v-else-if="posData.state === 'success'"
+              class="cusblue3 font-weight-regular text-capitalize ml-2"
+              depressed
+              dark
+            >
+              พิมพ์
+            </v-btn> -->
+            </div>
+          </v-row>
+        </div>
+        <div
+          v-else
+          class="pa-1 text-right"
+          style="border-top: 1px solid #dadada"
+        >
+          <v-row no-gutters align="center" justify="space-between">
+            <v-btn
+              v-if="visitData !== null && visitData.visitStatus.id === 2"
+              class="cusblue3 font-weight-regular text-capitalize"
+              depressed
+              dark
+              @click="endCheck($route.params.queue, 3)"
+            >
+              รอผลตรวจ
+            </v-btn>
+            <!-- <v-btn
+            v-if="visitData !== null && visitData.visitStatus.id === 6"
             class="cusblue3 font-weight-regular text-capitalize"
             depressed
             dark
           >
             รับชำระเงิน
-          </v-btn>
-          <div v-else class="pa-2 font-weight-medium">
-            <span>ราคารวม : {{ sumPrice }} บาท</span>
-          </div>
+          </v-btn> -->
+            <div class="font-weight-medium" style="display: inline-block">
+              <span>ราคารวม : {{ sumPrice }} บาท</span>
+            </div>
+          </v-row>
         </div>
       </template>
 
@@ -96,17 +158,20 @@
     </v-data-table>
     <drugDialog ref="drugDialog" />
     <confirmDialog ref="confirm" />
+    <finalDialog ref="finalDialog" @updateState="updateStatePOS" />
   </div>
 </template>
 
 <script>
 import checkListNav from '@/components/Queue/Checklist/checkListNav'
 import drugDialog from '@/components/Queue/Checklist/drugDialog'
+import finalDialog from '@/components/Queue/Checklist/finalDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     checkListNav,
     drugDialog,
+    finalDialog,
     confirmDialog,
   },
   props: {
@@ -117,6 +182,11 @@ export default {
     },
     orderItem: {
       type: Array,
+      required: false,
+      default: null,
+    },
+    posData: {
+      type: Object,
       required: false,
       default: null,
     },
@@ -185,6 +255,43 @@ export default {
     openDrugDialog(id) {
       this.$refs.drugDialog.open(id)
     },
+    finalDialog(item) {
+      this.$refs.finalDialog.open(item)
+    },
+    updateStatePOS(state) {
+      this.posData.state = state
+    },
+    updateState(id, states) {
+      this.$refs.confirm
+        .open(
+          `คุณแน่ใจหรือไม่?`,
+          `คุณแน่ใจหรือไม่ที่${
+            states === 'pending' ? 'พัก' : 'ยกเลิกพัก'
+          }รายการนี้`,
+          {
+            width: 290,
+            color: 'warning',
+          }
+        )
+        .then((confirm) => {
+          const state = {
+            state: states,
+          }
+          this.$axios
+            .$patch(`/api/pos/${id}`, state, {
+              progress: false,
+            })
+            .then((res) => {
+              states === 'pending'
+                ? this.$router.push('/pos')
+                : this.updateStatePOS('active')
+            })
+            .catch((error) => {
+              alert(error)
+            })
+        })
+        .catch(() => {})
+    },
     addOrder(res) {
       this.$emit('add', res)
     },
@@ -202,9 +309,16 @@ export default {
         })
         .then((confirm) => {
           this.$axios
-            .$delete(`/api/visits/${this.$route.params.queue}/orders/${id}`, {
-              progress: false,
-            })
+            .$delete(
+              `/api${
+                this.$route.params.queue !== undefined
+                  ? `/visits/${this.$route.params.queue}`
+                  : ''
+              }/orders/${id}`,
+              {
+                progress: false,
+              }
+            )
             .then((res) => {
               this.$emit('delete', id)
             })
@@ -220,7 +334,11 @@ export default {
       }
       this.$axios
         .$patch(
-          `/api/visits/${this.$route.params.queue}/orders/${id}`,
+          `/api${
+            this.$route.params.queue !== undefined
+              ? `/visits/${this.$route.params.queue}`
+              : ''
+          }/orders/${id}`,
           sendQTY,
           { progress: false }
         )
@@ -234,7 +352,11 @@ export default {
       }
       this.$axios
         .$patch(
-          `/api/visits/${this.$route.params.queue}/orders/${id}`,
+          `/api${
+            this.$route.params.queue !== undefined
+              ? `/visits/${this.$route.params.queue}`
+              : ''
+          }/orders/${id}`,
           sendPrice,
           { progress: false }
         )

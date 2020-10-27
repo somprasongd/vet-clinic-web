@@ -50,7 +50,7 @@ export default {
       visit.visitStatus.id === 2 ||
       visit.visitStatus.id === 3 ||
       visit.visitStatus.id === 4 ||
-      visit.visitStatus.id === 6 ||
+      // visit.visitStatus.id === 6 ||
       visit.visitStatus.id === 9
     )
       return true

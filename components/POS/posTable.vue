@@ -3,46 +3,64 @@
     <v-data-table
       class="elevation-4 overflow-y-auto"
       :headers="headers"
-      :items="desserts"
+      :items="orderItem"
       disable-pagination
       hide-default-footer
       height="calc(100vh - 210px)"
       fixed-header
     >
-      <template v-slot:[`item.num`]="props">
-        <v-edit-dialog :return-value.sync="props.item.num">
+      <template v-slot:[`item.qty`]="props">
+        <v-edit-dialog
+          :return-value.sync="props.item.qty"
+          @save="saveQTY(props.item.id, props.item.qty)"
+        >
           <span class="cusblue--text">
-            {{ props.item.num }}
+            {{ props.item.qty }}
           </span>
           <template v-slot:input>
             <v-text-field
-              v-model="props.item.num"
+              v-model="props.item.qty"
+              :rules="rules"
               label="Edit"
               single-line
               counter
+              @keypress="isNumber($event)"
             ></v-text-field>
           </template>
         </v-edit-dialog>
       </template>
 
       <template v-slot:[`item.price`]="props">
-        <v-edit-dialog :return-value.sync="props.item.price">
+        <v-edit-dialog
+          :return-value.sync="props.item.price"
+          @save="savePrice(props.item.id, props.item.price)"
+        >
           <span class="cusblue--text">
             {{ props.item.price }}
           </span>
           <template v-slot:input>
             <v-text-field
               v-model="props.item.price"
+              :rules="rules"
               label="Edit"
               single-line
               counter
+              @keypress="isNumber($event)"
             ></v-text-field>
           </template>
         </v-edit-dialog>
       </template>
 
-      <template v-slot:[`item.action`]>
-        <v-btn icon depressed @click="confirmDel = true">
+      <template v-slot:[`item.action`]="{ item }">
+        <v-btn
+          v-if="item.typeId === 1"
+          icon
+          x-small
+          @click="openDrugDialog(item.id)"
+        >
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn icon x-small @click="delOrder(item.id)">
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </template>
@@ -57,8 +75,9 @@
             dark
             depressed
             @click.stop="checkout = true"
-            >รับชำระ</v-btn
           >
+            รับชำระ
+          </v-btn>
 
           <v-dialog v-model="checkout" max-width="700">
             <v-card>
@@ -66,7 +85,7 @@
                 class="elevation-0 overflow-y-auto"
                 style="max-height: 550px"
                 :headers="headersDialog"
-                :items="desserts"
+                :items="orderItem"
                 disable-pagination
                 hide-default-footer
               >
@@ -82,76 +101,66 @@
               </v-data-table>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="cusblue2" text @click="checkout = false"
-                  >ยกเลิก</v-btn
-                >
+                <v-btn color="cusblue2" text @click="checkout = false">
+                  ยกเลิก
+                </v-btn>
 
-                <v-btn color="cusblue2" text @click="checkout = false"
-                  >ตกลง</v-btn
-                >
+                <v-btn color="cusblue2" text @click="checkout = false">
+                  ตกลง
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </div>
       </template>
     </v-data-table>
-
-    <v-dialog v-model="confirmDel" max-width="290">
-      <v-card>
-        <h2 class="pl-6 pt-3 pb-2">คุณแน่ใจหรือไม่?</h2>
-
-        <v-card-text> คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้ </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn color="red" text @click="confirmDel = false"> ลบ </v-btn>
-
-          <v-btn color="grey" text @click="confirmDel = false"> ยกเลิก </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    orderItem: {
+      type: Array,
+      required: false,
+      default: null,
+    },
+  },
   data() {
     return {
       confirmDel: false,
       checkout: false,
       headers: [
         {
-          text: 'ลำดับ',
-          value: 'id',
-          align: 'center',
-          width: '150',
-          sortable: false,
-          class: 'font-weight-bold',
-        },
-        {
-          text: 'ชื่อรายการ',
-          value: 'nameList',
+          text: 'รายการ',
+          value: 'itemLabel',
           align: 'left',
-          width: '400',
+          width: '180',
           sortable: false,
         },
         {
           text: 'ประเภท',
-          value: 'type',
+          value: 'typeLabel',
           align: 'center',
           width: '',
           sortable: false,
         },
         {
           text: 'จำนวน',
-          value: 'num',
+          value: 'qty',
           align: 'center',
           width: '',
           sortable: false,
         },
         {
-          text: 'ราคา / หน่วย',
+          text: 'หน่วย',
+          value: 'unit',
+          align: 'center',
+          width: '',
+          sortable: false,
+        },
+        {
+          text: 'ราคาต่อหน่วย',
           value: 'price',
           align: 'center',
           width: '',
@@ -171,10 +180,11 @@ export default {
           align: 'center',
           sortable: false,
           value: 'id',
+          width: '100',
           class: 'font-weight-bold',
         },
-        { text: 'ชื่อรายการ', value: 'nameList', sortable: false },
-        { text: 'ประเภท', value: 'type', sortable: false },
+        { text: 'ชื่อรายการ', value: 'itemLabel', sortable: false },
+        { text: 'ประเภท', value: 'typeLabel', sortable: false },
         {
           text: 'ราคา / หน่วย',
           value: 'price',
@@ -183,44 +193,36 @@ export default {
         },
         { text: 'Action', value: 'action', align: 'center', sortable: false },
       ],
-      desserts: [
-        {
-          id: '1',
-          nameList: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          price: '50',
-        },
-        {
-          id: '2',
-          nameList: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          price: '50',
-        },
-        {
-          id: '3',
-          nameList: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          price: '50',
-        },
-        {
-          id: '4',
-          nameList: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          price: '50',
-        },
-        {
-          id: '5',
-          nameList: 'XXXXXXXXXXXXXXXX',
-          type: 'ยา',
-          num: '10',
-          price: '50',
-        },
-      ],
+      rules: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
     }
+  },
+  methods: {
+    isNumber($event) {
+      const keyCode = $event.keyCode ? $event.keyCode : $event.which
+      if (keyCode < 48 || keyCode > 57) {
+        $event.preventDefault()
+      }
+    },
+    saveQTY(id, value) {
+      const sendQTY = {
+        qty: value,
+      }
+      this.$axios
+        .$patch(`/api/orders/${id}`, sendQTY, { progress: false })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    savePrice(id, value) {
+      const sendPrice = {
+        price: value,
+      }
+      this.$axios
+        .$patch(`/api/orders/${id}`, sendPrice, { progress: false })
+        .catch((error) => {
+          alert(error)
+        })
+    },
   },
 }
 </script>

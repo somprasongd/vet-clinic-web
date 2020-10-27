@@ -167,15 +167,27 @@ export default {
       //   console.log('not Drug')
       // }
       const order = { ...this.value }
-      const count = parseInt(this.count)
+      const count = this.count
       const sendOrder = {
+        posId:
+          this.$route.params.queue !== undefined
+            ? null
+            : this.$route.params.posid,
         itemId: order.id,
         qty: count,
       }
       this.$axios
-        .$post(`/api/visits/${this.$route.params.queue}/orders`, sendOrder, {
-          progress: false,
-        })
+        .$post(
+          `/api${
+            this.$route.params.queue !== undefined
+              ? `/visits/${this.$route.params.queue}`
+              : ''
+          }/orders`,
+          sendOrder,
+          {
+            progress: false,
+          }
+        )
         .then((res) => {
           this.$emit('add', res)
           this.count = 1
