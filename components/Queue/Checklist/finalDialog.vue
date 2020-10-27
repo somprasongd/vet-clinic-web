@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="assignModal" max-width="600" scrollable>
       <v-card>
-        <span class="pa-5 pb-2">สรุปยอด</span>
+        <h2 class="pa-5 pb-2">สรุปยอด</h2>
         <v-divider></v-divider>
 
         <v-card class="my-3 mx-7">
@@ -229,7 +229,7 @@ export default {
       this.assignModal = true
     },
     plusMoney(money) {
-      this.recieve += money
+      this.recieve = parseInt(this.recieve) + money
     },
     isNumber($event) {
       const keyCode = $event.keyCode ? $event.keyCode : $event.which
