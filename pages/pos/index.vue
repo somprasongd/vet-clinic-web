@@ -16,6 +16,7 @@
 <script>
 import posQueueNav from '@/components/POS/posQueueNav'
 import posQueue from '@/components/POS/posQueue'
+
 export default {
   components: {
     posQueueNav,
@@ -23,25 +24,33 @@ export default {
   },
 
   async asyncData({ $axios, params }) {
-    const pos = await $axios.$get(`/api/pos?state=active`, {
+    const pos = await $axios.$get(`/api/pos?state=pending`, {
       progress: false,
     })
     return { pos: pos.results }
   },
   data() {
     return {
-      select: 'active',
+      select: 'pending',
     }
   },
   methods: {
     addPosQueue(val) {
-      this.pos.push(val)
+      // this.pos.push(val)
+      this.$router.push('/pos/' + val.id)
     },
     async updateStatus(val) {
       this.select = val
-      const pos = await this.$axios.$get(`/api/pos?state=${val}`, {
-        progress: false,
-      })
+      const pos = await this.$axios.$get(
+        `/api/pos?${
+          val !== ''
+            ? `state=${val}`
+            : 'states=pending&states=success&states=cancel'
+        }`,
+        {
+          progress: false,
+        }
+      )
       this.pos = pos.results
     },
     deletePOS(id) {

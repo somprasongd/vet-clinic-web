@@ -6,6 +6,7 @@
           v-model="select"
           class="rounded-lg"
           :items="type"
+          :disabled="disabled"
           item-text="label"
           item-value="id"
           item-color="cusblue"
@@ -45,6 +46,7 @@
               v-model="value"
               class="rounded-lg"
               :items="items"
+              :disabled="disabled"
               item-text="label"
               item-value="id"
               item-color="cusblue2"
@@ -84,6 +86,7 @@
           <v-col cols="4" md="2">
             <v-text-field
               v-model="count"
+              :disabled="disabled"
               prepend-icon="mdi-close"
               class="ml-2 rounded-lg text-nav"
               filled
@@ -104,6 +107,13 @@
 
 <script>
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
   data() {
     return {
       type: this.$store.state.form.itemGroup,

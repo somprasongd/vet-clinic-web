@@ -30,9 +30,10 @@
       </template>
       <template v-slot:[`item.action`]="{ item }">
         <v-btn
-          :disabled="state === 'cancel' || state === 'success'"
+          :disabled="item.state === 'cancel'"
           icon
           depressed
+          x-small
           @click="delPOS(item.id)"
         >
           <v-icon>mdi-trash-can</v-icon>
@@ -41,12 +42,7 @@
       <template v-slot:footer>
         <div class="pa-2 text-right">
           <v-spacer></v-spacer>
-          <v-btn
-            :disabled="state !== 'active'"
-            color="cusblue2"
-            text
-            @click="addPosQueue"
-          >
+          <v-btn color="cusblue2" text @click="addPosQueue">
             <span class="text-none">Add</span>
             <v-icon>mdi-plus</v-icon>
           </v-btn>

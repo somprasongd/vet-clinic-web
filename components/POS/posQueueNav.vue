@@ -38,6 +38,22 @@
         flat
         hide-details
       >
+        <template v-slot:prepend-item>
+          <v-list-item
+            :style="selectStatus === '' ? 'background-color: #e2f5fc' : ''"
+            ripple
+            @click="selectStatus = ''"
+          >
+            <v-list-item-content>
+              <v-list-item-title
+                :class="selectStatus === '' ? 'cusblue--text' : ''"
+              >
+                แสดงทั้งหมด
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider class="mt-2"></v-divider>
+        </template>
       </v-select>
     </v-row>
   </v-card>
@@ -50,11 +66,11 @@ export default {
       assignModal: false,
       status: [
         { label: 'พักรายการ', value: 'pending' },
-        { label: 'กำลังทำรายการ', value: 'active' },
+        // { label: 'กำลังทำรายการ', value: 'active' },
         { label: 'ทำรายการสำเร็จ', value: 'success' },
         { label: 'ยกเลิกรายการ', value: 'cancel' },
       ],
-      selectStatus: 'active',
+      selectStatus: 'pending',
     }
   },
   watch: {

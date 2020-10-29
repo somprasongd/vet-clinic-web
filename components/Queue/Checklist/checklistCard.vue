@@ -54,13 +54,23 @@
       <template v-slot:[`item.action`]="{ item }">
         <v-btn
           v-if="item.typeId === 1"
+          :disabled="
+            posData === null || posData.state === 'active' ? false : true
+          "
           icon
           x-small
           @click="openDrugDialog(item.id)"
         >
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <v-btn icon x-small @click="delOrder(item.id)">
+        <v-btn
+          icon
+          x-small
+          :disabled="
+            posData === null || posData.state === 'active' ? false : true
+          "
+          @click="delOrder(item.id)"
+        >
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </template>
@@ -90,35 +100,28 @@
             >
               ยกเลิกพักรายการ
             </v-btn>
-            <v-btn
-              v-else-if="posData.state === 'success'"
-              class="cusblue3 font-weight-regular text-capitalize"
-              depressed
-              dark
-              @click="updateState($route.params.posid, 'active')"
-            >
-              ยกเลิกสังรายการ
-            </v-btn>
             <v-spacer></v-spacer>
             <div class="font-weight-medium" style="display: inline-block">
               <span>ราคารวม : {{ sumPrice }} บาท</span>
               <v-btn
                 v-if="posData.state === 'active'"
-                class="cusblue3 font-weight-regular text-capitalize ml-2"
+                class="font-weight-regular text-capitalize ml-2"
+                color="cusblue3 white--text"
+                :disabled="orderItem.length === 0"
                 depressed
-                dark
                 @click="finalDialog($route.params.posid)"
               >
                 สรุปยอด
               </v-btn>
-              <!-- <v-btn
-              v-else-if="posData.state === 'success'"
-              class="cusblue3 font-weight-regular text-capitalize ml-2"
-              depressed
-              dark
-            >
-              พิมพ์
-            </v-btn> -->
+              <v-btn
+                v-else-if="posData.state === 'success'"
+                class="cusblue3 font-weight-regular text-capitalize ml-2"
+                depressed
+                dark
+                @click="getReceipt(posData.receiptNumber)"
+              >
+                พิมพ์
+              </v-btn>
             </div>
           </v-row>
         </div>
@@ -153,26 +156,96 @@
       </template>
 
       <template v-slot:top>
-        <checkListNav @add="addOrder" />
+        <checkListNav
+          :disabled="
+            posData !== null && posData.state === 'active' ? false : true
+          "
+          @add="addOrder"
+        />
       </template>
     </v-data-table>
     <drugDialog ref="drugDialog" />
     <confirmDialog ref="confirm" />
-    <finalDialog ref="finalDialog" @updateState="updateStatePOS" />
+    <calcDialog ref="calcDialog" @updateState="printReceipt" />
+    <div v-if="showPrint" id="printMe" class="text-center">
+      <div class="bill">
+        <span>ใบเสร็จ</span>
+        <br />
+        <span>{{ receiptDetail.clinicName }}</span>
+        <br />
+        <span>
+          {{ receiptDetail.branchName + ' ' + receiptDetail.branchNo }}
+        </span>
+        <br />
+        <span>{{ receiptDetail.address }}</span>
+        <br />
+        <span>{{ receiptDetail.phone }}</span>
+        <br />
+        <span>{{ receiptDetail.receiptNumber }}</span>
+        <br />
+
+        <v-row
+          v-for="item in orderItem"
+          :key="item.name"
+          align="center"
+          justify="space-between"
+          dense
+        >
+          <v-col cols="6">{{
+            item.itemLabel + ' ( x' + item.qty + ' )'
+          }}</v-col>
+          <v-col cols="6">{{ item.price }} บาท</v-col>
+        </v-row>
+
+        <span>
+          {{ 'จำนวนรายการ ' + receiptDetail.qty + ' รายการ' }}
+        </span>
+        <br />
+        <span> {{ 'ราคา ' + receiptDetail.salesPrice + ' บาท' }} </span>
+        <span>
+          <br />
+          {{ 'ส่วนลด ' + receiptDetail.discount + ' บาท' }}
+        </span>
+        <br />
+        <span>
+          {{ 'รวม ' + receiptDetail.netPrice + ' บาท' }}
+        </span>
+        <br />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import checkListNav from '@/components/Queue/Checklist/checkListNav'
 import drugDialog from '@/components/Queue/Checklist/drugDialog'
-import finalDialog from '@/components/Queue/Checklist/finalDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
+import calcDialog from '@/components/POS/calcDialog'
+
+import Vue from 'vue'
+import VueHtmlToPaper from 'vue-html-to-paper'
+const options = {
+  name: '_blank',
+  specs: [
+    'fullscreen=yes',
+    'titlebar=yes',
+    'scrollbars=yes',
+    'width=1000,height=600',
+  ],
+  styles: [
+    '/receipt.css',
+    'https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css',
+    'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css',
+  ],
+}
+Vue.use(VueHtmlToPaper, options)
+
 export default {
   components: {
     checkListNav,
     drugDialog,
-    finalDialog,
     confirmDialog,
+    calcDialog,
   },
   props: {
     visitData: {
@@ -240,6 +313,8 @@ export default {
       ],
       qty: '',
       rules: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
+      showPrint: false,
+      receiptDetail: null,
     }
   },
   computed: {
@@ -256,7 +331,7 @@ export default {
       this.$refs.drugDialog.open(id)
     },
     finalDialog(item) {
-      this.$refs.finalDialog.open(item)
+      this.$refs.calcDialog.open(item)
     },
     updateStatePOS(state) {
       this.posData.state = state
@@ -385,6 +460,29 @@ export default {
             })
         })
         .catch(() => {})
+    },
+    async getReceipt(number) {
+      const receipt = await this.$axios.$get(
+        `/api/pos/${this.$route.params.posid}/receipts?receiptNumber=${number}`,
+        { progress: false }
+      )
+      this.receiptDetail = receipt
+      this.print()
+    },
+    printReceipt(val) {
+      this.receiptDetail = val
+      this.posData.receiptNumber = val.receiptNumber
+      this.updateStatePOS('success')
+      this.print()
+    },
+    print() {
+      this.showPrint = true
+      this.$nextTick(() => {
+        this.$htmlToPaper('printMe', null, () => {
+          // console.warn('done')
+          this.showPrint = false
+        })
+      })
     },
   },
 }

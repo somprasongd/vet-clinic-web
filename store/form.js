@@ -10,6 +10,9 @@ export const state = () => ({
   labGroup: [],
   mediaType: [],
   appointType: [],
+  paymentType: [],
+  creditCard: [],
+  creditFee: [],
 })
 
 export const mutations = {
@@ -45,6 +48,15 @@ export const mutations = {
   },
   setappointType(state, type) {
     state.appointType = type
+  },
+  setpaymentType(state, type) {
+    state.appointType = type
+  },
+  setcreditCard(state, card) {
+    state.appointType = card
+  },
+  setcreditFee(state, fee) {
+    state.appointType = fee
   },
 }
 
@@ -118,6 +130,27 @@ export const actions = {
     })
     commit('setappointType', type.results)
     return type.results
+  },
+  async addpaymentType({ commit }) {
+    const type = await this.$axios.$get('/api/master/payment-types', {
+      progress: false,
+    })
+    commit('setappointType', type.results)
+    return type.results
+  },
+  async addcreditCard({ commit }) {
+    const card = await this.$axios.$get('/api/master/credit-card-issuers', {
+      progress: false,
+    })
+    commit('setappointType', card.results)
+    return card.results
+  },
+  async addcreditFee({ commit }) {
+    const fee = await this.$axios.$get('/api/master/credit-card-fees-methods', {
+      progress: false,
+    })
+    commit('setappointType', fee.results)
+    return fee.results
   },
 }
 
