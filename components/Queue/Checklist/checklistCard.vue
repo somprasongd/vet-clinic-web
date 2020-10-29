@@ -130,7 +130,7 @@
                 class="cusblue3 font-weight-regular text-capitalize ml-2"
                 depressed
                 dark
-                @click="getReceipt(posData.receiptNumber)"
+                @click="getReceipt($route.params.posid)"
               >
                 พิมพ์
               </v-btn>
@@ -152,6 +152,7 @@
             >
               รอผลตรวจ
             </v-btn>
+            <v-spacer v-else></v-spacer>
             <!-- <v-btn
             v-if="visitData !== null && visitData.visitStatus.id === 6"
             class="cusblue3 font-weight-regular text-capitalize"
@@ -180,50 +181,121 @@
     <drugDialog ref="drugDialog" />
     <confirmDialog ref="confirm" />
     <calcDialog ref="calcDialog" @updateState="printReceipt" />
-    <div v-if="showPrint" id="printMe" class="text-center">
+    <div v-if="showPrint" id="printMe">
       <div class="bill">
-        <span>ใบเสร็จ</span>
-        <br />
-        <span>{{ receiptDetail.clinicName }}</span>
-        <br />
-        <span>
-          {{ receiptDetail.branchName + ' ' + receiptDetail.branchNo }}
-        </span>
-        <br />
-        <span>{{ receiptDetail.address }}</span>
-        <br />
-        <span>{{ receiptDetail.phone }}</span>
-        <br />
-        <span>{{ receiptDetail.receiptNumber }}</span>
-        <br />
-
-        <v-row
-          v-for="item in orderItem"
-          :key="item.name"
-          align="center"
-          justify="space-between"
-          dense
-        >
-          <v-col cols="6">{{
-            item.itemLabel + ' ( x' + item.qty + ' )'
-          }}</v-col>
-          <v-col cols="6">{{ item.price }} บาท</v-col>
-        </v-row>
-
-        <span>
-          {{ 'จำนวนรายการ ' + receiptDetail.qty + ' รายการ' }}
-        </span>
-        <br />
-        <span> {{ 'ราคา ' + receiptDetail.salesPrice + ' บาท' }} </span>
-        <span>
+        <div class="top">
+          <span>
+            {{ $moment().format('DD/MM/YYYY') }}
+          </span>
+          <span>Vet Clinic</span>
+        </div>
+        <div class="head">
+          <b style="font-size: 16px">{{ receiptDetail.clinicName }}</b>
           <br />
-          {{ 'ส่วนลด ' + receiptDetail.discount + ' บาท' }}
-        </span>
-        <br />
-        <span>
-          {{ 'รวม ' + receiptDetail.netPrice + ' บาท' }}
-        </span>
-        <br />
+          <b> สาขา {{ receiptDetail.branchName }} </b>
+          <br />
+          <b>ที่อยู่ {{ receiptDetail.address }}</b>
+          <br />
+          <b>Tel: {{ receiptDetail.phone }}</b>
+          <br />
+        </div>
+        <div class="body">
+          <span>หมายเลขใบเสร็จ {{ receiptDetail.receiptNumber }}</span>
+          <br />
+          <span>
+            {{
+              $moment(receiptDetail.createAt).format(
+                'เมื่อวันที่ DD/MM/YYYY เวลา HH:mm:ss'
+              )
+            }}
+          </span>
+          <br />
+          <div class="top">
+            <span>{{ receiptDetail.customer }}</span>
+            <span>{{ receiptDetail.createBy }}</span>
+          </div>
+          <table>
+            <tr>
+              <th>#</th>
+              <th>รายการ</th>
+              <th style="text-align: right">ราคา</th>
+            </tr>
+            <tr
+              v-for="(item, i) in receiptDetail.details.groups"
+              :key="item.name"
+            >
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.name }}</td>
+              <td style="text-align: right">
+                {{ parseFloat(item.price).toFixed(2) }}
+              </td>
+            </tr>
+          </table>
+          <div>
+            <hr />
+            <v-row no-gutters>
+              <span class="col-10" style="text-align: right">ส่วนลด</span>
+              <span class="col-2" style="text-align: right">
+                {{ parseFloat(receiptDetail.discount).toFixed(2) }}
+              </span>
+            </v-row>
+          </div>
+          <div>
+            <hr />
+            <v-row no-gutters>
+              <span class="col-10" style="text-align: right">ยอดชำระรวม</span>
+              <span class="col-2" style="text-align: right">
+                {{ parseFloat(receiptDetail.salesPrice).toFixed(2) }}
+              </span>
+            </v-row>
+            <div v-if="receiptDetail.paymentType === 'เงินสด'">
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">เงินสด</span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.cash).toFixed(2) }}
+                </span>
+              </v-row>
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">เงินทอน</span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.change).toFixed(2) }}
+                </span>
+              </v-row>
+            </div>
+            <div v-else-if="receiptDetail.paymentType === 'เครดิตการ์ด'">
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">บัตรเครดิต</span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.salesPrice).toFixed(2) }}
+                </span>
+              </v-row>
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">
+                  ค่าธรรมเนียม
+                </span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.creditCardFees).toFixed(2) }}
+                </span>
+              </v-row>
+            </div>
+            <div v-else-if="receiptDetail.paymentType === 'โอนเงิน'">
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">ยอดโอน</span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.salesPrice).toFixed(2) }}
+                </span>
+              </v-row>
+              <v-row no-gutters>
+                <span class="col-10" style="text-align: right">
+                  ค่าธรรมเนียม
+                </span>
+                <span class="col-2" style="text-align: right">
+                  {{ parseFloat(receiptDetail.creditCardFees).toFixed(2) }}
+                </span>
+              </v-row>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -496,11 +568,10 @@ export default {
         })
         .catch(() => {})
     },
-    async getReceipt(number) {
-      const receipt = await this.$axios.$get(
-        `/api/pos/${this.$route.params.posid}/receipts?receiptNumber=${number}`,
-        { progress: false }
-      )
+    async getReceipt(id) {
+      const receipt = await this.$axios.$get(`/api/pos/${id}/receipts`, {
+        progress: false,
+      })
       this.receiptDetail = receipt
       this.print()
     },

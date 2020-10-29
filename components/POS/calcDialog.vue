@@ -80,7 +80,6 @@
                 <v-row v-if="payType === 2" dense>
                   <v-textarea
                     v-model="note"
-                    :rules="rules.note"
                     color="cusblue"
                     label="Note"
                     auto-grow
@@ -89,7 +88,7 @@
                   ></v-textarea>
                 </v-row>
                 <v-row v-else-if="payType === 3">
-                  <v-col cols="12">
+                  <!-- <v-col cols="12">
                     <v-select
                       v-model="credit.typeSelected"
                       :items="credit.type"
@@ -100,7 +99,23 @@
                       dense
                       outlined
                     ></v-select>
-                  </v-col>
+                  </v-col> -->
+                  <v-row dense>
+                    <v-col v-for="type in credit.type" :key="type.id" cols="12">
+                      <v-btn
+                        color="cusblue3"
+                        block
+                        dark
+                        depressed
+                        :outlined="
+                          credit.typeSelected === type.id ? false : true
+                        "
+                        @click="credit.typeSelected = type.id"
+                      >
+                        {{ type.label }}
+                      </v-btn>
+                    </v-col>
+                  </v-row>
                   <v-col cols="6">
                     <v-text-field
                       v-model="credit.fee"
@@ -129,7 +144,6 @@
                   <v-col cols="12">
                     <v-textarea
                       v-model="credit.number"
-                      :rules="rules.number"
                       color="cusblue"
                       label="หมายเลขการโอน"
                       auto-grow
@@ -142,6 +156,7 @@
                   <v-col cols="6">
                     <v-text-field
                       v-model="money.receive"
+                      :rules="rules.receive"
                       label="เงินรับชำระ"
                       color="cusblue2"
                       dense
@@ -234,8 +249,8 @@ export default {
       credit: {
         typeSelected: 1,
         type: this.$store.state.form.creditCard,
-        fee: '',
-        followSelected: 2,
+        fee: '3',
+        followSelected: 1,
         follow: this.$store.state.form.creditFee,
         number: '',
       },
@@ -243,15 +258,10 @@ export default {
 
       valid: false,
       rules: {
-        note: [
-          (v) => !!v || 'กรุณากรอกโน้ต',
-          (v) => (v && v.length <= 1000) || 'ไม่ควรกรอกโน้ตเกิน 1000 ตัวอักษร',
-        ],
-        number: [
-          (v) => !!v || 'กรุณากรอกหมายเลขการโอน',
+        receive: [
+          (v) => !!v || 'กรุณากรอกเงินชำระ',
           (v) =>
-            (v && v.length <= 1000) ||
-            'ไม่ควรกรอกหมายเลขการโอนเกิน 1000 ตัวอักษร',
+            (v && this.checkChange(v)) || 'กรุณากรอกจำนวนเงินที่มากกว่านี้',
         ],
       },
     }
@@ -270,7 +280,7 @@ export default {
       return money.toFixed(0).toString()
     },
     payment() {
-      if (this.payType === 3 && this.credit.followSelected === 1) {
+      if (this.payType === 3 && this.credit.followSelected === 2) {
         const money =
           parseFloat(this.lessPrice || 0) + parseFloat(this.calcFee || 0)
         if (money >= 0) {
@@ -295,8 +305,10 @@ export default {
       const money =
         parseFloat(this.money.receive || 0) - parseFloat(this.payment || 0)
       if (money >= 0) {
+        this.setValid(true)
         return money.toFixed(2).toString()
       } else {
+        this.setValid(false)
         return 'ไม่สามารถทอนเงิน'
       }
     },
@@ -361,6 +373,14 @@ export default {
     setValid(bool) {
       this.valid = bool
     },
+    checkChange(num) {
+      const money = parseFloat(num || 0) - parseFloat(this.payment || 0)
+      if (money >= 0) {
+        return true
+      } else {
+        return false
+      }
+    },
     checkout(id) {
       if (this.valid && this.$refs.form.validate()) {
         const detail =
@@ -390,9 +410,11 @@ export default {
                 salesPrice: this.sumPrice,
                 discount: parseFloat(this.endBill || 0),
                 netPrice: parseFloat(this.payment || 0),
+                cash: parseFloat(this.money.receive || 0),
+                change: parseFloat(this.changeMoney || 0),
                 paymentTypeId: this.payType,
               }
-        console.log(detail)
+        // console.log(detail)
         this.$axios
           .$post(`/api/pos/${id}/receipts`, detail, { progress: false })
           .then((res) => {
