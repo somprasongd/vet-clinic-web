@@ -25,6 +25,7 @@
 import posQueueNav from '@/components/POS/posQueueNav'
 import posQueue from '@/components/POS/posQueue'
 
+import moment from 'moment'
 export default {
   components: {
     posQueueNav,
@@ -32,9 +33,14 @@ export default {
   },
 
   async asyncData({ $axios, params }) {
-    const pos = await $axios.$get(`/api/pos?state=pending`, {
-      progress: false,
-    })
+    const pos = await $axios.$get(
+      `/api/pos?state=pending&dateRange0=${moment()
+        .subtract(3, 'months')
+        .toISOString()}&dateRange1=${moment().toISOString()}`,
+      {
+        progress: false,
+      }
+    )
     return { pos: pos.results }
   },
   data() {
@@ -54,12 +60,14 @@ export default {
         })
     },
     async updateStatus(val) {
-      this.select = val
+      this.select = val.state
+      const start = moment(val.startDate).add(1, 'days').toISOString()
+      const end = moment(val.endDate).add(1, 'days').toISOString()
       const pos = await this.$axios.$get(
         `/api/pos?${
-          val !== ''
-            ? `state=${val}`
-            : 'states=pending&states=success&states=cancel'
+          val.state !== ''
+            ? `state=${val.state}&dateRange0=${start}&dateRange1=${end}`
+            : `states=pending&states=success&states=cancel&dateRange0=${start}&dateRange1=${end}`
         }`,
         {
           progress: false,
