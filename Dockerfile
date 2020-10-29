@@ -1,7 +1,8 @@
-# Dockerfile
 FROM node:12.18.4-alpine
 
+# set app serving to permissive / assigned
 ENV NUXT_HOST=0.0.0.0
+# set app port
 ENV NUXT_PORT=3000
 EXPOSE 3000
 

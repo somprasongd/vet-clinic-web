@@ -82,7 +82,15 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
     '@nuxtjs/auth',
+    'nuxt-socket-io',
   ],
+  io: {
+    sockets: [
+      {
+        url: 'http://localhost:9898', // IO server lives here
+      },
+    ],
+  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
