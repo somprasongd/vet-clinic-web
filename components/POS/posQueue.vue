@@ -6,7 +6,7 @@
       :items="posQueue"
       disable-pagination
       hide-default-footer
-      height="calc(100vh - 210px)"
+      height="calc(100vh - 160px)"
       fixed-header
     >
       <template v-slot:[`item.id`]="{ item }">
@@ -38,15 +38,6 @@
         >
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
-      </template>
-      <template v-slot:footer>
-        <div class="pa-2 text-right">
-          <v-spacer></v-spacer>
-          <v-btn color="cusblue2" text @click="addPosQueue">
-            <span class="text-none">Add</span>
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-        </div>
       </template>
     </v-data-table>
     <confirmDialog ref="confirm" />
@@ -145,16 +136,6 @@ export default {
           })
           .indexOf(id) + 1
       )
-    },
-    addPosQueue() {
-      this.$axios
-        .$post('/api/pos', null, { progress: false })
-        .then((res) => {
-          this.$emit('addPosQueue', res)
-        })
-        .catch((error) => {
-          alert(error)
-        })
     },
     delPOS(id) {
       this.$refs.confirm

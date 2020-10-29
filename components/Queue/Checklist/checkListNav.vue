@@ -113,6 +113,11 @@ export default {
       required: false,
       default: false,
     },
+    orderItem: {
+      type: Array,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -186,25 +191,57 @@ export default {
         itemId: order.id,
         qty: count,
       }
-      this.$axios
-        .$post(
-          `/api${
-            this.$route.params.queue !== undefined
-              ? `/visits/${this.$route.params.queue}`
-              : ''
-          }/orders`,
-          sendOrder,
-          {
-            progress: false,
-          }
-        )
-        .then((res) => {
-          this.$emit('add', res)
-          this.count = 1
-        })
-        .catch((error) => {
-          alert(error)
-        })
+      const index = this.orderItem.findIndex(
+        (order) => order.itemId === sendOrder.itemId
+      )
+      console.log(order)
+      if (
+        index !== -1 &&
+        order.itemGroup.id !== 3 &&
+        order.itemGroup.id !== 4
+      ) {
+        const num =
+          parseInt(this.orderItem[index].qty) + parseInt(sendOrder.qty)
+        const sendQTY = {
+          qty: num,
+        }
+        this.$axios
+          .$patch(
+            `/api${
+              this.$route.params.queue !== undefined
+                ? `/visits/${this.$route.params.queue}`
+                : ''
+            }/orders/${this.orderItem[index].id}`,
+            sendQTY,
+            { progress: false }
+          )
+          .then(() => {
+            this.orderItem[index].qty = num
+          })
+          .catch((error) => {
+            alert(error)
+          })
+      } else {
+        this.$axios
+          .$post(
+            `/api${
+              this.$route.params.queue !== undefined
+                ? `/visits/${this.$route.params.queue}`
+                : ''
+            }/orders`,
+            sendOrder,
+            {
+              progress: false,
+            }
+          )
+          .then((res) => {
+            this.$emit('add', res)
+            this.count = 1
+          })
+          .catch((error) => {
+            alert(error)
+          })
+      }
     },
     isNumber($event) {
       const keyCode = $event.keyCode ? $event.keyCode : $event.which

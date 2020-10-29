@@ -84,22 +84,34 @@
           <v-row no-gutters align="center" justify="space-between">
             <v-btn
               v-if="posData.state === 'active'"
-              class="cusblue3 font-weight-regular text-capitalize"
+              class="font-weight-regular text-capitalize"
+              color="orange accent-2"
               depressed
               dark
               @click="updateState($route.params.posid, 'pending')"
             >
               พักรายการ
             </v-btn>
-            <v-btn
-              v-else-if="posData.state === 'pending'"
-              class="cusblue3 font-weight-regular text-capitalize"
-              depressed
-              dark
-              @click="updateState($route.params.posid, 'active')"
-            >
-              ยกเลิกพักรายการ
-            </v-btn>
+            <div v-else-if="posData.state === 'pending'">
+              <v-btn
+                class="font-weight-regular text-capitalize"
+                color="green lighten-1"
+                depressed
+                dark
+                @click="updateState($route.params.posid, 'active')"
+              >
+                ทำต่อ
+              </v-btn>
+              <v-btn
+                class="font-weight-regular text-capitalize"
+                color="red accent-2"
+                depressed
+                dark
+                @click="updateState($route.params.posid, 'cancel')"
+              >
+                ลบ
+              </v-btn>
+            </div>
             <v-spacer></v-spacer>
             <div class="font-weight-medium" style="display: inline-block">
               <span>ราคารวม : {{ sumPrice }} บาท</span>
@@ -158,8 +170,9 @@
       <template v-slot:top>
         <checkListNav
           :disabled="
-            posData !== null && posData.state === 'active' ? false : true
+            posData === null || posData.state === 'active' ? false : true
           "
+          :order-item="orderItem"
           @add="addOrder"
         />
       </template>
@@ -341,29 +354,51 @@ export default {
         .open(
           `คุณแน่ใจหรือไม่?`,
           `คุณแน่ใจหรือไม่ที่${
-            states === 'pending' ? 'พัก' : 'ยกเลิกพัก'
+            states === 'active'
+              ? 'ยกเลิกพัก'
+              : states === 'active'
+              ? 'ลบ'
+              : 'พัก'
           }รายการนี้`,
           {
             width: 290,
-            color: 'warning',
+            color:
+              states === 'active'
+                ? 'success'
+                : states === 'cancel'
+                ? 'red'
+                : 'warning',
           }
         )
         .then((confirm) => {
           const state = {
             state: states,
           }
-          this.$axios
-            .$patch(`/api/pos/${id}`, state, {
-              progress: false,
-            })
-            .then((res) => {
-              states === 'pending'
-                ? this.$router.push('/pos')
-                : this.updateStatePOS('active')
-            })
-            .catch((error) => {
-              alert(error)
-            })
+          if (states === 'cancel') {
+            this.$axios
+              .$delete(`/api/pos/${id}`, {
+                progress: false,
+              })
+              .then((res) => {
+                this.$router.push('/pos')
+              })
+              .catch((error) => {
+                alert(error)
+              })
+          } else {
+            this.$axios
+              .$patch(`/api/pos/${id}`, state, {
+                progress: false,
+              })
+              .then((res) => {
+                states === 'pending'
+                  ? this.$router.push('/pos')
+                  : this.updateStatePOS('active')
+              })
+              .catch((error) => {
+                alert(error)
+              })
+          }
         })
         .catch(() => {})
     },

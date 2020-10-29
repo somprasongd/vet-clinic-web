@@ -3,13 +3,21 @@
     <posQueueNav @updateStatus="updateStatus" />
 
     <div class="custom-container">
-      <posQueue
-        :pos-queue="pos"
-        :state="select"
-        @addPosQueue="addPosQueue"
-        @deletePOS="deletePOS"
-      />
+      <posQueue :pos-queue="pos" :state="select" @deletePOS="deletePOS" />
     </div>
+
+    <v-btn
+      color="cusblue2"
+      fixed
+      fab
+      large
+      dark
+      bottom
+      right
+      @click.stop="addPosQueue"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -35,9 +43,15 @@ export default {
     }
   },
   methods: {
-    addPosQueue(val) {
-      // this.pos.push(val)
-      this.$router.push('/pos/' + val.id)
+    addPosQueue() {
+      this.$axios
+        .$post('/api/pos', null, { progress: false })
+        .then((res) => {
+          this.$router.push('/pos/' + res.id)
+        })
+        .catch((error) => {
+          alert(error)
+        })
     },
     async updateStatus(val) {
       this.select = val
