@@ -5,10 +5,32 @@
   }
 }
 .bill {
-  width: 300px;
+  width: 250px;
   text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
   border: 1px solid black;
+}
+
+.bill table {
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+}
+
+.bill .top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.bill .head {
+  text-align: center;
+  font-size: 14px;
+}
+
+.bill .body {
+  font-size: 14px;
+  text-align: left;
 }
