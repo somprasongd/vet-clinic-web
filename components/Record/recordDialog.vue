@@ -202,18 +202,18 @@ export default {
           (v) =>
             (v && v.length <= 300) || 'ไม่ควรกรอกบ้านเลขที่เกิน 50 ตัวอักษร',
         ],
-        address: [
-          (v) => !!v || 'กรุณากรอกที่อยู่',
-          (v) => (v && v.length <= 300) || 'ไม่ควรกรอกที่อยู่เกิน 300 ตัวอักษร',
-        ],
-        email: [
-          (v) => !!v || 'กรุณากรอกอีเมล์',
-          (v) => /.+@.+\..+/.test(v) || 'กรุณากรอกอีเมล์ให้ถูกรูปแบบ',
-        ],
+        // address: [
+        //   (v) => !!v || 'กรุณากรอกที่อยู่',
+        //   (v) => (v && v.length <= 300) || 'ไม่ควรกรอกที่อยู่เกิน 300 ตัวอักษร',
+        // ],
+        // email: [
+        //   (v) => !!v || 'กรุณากรอกอีเมล์',
+        //   (v) => /.+@.+\..+/.test(v) || 'กรุณากรอกอีเมล์ให้ถูกรูปแบบ',
+        // ],
         tel: [
           (v) => !!v || 'กรุณากรอกเบอร์โทรศัพท์',
           (v) => (v && this.validatePhone(v)) || 'กรุณากรอกเบอร์ให้ถูกรูปแบบ',
-          (v) => (v && v.length <= 2) || 'ไม่ควรใส่เบอร์เกิน 2 เบอร์',
+          // (v) => (v && v.length <= 2) || 'ไม่ควรใส่เบอร์เกิน 2 เบอร์',
         ],
       },
     }
@@ -224,6 +224,51 @@ export default {
         this.nameTitle = res
       })
     }
+    this.socket = this.$nuxtSocket({
+      // reconnection: true, // whether to reconnect automatically
+      // reconnectionAttempts: Infinity, // number of reconnection attempts before giving up
+      // reconnectionDelay: 1000, // how long to initially wait before attempting a new reconnection
+      // reconnectionDelayMax: 5000, // maximum amount of time to wait between reconnection attempts. Each attempt increases the reconnection delay by 2x along with a randomization factor
+      // randomizationFactor: 0.5,
+    })
+
+    // this.socket.on('reconnect_attempt', (data) => {
+    //   console.log('reconnect_attempt', data)
+    // })
+
+    // this.socket.on('reconnect_error', (data) => {
+    //   console.log('reconnect_error', data)
+    // })
+
+    // this.socket.on('reconnect_failed', (data) => {
+    //   console.log('reconnect_failed', data)
+    // })
+
+    // this.socket.on('connect_error', () => {
+    //   console.log('connect_error')
+    //   // setTimeout(() => {
+    //   //   this.socket.connect()
+    //   // }, 5000)
+    // })
+
+    this.socket.on('connect', (data) => {
+      /* Emit events */
+      this.socket.emit(
+        'set-query',
+        {
+          query: ['name', 'address', 'photo'],
+        },
+        (resp) => {
+          //
+        }
+      )
+    })
+
+    this.socket.on('disconnect', () => {
+      setTimeout(() => {
+        this.socket.connect()
+      }, 1000)
+    })
   },
   methods: {
     open(val) {
@@ -241,7 +286,54 @@ export default {
           tel: val.tels,
           other: val.remark,
         }
+        return
       }
+      /* Listen for events: */
+      this.socket.on('smc-data', (msg) => {
+        this.loading = false
+        const {
+          name: { prefix, firstname, lastname },
+          address: { houseNo, full },
+        } = msg.data
+
+        this.addCustomer = {
+          id: '',
+          prefix:
+            prefix === 'นาย'
+              ? 2
+              : prefix === 'นางสาว'
+              ? 3
+              : prefix === 'นาง'
+              ? 4
+              : 1,
+          f_name: firstname,
+          l_name: lastname,
+          houseNo,
+          address: full.substring(houseNo.length + 1),
+          email: '',
+          tel: [],
+          other: '',
+        }
+      })
+      this.socket.on('smc-error', (msg) => {
+        this.loading = false
+        this.alert = true
+        this.error = 'อ่านข้อมูลบัตรผิดพลาด ลองใหม่อีกครั้ง'
+      })
+      this.socket.on('smc-removed', (msg) => {
+        this.loading = false
+        this.alert = false
+      })
+      this.socket.on('smc-incorrect', (msg) => {
+        this.loading = false
+        this.alert = true
+        this.error = 'เสียบบัตรไม่ถูกต้อง'
+      })
+      this.socket.on('smc-inserted', (msg) => {
+        this.loading = true
+        this.alert = false
+        this.error = ''
+      })
     },
     cancelForm() {
       this.$refs.form.reset()
