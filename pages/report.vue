@@ -16,5 +16,12 @@ export default {
     reportNav,
     reportList,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 7
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
 }
 </script>

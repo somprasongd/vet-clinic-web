@@ -31,7 +31,13 @@ export default {
     posQueueNav,
     posQueue,
   },
-
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 6
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   async asyncData({ $axios, params }) {
     const pos = await $axios.$get(
       `/api/pos?state=pending&dateRange0=${moment()

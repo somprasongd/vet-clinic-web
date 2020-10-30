@@ -19,17 +19,24 @@ export default {
     insertDialog,
   },
   async validate({ $axios, params, query, store }) {
-    const visit = await $axios.$get(`/api/visits/${params.queue}`, {
-      progress: false,
-    })
     if (
-      visit.visitStatus.id === 1 ||
-      visit.visitStatus.id === 2 ||
-      visit.visitStatus.id === 3 ||
-      visit.visitStatus.id === 4
-    )
-      return true
-    else return false
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 2
+      }) ||
+      store.getters.loggedInUser.isAdmin
+    ) {
+      const visit = await $axios.$get(`/api/visits/${params.queue}`, {
+        progress: false,
+      })
+      if (
+        visit.visitStatus.id === 1 ||
+        visit.visitStatus.id === 2 ||
+        visit.visitStatus.id === 3 ||
+        visit.visitStatus.id === 4
+      )
+        return true
+      else return false
+    } else return false
   },
   async asyncData({ $axios, params }) {
     const img = await $axios.$get(`/api/visits/${params.queue}/images`, {

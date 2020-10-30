@@ -15,6 +15,13 @@ export default {
     hisNav,
     imgCard,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 1 || role.id === 2
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   data() {
     return {
       dialogImg: false,

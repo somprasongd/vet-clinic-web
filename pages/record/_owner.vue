@@ -38,6 +38,13 @@ export default {
     petCard,
     petDialog,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 1 || role.id === 2
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   async asyncData({ $axios, params }) {
     const id = params.owner
     const member = await $axios.$get(`/api/members/${id}`, { progress: false })
@@ -60,9 +67,6 @@ export default {
     return {
       // ownerDetail: {},
     }
-  },
-  validate({ params, $axios }) {
-    return /^[0-9]*$/.test(params.owner)
   },
   methods: {
     addPetDialog() {

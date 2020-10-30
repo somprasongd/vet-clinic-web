@@ -34,6 +34,13 @@ export default {
     recordTable,
     recordDialog,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 1 || role.id === 2
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   // async asyncData({ $axios }) {
   //   try {
   //     const member = await $axios.$get('/api/registration')

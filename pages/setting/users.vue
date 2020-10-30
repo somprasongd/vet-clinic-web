@@ -61,6 +61,9 @@ export default {
     userForm,
     userDialog,
   },
+  validate({ store }) {
+    return store.getters.loggedInUser.isAdmin
+  },
   data() {
     return {
       allUser: [],

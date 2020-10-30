@@ -53,6 +53,9 @@ export default {
     checkList,
     checkDialog,
   },
+  validate({ store }) {
+    return store.getters.loggedInUser.isAdmin
+  },
   async asyncData({ $axios }) {
     const item = await $axios.$get('/api/config/items', { progress: false })
     return { item: item.results }

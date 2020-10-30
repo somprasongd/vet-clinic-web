@@ -37,6 +37,9 @@ export default {
     settingTab,
     hospitalForm,
   },
+  validate({ store }) {
+    return store.getters.loggedInUser.isAdmin
+  },
   async asyncData({ $axios }) {
     const hospital = await $axios.$get('/api/config/site')
     return { hospital }

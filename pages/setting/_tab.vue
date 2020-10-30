@@ -64,15 +64,17 @@ export default {
     help,
     helpDialog,
   },
-  validate({ params }) {
-    if (
-      params.tab === 'Chief-Complaint' ||
-      params.tab === 'Differential-Diagnosis' ||
-      params.tab === 'History-Ranking' ||
-      params.tab === 'Physical-Examination'
-    )
-      return true
-    else return false
+  validate({ params, store }) {
+    if (store.getters.loggedInUser.isAdmin) {
+      if (
+        params.tab === 'Chief-Complaint' ||
+        params.tab === 'Differential-Diagnosis' ||
+        params.tab === 'History-Ranking' ||
+        params.tab === 'Physical-Examination'
+      )
+        return true
+      else return false
+    } else return false
   },
   async asyncData({ $axios, params }) {
     const helper = await $axios.$get(

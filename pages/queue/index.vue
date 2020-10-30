@@ -28,6 +28,20 @@ export default {
     queueTable,
     queueDialog,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return (
+          role.id === 1 ||
+          role.id === 2 ||
+          role.id === 3 ||
+          role.id === 4 ||
+          role.id === 5 ||
+          role.id === 6
+        )
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   async asyncData({ $axios }) {
     const visit = await $axios.$get('/api/visits', { progress: false })
     return { visit: visit.results }

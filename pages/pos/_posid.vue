@@ -24,6 +24,13 @@ export default {
     checklistCard,
     // posTable,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 6
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   async asyncData({ $axios, params }) {
     const order = await $axios.$get(`/api/orders?posId=${params.posid}`, {
       progress: false,

@@ -42,19 +42,26 @@ export default {
     checklistCard,
   },
   async validate({ $axios, params, query, store }) {
-    const visit = await $axios.$get(`/api/visits/${params.queue}`, {
-      progress: false,
-    })
     if (
-      visit.visitStatus.id === 1 ||
-      visit.visitStatus.id === 2 ||
-      visit.visitStatus.id === 3 ||
-      visit.visitStatus.id === 4 ||
-      // visit.visitStatus.id === 6 ||
-      visit.visitStatus.id === 9
-    )
-      return true
-    else return false
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 2 || role.id === 3 || role.id === 4 || role.id === 5
+      }) ||
+      store.getters.loggedInUser.isAdmin
+    ) {
+      const visit = await $axios.$get(`/api/visits/${params.queue}`, {
+        progress: false,
+      })
+      if (
+        visit.visitStatus.id === 1 ||
+        visit.visitStatus.id === 2 ||
+        visit.visitStatus.id === 3 ||
+        visit.visitStatus.id === 4 ||
+        // visit.visitStatus.id === 6 ||
+        visit.visitStatus.id === 9
+      )
+        return true
+      else return false
+    } else return false
   },
   async asyncData({ $axios, params }) {
     try {

@@ -110,6 +110,13 @@ export default {
     printForm,
     images,
   },
+  validate({ store }) {
+    return (
+      store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 1 || role.id === 2
+      }) || store.getters.loggedInUser.isAdmin
+    )
+  },
   async asyncData({ $axios, params }) {
     const visit = await $axios.$get(
       `/api/visits?petId=${params.id}&dateRange0=${moment()
