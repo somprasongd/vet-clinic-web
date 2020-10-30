@@ -82,11 +82,29 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  v-model="editedItem.weight"
+                  :disabled="loading"
+                  :rules="rules.weight"
+                  color="cusblue"
+                  label="Weight/kg"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
                   v-model="editedItem.temp"
                   :disabled="loading"
                   :rules="rules.temp"
                   color="cusblue"
-                  label="F/F°"
+                  label="Temp/F"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="editedItem.pulse"
+                  :disabled="loading"
+                  :rules="rules.pulse"
+                  color="cusblue"
+                  label="Pulse"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
@@ -118,11 +136,11 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
-                  v-model="editedItem.weight"
+                  v-model="editedItem.bcs"
                   :disabled="loading"
-                  :rules="rules.weight"
+                  :rules="rules.bcs"
                   color="cusblue"
-                  label="Weight/kg"
+                  label="BCS"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
@@ -132,15 +150,6 @@
                   :rules="rules.painScore"
                   color="cusblue"
                   label="Pain Score"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model="editedItem.bcs"
-                  :disabled="loading"
-                  :rules="rules.bcs"
-                  color="cusblue"
-                  label="BCS"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -171,7 +180,7 @@
 
     <v-dialog
       v-model="dialogShow"
-      max-width="900"
+      max-width="930"
       :fullscreen="this.$vuetify.breakpoint.xsOnly"
       scrollable
     >
@@ -263,6 +272,7 @@ export default {
         time: '',
         temp: '',
         rr: '',
+        pulse: '',
         sys: '',
         dia: '',
         weight: '',
@@ -275,6 +285,7 @@ export default {
         { text: 'Time', value: 'time', align: 'center' },
         { text: 'Temp', value: 'temp', align: 'center' },
         { text: 'R', value: 'rr', align: 'center' },
+        { text: 'Pulse', value: 'pulse', align: 'center' },
         { text: 'SysBp', value: 'sys', align: 'center' },
         { text: 'DiaBp', value: 'dia', align: 'center' },
         { text: 'Weight', value: 'weight', align: 'center' },
@@ -286,6 +297,11 @@ export default {
         date: [(v) => !!v || 'กรุณาเลือกวันที่'],
         time: [(v) => !!v || 'กรุณาเลือกเวลา'],
         rr: [
+          (v) =>
+            (v && /^[0-9]{1,3}$/.test(v)) ||
+            'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
+        ],
+        pulse: [
           (v) =>
             (v && /^[0-9]{1,3}$/.test(v)) ||
             'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
@@ -379,6 +395,7 @@ export default {
           time: '',
           temp: '',
           rr: '',
+          pulse: '',
           sys: '',
           dia: '',
           weight: '',
@@ -407,6 +424,7 @@ export default {
         vitalSignAt: date.toISOString(),
         temp: vs.temp === '' ? null : vs.temp,
         rr: vs.rr === '' ? null : vs.rr,
+        pulse: vs.pulse === '' ? null : vs.pulse,
         sys: vs.sys === '' ? null : vs.sys,
         dia: vs.dia === '' ? null : vs.dia,
         weight: vs.weight === '' ? null : vs.weight,
@@ -434,6 +452,7 @@ export default {
         vitalSignAt: date.toISOString(),
         temp: vs.temp === '' ? null : vs.temp,
         rr: vs.rr === '' ? null : vs.rr,
+        pulse: vs.pulse === '' ? null : vs.pulse,
         sys: vs.sys === '' ? null : vs.sys,
         dia: vs.dia === '' ? null : vs.dia,
         weight: vs.weight === '' ? null : vs.weight,

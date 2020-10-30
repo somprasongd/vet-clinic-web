@@ -118,12 +118,12 @@ export default {
       return {
         weight: {
           header: 'Weight',
-          value: temp === null ? '-' : temp,
+          value: weight === null ? '-' : weight,
           unit: 'Kg',
         },
         temp: {
           header: 'Temp.',
-          value: weight === null ? '-' : weight,
+          value: temp === null ? '-' : temp,
           unit: 'F',
         },
         bp: {
