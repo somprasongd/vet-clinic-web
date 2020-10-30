@@ -15,11 +15,29 @@
         </div>
       </template>
       <template v-slot:[`item.name`]="{ item }">
-        <div v-if="item.visitStatus.id !== 6" class="font-weight-medium">
+        <div
+          v-if="
+            ($store.getters.loggedInUser.roles.some((role) => {
+              return (
+                role.id === 2 || role.id === 3 || role.id === 4 || role.id === 5
+              )
+            }) ||
+              $store.getters.loggedInUser.isAdmin) &&
+            item.visitStatus.id !== 6
+          "
+          class="font-weight-medium"
+        >
           <nuxt-link
             class="bold-owner text-decoration-none text-truncate"
             :to="
-              item.visitStatus.id === 6 || item.visitStatus.id === 9
+              ($store.getters.loggedInUser.roles.some((role) => {
+                return (
+                  (role.id === 3 || role.id === 4 || role.id === 5) &&
+                  role.id !== 2
+                )
+              }) ||
+                item.visitStatus.id === 9) &&
+              !$store.getters.loggedInUser.isAdmin
                 ? '/queue/' + item.id + '/checklist'
                 : '/queue/' + item.id
             "
