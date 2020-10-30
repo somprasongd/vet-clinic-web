@@ -335,7 +335,7 @@ export default {
       }
       if (num.length !== 0) {
         return num.every((n) => {
-          return n.length >= 9 && n.length <= 10 && n.match(/^[0-9]*$/)
+          return n.match(/^[0-9]{9,10}$/)
         })
       }
     },
