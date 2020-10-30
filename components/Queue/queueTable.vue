@@ -71,6 +71,11 @@
               <!-- รอตรวจ -->
               <div v-if="item.visitStatus.id === 1">
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -80,6 +85,11 @@
                   เข้ารับการตรวจ
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 1 || role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -94,6 +104,11 @@
                   ส่งต่อ
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 1 || role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -106,6 +121,11 @@
               <!-- ตรวจรักษา -->
               <div v-else-if="item.visitStatus.id === 2">
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2 || role.id === 3 || role.id === 4
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -115,6 +135,11 @@
                   รอผลตรวจ
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -127,6 +152,11 @@
               <!-- รอผลตรวจ -->
               <div v-else-if="item.visitStatus.id === 3">
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2 || role.id === 3 || role.id === 4
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -136,6 +166,11 @@
                   รายงานผล
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -148,6 +183,11 @@
               <!-- รายงานผล -->
               <div v-else-if="item.visitStatus.id === 4">
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2 || role.id === 3 || role.id === 4
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -157,6 +197,11 @@
                   รอผลตรวจ
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -169,6 +214,11 @@
               <!-- รอชำระเงิน -->
               <div v-else>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 1 || role.id === 2 || role.id === 6
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -178,6 +228,11 @@
                   รับชำระเงิน
                 </v-btn>
                 <v-btn
+                  v-if="
+                    $store.getters.loggedInUser.roles.some((role) => {
+                      return role.id === 2
+                    }) || $store.getters.loggedInUser.isAdmin
+                  "
                   class="cusblue2--text"
                   block
                   text
@@ -191,6 +246,11 @@
             <!-- ฝากเลี้ยง -->
             <div v-else>
               <v-btn
+                v-if="
+                  $store.getters.loggedInUser.roles.some((role) => {
+                    return role.id === 1 || role.id === 2 || role.id === 6
+                  }) || $store.getters.loggedInUser.isAdmin
+                "
                 class="cusblue2--text"
                 block
                 text
@@ -200,6 +260,11 @@
                 รับกลับบ้าน
               </v-btn>
               <v-btn
+                v-if="
+                  $store.getters.loggedInUser.roles.some((role) => {
+                    return role.id === 1 || role.id === 2
+                  }) || $store.getters.loggedInUser.isAdmin
+                "
                 class="cusblue2--text"
                 block
                 text
