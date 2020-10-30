@@ -375,7 +375,12 @@ export default {
               progress: false,
             })
             .then((res) => {
-              if (res.id !== undefined) {
+              if (
+                res.id !== undefined &&
+                this.$store.getters.loggedInUser.roles.some((role) => {
+                  return role.id === 6
+                })
+              ) {
                 this.$router.push('/pos/' + res.id)
               } else {
                 this.$emit('delete', id)
