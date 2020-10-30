@@ -77,7 +77,7 @@
               <v-col lg="5" md="12" cols="12">
                 <span class="font-weight-medium">ที่อยู่ :</span>
                 <span class="font-weight-light">
-                  {{ owner.address }} {{ owner.houseNo }}
+                  {{ owner.houseNo }} {{ owner.address }}
                 </span>
               </v-col>
             </v-row>
