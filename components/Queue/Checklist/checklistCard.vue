@@ -294,6 +294,7 @@
                 </span>
               </v-row>
             </div>
+            <hr />
           </div>
         </div>
       </div>
@@ -318,8 +319,7 @@ const options = {
     'width=1000,height=600',
   ],
   styles: [
-    'https://somprasongd.github.io/vet-clinic-web/receipt.css',
-    'https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css',
+    window.location.origin + '/receipt.css',
     'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css',
   ],
 }
