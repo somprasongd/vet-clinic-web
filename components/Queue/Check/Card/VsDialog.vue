@@ -1,13 +1,21 @@
 <template>
   <div>
-    <v-dialog v-model="assignModalVS" max-width="600">
+    <v-dialog
+      v-model="assignModalVS"
+      max-width="600"
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+      scrollable
+    >
       <v-card>
         <h2 class="pa-5 pb-2">{{ VsTitle }}</h2>
+        <v-btn class="mt-4" icon absolute right @click="assignModalVS = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
         <v-divider class="darker-divider"></v-divider>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <v-row dense>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-menu
                   ref="menu"
                   v-model="MeasureDate"
@@ -39,7 +47,7 @@
                   ></v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-menu
                   ref="menu"
                   v-model="MeasureTime"
@@ -72,7 +80,7 @@
                   ></v-time-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.temp"
                   :disabled="loading"
@@ -81,7 +89,7 @@
                   label="F/F°"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.rr"
                   :disabled="loading"
@@ -90,7 +98,7 @@
                   label="R"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.sys"
                   :disabled="loading"
@@ -99,7 +107,7 @@
                   label="Systolic P/bpm"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.dia"
                   :disabled="loading"
@@ -108,7 +116,7 @@
                   label="Diastolic P/bpm"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.weight"
                   :disabled="loading"
@@ -117,7 +125,7 @@
                   label="Weight/kg"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.painScore"
                   :disabled="loading"
@@ -126,7 +134,7 @@
                   label="Pain Score"
                 ></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="editedItem.bcs"
                   :disabled="loading"
@@ -161,15 +169,25 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogShow" max-width="900">
-      <v-card>
+    <v-dialog
+      v-model="dialogShow"
+      max-width="900"
+      :fullscreen="this.$vuetify.breakpoint.xsOnly"
+      scrollable
+    >
+      <v-card height="100%">
+        <h2 class="pa-5 pb-2">Vital Sign</h2>
+        <v-btn class="mt-4" icon absolute right @click="dialogShow = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-divider class="darker-divider"></v-divider>
         <v-data-table
           :headers="headers"
           :items="cardData"
           class="elevation-1"
           disable-pagination
           hide-default-footer
-          height="80vh"
+          height="100%"
           fixed-header
         >
           <template v-slot:[`item.date`]="{ item }">
@@ -186,7 +204,7 @@
           </template>
         </v-data-table>
 
-        <v-card-actions>
+        <v-card-actions v-if="!this.$vuetify.breakpoint.xsOnly">
           <v-spacer></v-spacer>
           <v-btn color="cusblue2" text @click="dialogShow = false">ออก</v-btn>
         </v-card-actions>
