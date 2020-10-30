@@ -225,31 +225,12 @@ export default {
       })
     }
     this.socket = this.$nuxtSocket({
-      // reconnection: true, // whether to reconnect automatically
-      // reconnectionAttempts: Infinity, // number of reconnection attempts before giving up
-      // reconnectionDelay: 1000, // how long to initially wait before attempting a new reconnection
-      // reconnectionDelayMax: 5000, // maximum amount of time to wait between reconnection attempts. Each attempt increases the reconnection delay by 2x along with a randomization factor
-      // randomizationFactor: 0.5,
+      reconnection: true, // whether to reconnect automatically
+      reconnectionAttempts: 5, // number of reconnection attempts before giving up
+      reconnectionDelay: 1000, // how long to initially wait before attempting a new reconnection
+      reconnectionDelayMax: 5000, // maximum amount of time to wait between reconnection attempts. Each attempt increases the reconnection delay by 2x along with a randomization factor
+      randomizationFactor: 0.5,
     })
-
-    // this.socket.on('reconnect_attempt', (data) => {
-    //   console.log('reconnect_attempt', data)
-    // })
-
-    // this.socket.on('reconnect_error', (data) => {
-    //   console.log('reconnect_error', data)
-    // })
-
-    // this.socket.on('reconnect_failed', (data) => {
-    //   console.log('reconnect_failed', data)
-    // })
-
-    // this.socket.on('connect_error', () => {
-    //   console.log('connect_error')
-    //   // setTimeout(() => {
-    //   //   this.socket.connect()
-    //   // }, 5000)
-    // })
 
     this.socket.on('connect', (data) => {
       /* Emit events */
@@ -262,6 +243,12 @@ export default {
           //
         }
       )
+    })
+
+    this.socket.on('connect_error', () => {
+      setTimeout(() => {
+        this.socket.connect()
+      }, 1000)
     })
 
     this.socket.on('disconnect', () => {
