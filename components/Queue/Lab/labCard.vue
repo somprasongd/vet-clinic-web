@@ -40,7 +40,7 @@
 
       <template v-slot:[`item.interpret`]="{ item }">
         <v-row
-          v-if="/^[0-9]*$/.test(item.result) && item.result !== ''"
+          v-if="/^[0-9]*\.?[0-9]+$/.test(item.result) && item.result !== ''"
           no-gutters
         >
           <v-col cols="4">{{ item.interpret }}</v-col>

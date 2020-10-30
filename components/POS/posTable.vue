@@ -193,7 +193,10 @@ export default {
         },
         { text: 'Action', value: 'action', align: 'center', sortable: false },
       ],
-      rules: [(v) => (v && /^[0-9]*$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น'],
+      rules: [
+        (v) =>
+          (v && /^[0-9]*\.?[0-9]{1,2}$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+      ],
     }
   },
   methods: {

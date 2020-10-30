@@ -64,7 +64,7 @@
           <td>{{ item.interpret }}</td>
           <td>
             <v-row
-              v-if="/^[0-9]*$/.test(item.result) && item.result !== ''"
+              v-if="/^[0-9]*\.?[0-9]+$/.test(item.result) && item.result !== ''"
               no-gutters
             >
               <!-- <v-col cols="4"> รายงานผล </v-col> -->
