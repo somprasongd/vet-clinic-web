@@ -40,6 +40,19 @@ export default {
     })
     return { order: order.results, pos: post }
   },
+  beforeDestroy() {
+    if (this.pos.state === 'active') {
+      this.$axios
+        .$patch(
+          `/api/pos/${this.pos.id}`,
+          {
+            state: 'pending',
+          },
+          { progress: false }
+        )
+        .catch((error) => alert(error))
+    }
+  },
   methods: {
     async addOrder(data) {
       // this.order.push(data)
