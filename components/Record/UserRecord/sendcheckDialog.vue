@@ -83,7 +83,7 @@
                   v-model="sendCheck.temp"
                   :disabled="loading"
                   color="cusblue"
-                  label="อุณหภูมิ / C°"
+                  label="อุณหภูมิ / F°"
                   :rules="rules.temp"
                 ></v-text-field>
               </v-col>
@@ -255,9 +255,9 @@ export default {
           (v) => (v && v.length <= 3) || 'ไม่ควรกรอกน้ำหนักเกิน 3 หลัก',
         ],
         temp: [
-          (v) => !!v || 'กรุณากรอกอุณหภูมิ',
+          // (v) => !!v || 'กรุณากรอกอุณหภูมิ',
           (v) => /^[0-9]*$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
-          (v) => (v && v.length <= 3) || 'ไม่ควรกรอกอุณหภูมิเกิน 3 หลัก',
+          (v) => !v || v.length <= 3 || 'ไม่ควรกรอกอุณหภูมิเกิน 3 หลัก',
         ],
       },
     }
@@ -302,7 +302,7 @@ export default {
           doctorId: pet.doctor === '' ? null : pet.doctor,
           visitPriorityId: pet.important,
           weight: pet.weight,
-          temp: pet.temp,
+          temp: pet.temp === '' ? null : pet.temp,
           visitCause: pet.do.check.join(', '),
           note: pet.problem,
           appointId: pet.appointId === '' ? null : pet.appointId,
