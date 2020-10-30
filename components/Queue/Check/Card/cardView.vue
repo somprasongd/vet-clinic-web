@@ -1,6 +1,10 @@
 <template>
   <v-card class="my-1 mx-1" max-height="100%">
-    <v-card-title class="pb-1 pt-3">
+    <v-card-title
+      v-ripple
+      class="pb-1 pt-3 custom-cardTitle"
+      @click="isExpand = !isExpand"
+    >
       {{ cardTitle }}
       <v-chip v-if="loading" class="ma-2" color="primary" outlined pill x-small>
         Saving
@@ -17,7 +21,7 @@
       </v-chip>
 
       <v-spacer></v-spacer>
-      <v-btn color="cusblue2" icon @click="isExpand = !isExpand">
+      <v-btn color="cusblue2" icon>
         <v-icon v-show="isExpand == false">mdi-chevron-down</v-icon>
         <v-icon v-show="isExpand == true">mdi-chevron-up</v-icon>
       </v-btn>

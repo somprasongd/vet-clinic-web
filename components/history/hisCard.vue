@@ -58,9 +58,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.custom-cardTitle.v-card__title {
-  cursor: pointer;
-}
-</style>

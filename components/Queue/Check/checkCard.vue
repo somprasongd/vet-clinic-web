@@ -3,10 +3,14 @@
     <v-row no-gutters>
       <v-col cols="12" md="6">
         <v-card class="my-1 mx-1" max-height="100%">
-          <v-card-title class="pb-1 pt-3">
+          <v-card-title
+            v-ripple
+            class="pb-1 pt-3 custom-cardTitle"
+            @click="checkInfo = !checkInfo"
+          >
             ข้อมูลการเข้าตรวจ
             <v-spacer></v-spacer>
-            <v-btn color="cusblue2" icon @click="checkInfo = !checkInfo">
+            <v-btn color="cusblue2" icon>
               <v-icon v-show="checkInfo == false">mdi-chevron-down</v-icon>
               <v-icon v-show="checkInfo == true">mdi-chevron-up</v-icon>
             </v-btn>
