@@ -11,6 +11,7 @@
     >
       <template v-slot:[`item.qty`]="props">
         <v-edit-dialog
+          v-if="posData.state !== 'success' && posData.state !== 'cancel'"
           :return-value.sync="props.item.qty"
           @save="saveQTY(props.item.id, props.item.qty)"
         >
@@ -28,10 +29,12 @@
             ></v-text-field>
           </template>
         </v-edit-dialog>
+        <span v-else>{{ props.item.qty }}</span>
       </template>
 
       <template v-slot:[`item.price`]="props">
         <v-edit-dialog
+          v-if="posData.state !== 'success' && posData.state !== 'cancel'"
           :return-value.sync="props.item.price"
           @save="savePrice(props.item.id, props.item.price)"
         >
@@ -49,6 +52,7 @@
             ></v-text-field>
           </template>
         </v-edit-dialog>
+        <span v-else>{{ props.item.price }}</span>
       </template>
 
       <template v-slot:[`item.action`]="{ item }">
