@@ -14,6 +14,13 @@
           {{ orderNum(posQueue, item.id) }}
         </div>
       </template>
+      <template v-slot:[`item.state`]="{ item }">
+        <div class="text-center">
+          <v-chip :color="getColor(item.state)" dark small label>
+            {{ item.state }}
+          </v-chip>
+        </div>
+      </template>
       <template v-slot:[`item.posNumber`]="{ item }">
         <div class="font-weight-medium">
           <nuxt-link
@@ -154,6 +161,11 @@ export default {
             })
         })
         .catch(() => {})
+    },
+    getColor(status) {
+      if (status === 'cancel') return 'rgb(255, 98, 98)'
+      else if (status === 'pending') return 'rgb(255, 191, 72)'
+      else return 'rgb(87, 243, 87)'
     },
   },
 }
