@@ -1,16 +1,16 @@
 @media print {
   @page {
-    size: 4in 10in;
+    size: horizontal;
     margin: 3mm 3mm;
   }
   body {
     /* size: 5in 7in; */
-    margin: 10mm;
+    /* margin: 10mm; */
     text-align: center;
   }
 }
 .bill {
-  width: 250px;
+  width: 100%;
   text-align: center;
   display: block;
   margin-left: auto;
