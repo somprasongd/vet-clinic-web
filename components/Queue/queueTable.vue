@@ -375,7 +375,11 @@ export default {
               progress: false,
             })
             .then((res) => {
-              this.$router.push('/pos/' + res.id)
+              if (res.id !== undefined) {
+                this.$router.push('/pos/' + res.id)
+              } else {
+                this.$emit('delete', id)
+              }
             })
             .catch((error) => {
               alert(error)
