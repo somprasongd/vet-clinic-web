@@ -6,7 +6,11 @@
       :dense="this.$vuetify.breakpoint.xsOnly"
     >
       <v-col cols="12" sm="5">
-        <v-card class="elevation-4" height="180" :disabled="disable">
+        <v-card
+          class="elevation-4 overflow-auto"
+          height="180"
+          :disabled="disable"
+        >
           <v-card-title class="pa-0 pl-5 pt-3"> สิทธิทั้งหมด </v-card-title>
           <v-divider></v-divider>
           <v-row dense>
@@ -82,7 +86,11 @@
       </v-col>
 
       <v-col cols="12" sm="5">
-        <v-card class="elevation-4" height="180" :disabled="disable">
+        <v-card
+          class="elevation-4 overflow-auto"
+          height="180"
+          :disabled="disable"
+        >
           <v-card-title class="pa-0 pl-5 pt-3">
             <span :class="alerts ? 'red--text' : ''">สิทธิที่เลือก</span>
             <v-chip
