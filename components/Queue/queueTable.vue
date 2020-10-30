@@ -369,7 +369,9 @@ export default {
         })
         .then((confirm) => {
           this.$axios
-            .$patch(`/api/visits/${id}/status/discharge`, { progress: false })
+            .$patch(`/api/visits/${id}/status/discharge`, null, {
+              progress: false,
+            })
             .then((res) => {
               this.$router.push('/pos/' + res.id)
             })
