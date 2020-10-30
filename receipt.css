@@ -1,7 +1,12 @@
 @media print {
   @page {
-    size: 58 3276mm;
-    margin: 0mm;
+    size: 4in 10in;
+    margin: 3mm 3mm;
+  }
+  body {
+    /* size: 5in 7in; */
+    margin: 10mm;
+    text-align: center;
   }
 }
 .bill {
@@ -10,13 +15,13 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid black;
+  /* border: 1px solid black; */
 }
 
 .bill table {
   width: 100%;
   text-align: left;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .bill .top {
@@ -28,9 +33,10 @@
 .bill .head {
   text-align: center;
   font-size: 14px;
+  margin-top: 10px;
 }
 
 .bill .body {
-  font-size: 14px;
+  font-size: 12px;
   text-align: left;
 }
