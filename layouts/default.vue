@@ -23,11 +23,64 @@
         centered
         :hide-slider="!!this.$route.params.id"
       >
-        <v-tab class="font-weight-regular" to="/queue">คิว</v-tab>
-        <v-tab class="font-weight-regular" to="/record">เวชระเบียน</v-tab>
-        <v-tab class="font-weight-regular" to="/pos">POS</v-tab>
-        <v-tab class="font-weight-regular" to="/report">รายงาน</v-tab>
-        <v-tab class="font-weight-regular" to="/setting">ตั้งค่า</v-tab>
+        <v-tab
+          v-if="
+            $store.getters.loggedInUser.roles.some((role) => {
+              return (
+                role.id === 1 ||
+                role.id === 2 ||
+                role.id === 3 ||
+                role.id === 4 ||
+                role.id === 5 ||
+                role.id === 6
+              )
+            }) || $store.getters.loggedInUser.isAdmin
+          "
+          class="font-weight-regular"
+          to="/queue"
+        >
+          คิว
+        </v-tab>
+        <v-tab
+          v-if="
+            $store.getters.loggedInUser.roles.some((role) => {
+              return role.id === 1 || role.id === 2
+            }) || $store.getters.loggedInUser.isAdmin
+          "
+          class="font-weight-regular"
+          to="/record"
+        >
+          เวชระเบียน
+        </v-tab>
+        <v-tab
+          v-if="
+            $store.getters.loggedInUser.roles.some((role) => {
+              return role.id === 6
+            }) || $store.getters.loggedInUser.isAdmin
+          "
+          class="font-weight-regular"
+          to="/pos"
+        >
+          POS
+        </v-tab>
+        <v-tab
+          v-if="
+            $store.getters.loggedInUser.roles.some((role) => {
+              return role.id === 7
+            }) || $store.getters.loggedInUser.isAdmin
+          "
+          class="font-weight-regular"
+          to="/report"
+        >
+          รายงาน
+        </v-tab>
+        <v-tab
+          v-if="$store.getters.loggedInUser.isAdmin"
+          class="font-weight-regular"
+          to="/setting"
+        >
+          ตั้งค่า
+        </v-tab>
       </v-tabs>
 
       <v-tabs
