@@ -50,6 +50,7 @@
                       <v-col cols="6">
                         <v-btn
                           class="ml-1"
+                          :disabled="item.id === 1 ? true : false"
                           icon
                           x-small
                           @click="deleteUser(item.id)"
