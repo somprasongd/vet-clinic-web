@@ -318,7 +318,7 @@ const options = {
     'width=1000,height=600',
   ],
   styles: [
-    '/receipt.css',
+    'https://somprasongd.github.io/vet-clinic-web/receipt.css',
     'https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css',
     'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css',
   ],
