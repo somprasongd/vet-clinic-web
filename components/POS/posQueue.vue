@@ -21,19 +21,29 @@
           </v-chip>
         </div>
       </template>
-      <template v-slot:[`item.posNumber`]="{ item }">
+      <template v-slot:[`item.refNumber`]="{ item }">
         <div class="font-weight-medium">
           <nuxt-link
             class="bold-owner text-decoration-none text-truncate"
             :to="'/pos/' + item.id"
           >
-            {{ item.posNumber }}
+            {{ item.receiptNumber || item.posNumber }}
             <v-icon color="cusblue2" small>mdi-chevron-right</v-icon>
           </nuxt-link>
         </div>
       </template>
+      <template v-slot:[`item.user`]="{ item }">
+        {{ item.receiptBy || item.createBy }}
+      </template>
       <template v-slot:[`item.createAt`]="{ item }">
-        {{ $moment(item.createAt).format('DD/MM/YYYY') }}
+        {{
+          $moment(item.receiptAt || item.createAt).format('DD/MM/YYYY HH:mm:ss')
+        }}
+      </template>
+      <template v-slot:[`item.netPrice`]="{ item }">
+        {{
+          item.netPrice ? new Intl.NumberFormat().format(item.netPrice) : '-'
+        }}
       </template>
       <template v-slot:[`item.action`]="{ item }">
         <v-btn
@@ -82,45 +92,45 @@ export default {
           class: 'font-weight-bold',
         },
         {
-          text: 'POS Number',
-          value: 'posNumber',
+          text: 'หมายเลขอ้างอิง',
+          value: 'refNumber',
           align: 'center',
           width: '150',
           sortable: false,
           class: 'font-weight-bold',
         },
         {
-          text: 'Create AT',
+          text: 'ผู้ทำรายการ',
+          value: 'user',
+          align: 'center',
+          width: '',
+          sortable: false,
+        },
+        {
+          text: 'ลูกค้า',
+          value: 'customer',
+          align: 'center',
+          width: '',
+          sortable: false,
+        },
+        {
+          text: 'ทำรายการเมื่อ',
           value: 'createAt',
           align: 'center',
           width: '',
           sortable: false,
         },
         {
-          text: 'State',
+          text: 'สถานะ',
           value: 'state',
           align: 'center',
           width: '',
           sortable: false,
         },
         {
-          text: 'Receipt No',
-          value: 'receiptNumber',
-          align: 'center',
-          width: '',
-          sortable: false,
-        },
-        {
-          text: 'Final Price',
-          value: 'finalPrice',
-          align: 'center',
-          width: '',
-          sortable: false,
-        },
-        {
-          text: 'Remark',
-          value: 'remark',
-          align: 'center',
+          text: 'จำนวนเงินสุทธิ',
+          value: 'netPrice',
+          align: 'right',
           width: '',
           sortable: false,
         },
