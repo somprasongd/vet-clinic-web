@@ -283,6 +283,13 @@ export default {
     open(id, doctor) {
       this.sendCheck.petId = id
       this.sendCheckDialog = true
+      this.sendCheck.doctor = this.$store.getters.loggedInUser.roles.some(
+        (role) => {
+          return role.id === 2
+        }
+      )
+        ? this.$store.getters.loggedInUser.id
+        : ''
     },
     open1(id, doctor, appointId) {
       this.sendCheck.petId = id
