@@ -219,7 +219,7 @@
               </v-btn>
             </div>
           </div>
-          <div v-else-if="showVsDx">
+          <div v-else-if="showVsDx && visitData.visitType.id !== 3">
             <v-divider class="dash-divider hidden-sm-and-down"></v-divider>
 
             <div class="hidden-sm-and-down">

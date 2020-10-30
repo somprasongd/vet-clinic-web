@@ -215,16 +215,19 @@
     </v-data-table>
 
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
+    <takeHomeDialog ref="takeHomeDialog" />
     <confirmDialog ref="confirm" />
   </div>
 </template>
 
 <script>
 import sendDoctorDialog from '@/components/Queue/sendDoctorDialog'
+import takeHomeDialog from '@/components/Queue/takeHomeDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
 export default {
   components: {
     sendDoctorDialog,
+    takeHomeDialog,
     confirmDialog,
   },
   props: {
@@ -263,8 +266,7 @@ export default {
   },
   methods: {
     backHome(id, date) {
-      console.log(id)
-      console.log(date)
+      this.$refs.takeHomeDialog.open(id, date)
     },
     openSendDocs(name, id) {
       this.$refs.sendDoctor.open(name, id)
