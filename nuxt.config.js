@@ -207,6 +207,6 @@ export default {
   //   },
   // ],
   env: {
-    apiUrl: process.env.API_URI,
+    apiUrl: process.env.API_URI || '',
   },
 }
