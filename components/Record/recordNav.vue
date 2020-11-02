@@ -89,7 +89,10 @@ export default {
     // this.search = this.$auth.$storage.getState('searchHis')
     if (localStorage.getItem('select') !== null)
       this.select = JSON.parse(localStorage.getItem('select'))
-    if (localStorage.search !== undefined) this.search = localStorage.search
+    if (localStorage.search !== undefined) {
+      this.search = localStorage.search
+      this.sendValue()
+    }
   },
   methods: {
     sendValue() {
