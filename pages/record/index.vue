@@ -1,11 +1,15 @@
 <template>
   <div>
-    <recordNav @search="filter" />
+    <recordNav
+      :default-search-key="defaultSearchKey"
+      :default-search-value="defaultSearchValue"
+      @onSearch="search"
+    />
 
     <div class="custom-container">
-      <recordTable :dessert="member" :loading="loading" />
+      <recordTable :dessert="members" :loading="loading" />
     </div>
-    <!-- {{ this.customer }} -->
+
     <recordDialog ref="addMemberDialog" />
 
     <v-btn
@@ -41,51 +45,52 @@ export default {
       }) || store.getters.loggedInUser.isAdmin
     )
   },
-  // async asyncData({ $axios }) {
-  //   try {
-  //     const member = await $axios.$get('/api/registration')
-  //     return { member: member.results }
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // },
   data() {
     return {
-      member: [],
+      members: [],
       loading: false,
-      timeout: null,
     }
+  },
+  computed: {
+    defaultSearchKey() {
+      if (localStorage.getItem('registerFilters')) {
+        const { key } = JSON.parse(localStorage.getItem('registerFilters'))
+        return key
+      }
+
+      return undefined
+    },
+    defaultSearchValue() {
+      if (localStorage.getItem('registerFilters')) {
+        const { value } = JSON.parse(localStorage.getItem('registerFilters'))
+        return value
+      }
+
+      return ''
+    },
   },
   methods: {
     addMemberDialog() {
       this.$refs.addMemberDialog.open()
     },
-    filter(val) {
+    async search({ key, value = '' }) {
+      if (value === '') {
+        this.members = []
+        return
+      }
       this.loading = true
-      clearTimeout(this.timeout)
 
-      this.timeout = setTimeout(() => {
-        if (val[1] !== '') {
-          this.$axios
-            .$get(
-              `/api/registration?limit=0${
-                val[1] !== '' ? '&' + val[0] + '=' + val[1] : ''
-              }`,
-              { progress: false }
-            )
-            .then((res) => {
-              this.member = res.results
-              this.loading = false
-            })
-            .catch((err) => {
-              console.log(err)
-              this.loading = false
-            })
-        } else {
-          this.member = []
-          this.loading = false
-        }
-      }, 600)
+      const params = {}
+      params[key.value] = value
+
+      localStorage.setItem('registerFilters', JSON.stringify({ key, value }))
+
+      try {
+        const res = await this.$axios.$get(`/api/registration`, { params })
+        this.members = res.results
+      } finally {
+        this.loading = false
+      }
     },
   },
 }

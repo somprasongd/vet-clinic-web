@@ -186,8 +186,13 @@ export default {
       if (this.startDate !== null) this.emitDate()
     },
     selectStatus(val) {
+      localStorage.posState = val
       if (this.startDate !== null && this.startDate !== null) this.emitDate()
     },
+  },
+  mounted() {
+    if (localStorage.posState !== undefined)
+      this.selectStatus = localStorage.posState
   },
   methods: {
     emitDate() {

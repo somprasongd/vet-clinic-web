@@ -6,6 +6,7 @@ export const state = () => ({
     xray: false,
     // queueCount: 0,
   },
+  avatarImg: null,
 })
 
 export const mutations = {
@@ -14,6 +15,12 @@ export const mutations = {
   },
   setQueue(state, queue) {
     state.queueCount = queue
+  },
+  setAvatar(state, avatar) {
+    state.avatarImg = avatar
+  },
+  setMe(state, me) {
+    state.auth.user = me
   },
   // addQueue(state, value) {
   //   state.queueCount += value

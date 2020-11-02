@@ -52,7 +52,7 @@ export default {
         progress: false,
       })
       if (
-        visit.visitStatus.id === 1 ||
+        // visit.visitStatus.id === 1 ||
         visit.visitStatus.id === 2 ||
         visit.visitStatus.id === 3 ||
         visit.visitStatus.id === 4 ||

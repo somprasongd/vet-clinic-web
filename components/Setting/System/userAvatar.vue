@@ -58,7 +58,7 @@
 export default {
   props: {
     avatarid: {
-      type: Number,
+      type: String,
       required: false,
       default: null,
     },
@@ -148,6 +148,10 @@ export default {
       setTimeout(() => {
         this.loadingAvatar = false
         this.avatar = img
+        if (this.avatarid === 'me') {
+          this.$store.commit('setAvatar', img)
+          console.log(img)
+        }
       }, 1000)
     },
     avatarError() {
