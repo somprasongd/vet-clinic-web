@@ -16,32 +16,33 @@
       </template>
       <template v-slot:[`item.name`]="{ item }">
         <div
-          v-if="
-            ($store.getters.loggedInUser.roles.some((role) => {
-              return (
-                role.id === 2 || role.id === 3 || role.id === 4 || role.id === 5
-              )
-            }) ||
-              $store.getters.loggedInUser.isAdmin) &&
-            item.visitStatus.id !== 6
-          "
+          v-if="permission([2, 3, 4, 5]) && item.visitStatus.id !== 6"
           class="font-weight-medium"
         >
+          <!-- ถ้า status เป็นรอตรวจ และ ไม่มีสิทธิเข้าหน้าห้องตรวจให้ปิดการกดชื่อไปเลย (ปกติรอตรวจจะเข้าได้แต่หน้าห้องตรวจ) -->
+          <span
+            v-if="
+              $store.getters.loggedInUser.roles.some((role) => {
+                return role.id === 3 || role.id === 4 || role.id === 5
+              }) &&
+              item.visitStatus.id === 1 &&
+              !permission([2])
+            "
+          >
+            {{ item.pet.owner.name }}
+          </span>
           <nuxt-link
+            v-else
             class="bold-owner text-decoration-none text-truncate"
             :to="
-              ($store.getters.loggedInUser.roles.some((role) => {
-                return (
-                  (role.id === 3 || role.id === 4 || role.id === 5) &&
-                  role.id !== 2
-                )
-              }) ||
-                item.visitStatus.id === 9) &&
-              !$store.getters.loggedInUser.isAdmin
+              $store.getters.loggedInUser.roles.some((role) => {
+                return role.id === 3 || role.id === 4 || role.id === 5
+              }) && !permission([2])
                 ? '/queue/' + item.id + '/checklist'
                 : '/queue/' + item.id
             "
-            >{{ item.pet.owner.name }}
+          >
+            {{ item.pet.owner.name }}
             <v-icon color="cusblue2" small>mdi-chevron-right</v-icon>
           </nuxt-link>
         </div>
@@ -68,8 +69,14 @@
         <v-menu :offset-x="offset" nudge-left="200">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              color="cusblue2"
-              dark
+              color="cusblue2 white--text"
+              :disabled="
+                (item.visitStatus.id === 1 && !permission([1, 2])) ||
+                (item.visitStatus.id === 2 && !permission([2, 3, 4])) ||
+                (item.visitStatus.id === 3 && !permission([2, 3, 4])) ||
+                (item.visitStatus.id === 4 && !permission([2, 3, 4])) ||
+                (item.visitStatus.id === 6 && !permission([1, 2, 6]))
+              "
               v-bind="attrs"
               icon
               depressed
@@ -89,11 +96,7 @@
               <!-- รอตรวจ -->
               <div v-if="item.visitStatus.id === 1">
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2])"
                   class="cusblue2--text"
                   block
                   text
@@ -103,11 +106,7 @@
                   เข้ารับการตรวจ
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 1 || role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([1, 2])"
                   class="cusblue2--text"
                   block
                   text
@@ -122,11 +121,7 @@
                   ส่งต่อ
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 1 || role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([1, 2])"
                   class="cusblue2--text"
                   block
                   text
@@ -139,11 +134,7 @@
               <!-- ตรวจรักษา -->
               <div v-else-if="item.visitStatus.id === 2">
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2 || role.id === 3 || role.id === 4
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2, 3, 4])"
                   class="cusblue2--text"
                   block
                   text
@@ -153,11 +144,7 @@
                   รอผลตรวจ
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2])"
                   class="cusblue2--text"
                   block
                   text
@@ -170,11 +157,7 @@
               <!-- รอผลตรวจ -->
               <div v-else-if="item.visitStatus.id === 3">
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2 || role.id === 3 || role.id === 4
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2, 3, 4])"
                   class="cusblue2--text"
                   block
                   text
@@ -184,11 +167,7 @@
                   รายงานผล
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2])"
                   class="cusblue2--text"
                   block
                   text
@@ -201,11 +180,7 @@
               <!-- รายงานผล -->
               <div v-else-if="item.visitStatus.id === 4">
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2 || role.id === 3 || role.id === 4
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2, 3, 4])"
                   class="cusblue2--text"
                   block
                   text
@@ -215,11 +190,7 @@
                   รอผลตรวจ
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2])"
                   class="cusblue2--text"
                   block
                   text
@@ -232,11 +203,7 @@
               <!-- รอชำระเงิน -->
               <div v-else>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 1 || role.id === 2 || role.id === 6
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([1, 2, 6])"
                   class="cusblue2--text"
                   block
                   text
@@ -246,11 +213,7 @@
                   รับชำระเงิน
                 </v-btn>
                 <v-btn
-                  v-if="
-                    $store.getters.loggedInUser.roles.some((role) => {
-                      return role.id === 2
-                    }) || $store.getters.loggedInUser.isAdmin
-                  "
+                  v-if="permission([2])"
                   class="cusblue2--text"
                   block
                   text
@@ -264,11 +227,7 @@
             <!-- ฝากเลี้ยง -->
             <div v-else>
               <v-btn
-                v-if="
-                  $store.getters.loggedInUser.roles.some((role) => {
-                    return role.id === 1 || role.id === 2 || role.id === 6
-                  }) || $store.getters.loggedInUser.isAdmin
-                "
+                v-if="permission([1, 2, 6])"
                 class="cusblue2--text"
                 block
                 text
@@ -278,11 +237,7 @@
                 รับกลับบ้าน
               </v-btn>
               <v-btn
-                v-if="
-                  $store.getters.loggedInUser.roles.some((role) => {
-                    return role.id === 1 || role.id === 2
-                  }) || $store.getters.loggedInUser.isAdmin
-                "
+                v-if="permission([1, 2])"
                 class="cusblue2--text"
                 block
                 text
@@ -348,6 +303,19 @@ export default {
     //
   },
   methods: {
+    permission(idArray) {
+      for (const id in idArray) {
+        if (
+          this.$store.getters.loggedInUser.roles.some(
+            (role) => role.id === idArray[id]
+          ) ||
+          this.$store.getters.loggedInUser.isAdmin
+        ) {
+          return true
+        }
+      }
+      return false
+    },
     backHome(id, date) {
       this.$refs.takeHomeDialog.open(id, date)
     },
