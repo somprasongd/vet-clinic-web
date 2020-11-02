@@ -64,6 +64,15 @@
                         block
                         text
                         tile
+                        @click="changeOwner(pet.id)"
+                      >
+                        เปลี่ยนเจ้าของ
+                      </v-btn>
+                      <v-btn
+                        class="cusblue2--text"
+                        block
+                        text
+                        tile
                         @click="deletePet(pet.id)"
                       >
                         ลบข้อมูล
@@ -263,6 +272,7 @@
         <depositDialog ref="depoDialog" />
         <appointDialog ref="appDialog" @updateAppoint="updateAppoint" />
         <confirmDialog ref="confirm" />
+        <sendOwnerDialog ref="sendOwnerDialog" @removePet="updateOwner" />
       </div>
 
       <div v-else class="text-center pa-15 grey--text">Not Found Pet</div>
@@ -274,6 +284,7 @@
 import sendcheckDialog from '@/components/Record/UserRecord/sendcheckDialog'
 import depositDialog from '@/components/Record/UserRecord/depositDialog'
 import appointDialog from '@/components/Record/UserRecord/appointDialog'
+import sendOwnerDialog from '@/components/Record/UserRecord/sendOwnerDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
 import userAvatar from '@/components/Setting/System/userAvatar'
 import moment from 'moment'
@@ -282,6 +293,7 @@ export default {
     sendcheckDialog,
     depositDialog,
     appointDialog,
+    sendOwnerDialog,
     confirmDialog,
     userAvatar,
   },
@@ -302,6 +314,9 @@ export default {
     onClickApp(id) {
       this.$refs.appDialog.open(id)
     },
+    changeOwner(id) {
+      this.$refs.sendOwnerDialog.open(id)
+    },
     calcAge(date) {
       const nowDate = moment()
       const pickDate = moment(date.toString(), 'YYYY-MM-DD')
@@ -314,6 +329,9 @@ export default {
         dateDiff.days() +
         ' วัน '
       )
+    },
+    updateOwner(id) {
+      this.$emit('del', id)
     },
     async onClickCheck(id) {
       const check = await this.$axios.$get(`/api/visits//is-visit/${id}`, {
