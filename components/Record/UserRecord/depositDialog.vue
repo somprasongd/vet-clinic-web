@@ -214,7 +214,6 @@ export default {
         this.loading = false
         this.alert = false
         this.depositDialog = false
-        console.log(res)
         this.sendDeposit.note = ''
         this.$refs.form.resetValidation()
       }, 500)

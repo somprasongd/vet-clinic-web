@@ -64,7 +64,6 @@ export default {
   },
   methods: {
     changeSelect(id) {
-      console.log(id)
       this.type = id
     },
     addImg(img) {

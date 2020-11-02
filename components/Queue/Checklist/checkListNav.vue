@@ -194,7 +194,6 @@ export default {
       const index = this.orderItem.findIndex(
         (order) => order.itemId === sendOrder.itemId
       )
-      console.log(order)
       if (
         index !== -1 &&
         order.itemGroup.id !== 3 &&

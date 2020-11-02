@@ -273,9 +273,7 @@ export default {
       }
     },
     updateMe(me) {
-      console.log(me)
       this.$store.commit('setMe', me)
-      console.log(this.$store.state.auth.user)
     },
   },
 }

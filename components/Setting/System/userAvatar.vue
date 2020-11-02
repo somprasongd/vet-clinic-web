@@ -150,7 +150,6 @@ export default {
         this.avatar = img
         if (this.avatarid === 'me') {
           this.$store.commit('setAvatar', img)
-          console.log(img)
         }
       }, 1000)
     },
