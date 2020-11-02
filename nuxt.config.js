@@ -20,8 +20,8 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
-    titleTemplate: 'Vet Clinic | ' + process.env.npm_package_name,
-    title: process.env.npm_package_name || 'VetClinic',
+    titleTemplate: 'Vet Clinic V.' + process.env.npm_package_version,
+    title: 'VetClinic',
     meta: [
       { charset: 'utf-8' },
       {
@@ -207,6 +207,7 @@ export default {
   //   },
   // ],
   env: {
+    version: process.env.npm_package_version,
     apiUrl: process.env.API_URI || '',
     pollingQueueDelay: process.env.POLLING_QUEUE_DELAY || 30000,
   },

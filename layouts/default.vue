@@ -14,6 +14,9 @@
       <v-toolbar-title v-else-if="this.$vuetify.breakpoint.lgAndUp">
         <v-img :src="require('~/assets/logo.png')" width="150"></v-img>
       </v-toolbar-title>
+      <!-- <v-toolbar-title v-if="this.$vuetify.breakpoint.lgAndUp" class="pa-2">
+        <v-chip color="secondary">{{ version }}</v-chip>
+      </v-toolbar-title> -->
 
       <!-- Tab -->
       <v-tabs
@@ -195,7 +198,9 @@ export default {
     }
   },
   computed: {
-    // a computed getter
+    version() {
+      return process.env.version
+    },
     user() {
       // `this` points to the vm instance
       if (this.$store.state.avatarImg === null) {
