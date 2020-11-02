@@ -9,7 +9,7 @@
             <v-row no-gutters>
               <v-col cols="12">
                 <userAvatar
-                  :avatarid="owner.id"
+                  :avatarid="owner.id.toString()"
                   :avatars="avatar"
                   type-avatar="members"
                   :size="100"

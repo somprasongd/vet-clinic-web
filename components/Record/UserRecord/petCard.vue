@@ -11,7 +11,7 @@
               <v-row>
                 <v-col class="text-center" cols="12">
                   <userAvatar
-                    :avatarid="pet.id"
+                    :avatarid="pet.id.toString()"
                     :avatars="getPetAvatar(pet.id)"
                     type-avatar="pets"
                     :size="100"
