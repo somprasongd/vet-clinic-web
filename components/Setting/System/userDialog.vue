@@ -24,7 +24,7 @@
             no-gutters
           >
             <userAvatar
-              :avatarid="isAdmin ? addUser.id : 'me'"
+              :avatarid="isAdmin ? addUser.id.toString() : 'me'"
               :avatars="avatar"
               type-avatar="users"
             />
