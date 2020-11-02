@@ -7,9 +7,10 @@
       :fullscreen="this.$vuetify.breakpoint.xsOnly"
     >
       <v-card>
-        <h2 class="pa-5 pb-2">
+        <h2 v-if="isAdmin" class="pa-5 pb-2">
           {{ addUser.id == '' ? 'เพิ่ม' : 'แก้ไข' }}
         </h2>
+        <h2 v-else class="pa-5 pb-2">Profile</h2>
         <v-btn class="mt-4" icon absolute right @click="assignModal = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -23,7 +24,7 @@
             no-gutters
           >
             <userAvatar
-              :avatarid="addUser.id"
+              :avatarid="isAdmin ? addUser.id : 'me'"
               :avatars="avatar"
               type-avatar="users"
             />
@@ -102,7 +103,7 @@
                 >
                 </v-text-field>
               </v-col>
-              <v-col v-if="addUser.id == ''" cols="6">
+              <v-col v-if="addUser.id == '' || isAdmin === false" cols="6">
                 <v-text-field
                   ref="confirm"
                   v-model="addUser.confirm"
@@ -114,7 +115,7 @@
                 >
                 </v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col v-if="isAdmin" cols="6">
                 <v-checkbox
                   v-model="addUser.isAdmin"
                   :color="color"
@@ -124,6 +125,7 @@
               </v-col>
             </v-row>
             <roleSelect
+              v-if="isAdmin"
               :alert="roleAlert"
               :defaultrole="defaultRole"
               :disable="loading"
@@ -156,6 +158,7 @@
             Cancel
           </v-btn>
           <v-btn
+            v-if="isAdmin"
             class="cusblue2--text text-none"
             text
             :disabled="loading"
@@ -197,6 +200,11 @@ export default {
     alluser: {
       default: null,
       type: Array,
+      required: false,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: true,
       required: false,
     },
   },
@@ -315,7 +323,9 @@ export default {
       // ถ้ามี id ส่งมาเ (แก้ไข) (เซ็ตค่า default)
       if (Number.isInteger(id)) {
         this.$axios
-          .$get(`/api/users/${id}`, { progress: false })
+          .$get(`${this.isAdmin ? `/api/users/${id}` : '/api/users/me'}`, {
+            progress: false,
+          })
           .then((editUser) => {
             // set default detail to textfield
             this.addUser = {
@@ -373,16 +383,26 @@ export default {
         this.roleAlert = false
         this.loading = true
         const userData = { ...this.addUser }
-        const sendData = {
-          username: userData.username.toLowerCase(),
-          name: userData.name,
-          email: userData.email,
-          password: userData.password === '' ? null : userData.password,
-          isAdmin: userData.isAdmin,
-          roles: userData.rank,
-        }
+        const sendData = this.isAdmin
+          ? {
+              username: userData.username.toLowerCase(),
+              name: userData.name,
+              email: userData.email,
+              password: userData.password === '' ? null : userData.password,
+              isAdmin: userData.isAdmin,
+              roles: userData.rank,
+            }
+          : {
+              name: userData.name,
+              email: userData.email,
+              password: userData.password === '' ? null : userData.password,
+            }
         this.$axios
-          .$put(`/api/users/${userData.id}`, sendData, { progress: false })
+          .$put(
+            `${this.isAdmin ? `/api/users/${userData.id}` : '/api/users/me'}`,
+            sendData,
+            { progress: false }
+          )
           .then((response) => {
             // save success
             this.updateSuccess(response)

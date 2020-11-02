@@ -24,54 +24,23 @@
         :hide-slider="!!this.$route.params.id"
       >
         <v-tab
-          v-if="
-            $store.getters.loggedInUser.roles.some((role) => {
-              return (
-                role.id === 1 ||
-                role.id === 2 ||
-                role.id === 3 ||
-                role.id === 4 ||
-                role.id === 5 ||
-                role.id === 6
-              )
-            }) || $store.getters.loggedInUser.isAdmin
-          "
+          v-if="permission([1, 2, 3, 4, 5, 6])"
           class="font-weight-regular"
           to="/queue"
         >
           คิว
         </v-tab>
         <v-tab
-          v-if="
-            $store.getters.loggedInUser.roles.some((role) => {
-              return role.id === 1 || role.id === 2
-            }) || $store.getters.loggedInUser.isAdmin
-          "
+          v-if="permission([1, 2])"
           class="font-weight-regular"
           to="/record"
         >
           เวชระเบียน
         </v-tab>
-        <v-tab
-          v-if="
-            $store.getters.loggedInUser.roles.some((role) => {
-              return role.id === 6
-            }) || $store.getters.loggedInUser.isAdmin
-          "
-          class="font-weight-regular"
-          to="/pos"
-        >
+        <v-tab v-if="permission([6])" class="font-weight-regular" to="/pos">
           POS
         </v-tab>
-        <v-tab
-          v-if="
-            $store.getters.loggedInUser.roles.some((role) => {
-              return role.id === 7
-            }) || $store.getters.loggedInUser.isAdmin
-          "
-          class="font-weight-regular"
-          to="/report"
-        >
+        <v-tab v-if="permission([7])" class="font-weight-regular" to="/report">
           รายงาน
         </v-tab>
         <v-tab
@@ -96,7 +65,7 @@
       >
         <v-tab class="font-weight-regular" exact to="/queue">คิว</v-tab>
         <v-tab
-          :disabled="this.$store.state.navTab.check"
+          :disabled="this.$store.state.navTab.check || !permission([2])"
           class="font-weight-regular"
           exact
           :to="'/queue/' + this.$route.params.queue + '/'"
@@ -104,21 +73,23 @@
           ห้องตรวจ
         </v-tab>
         <v-tab
-          :disabled="this.$store.state.navTab.checkList"
+          :disabled="
+            this.$store.state.navTab.checkList || !permission([2, 3, 4, 5])
+          "
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/checklist'"
         >
           รายการสั่งตรวจ
         </v-tab>
         <v-tab
-          :disabled="this.$store.state.navTab.lab"
+          :disabled="this.$store.state.navTab.lab || !permission([2, 3, 4])"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/lab'"
         >
           Lab
         </v-tab>
         <v-tab
-          :disabled="this.$store.state.navTab.xray"
+          :disabled="this.$store.state.navTab.xray || !permission([2, 3, 4])"
           class="font-weight-regular"
           :to="'/queue/' + this.$route.params.queue + '/xray'"
         >
@@ -139,7 +110,7 @@
             <!-- Name -->
             <v-avatar size="35" style="border: 1px solid #3894b3">
               <v-img
-                :src="avatarImg"
+                :src="user.avatar"
                 :lazy-src="require('~/assets/profile/defaultProfile.svg')"
               ></v-img>
             </v-avatar>
@@ -149,7 +120,7 @@
           <v-list-item
             v-for="item in userDrop"
             :key="item.title"
-            @click="logOut"
+            @click="item.link"
           >
             <v-list-item-title>
               <v-icon>{{ item.icon }}</v-icon>
@@ -170,7 +141,7 @@
                 style="border: 1px solid #3894b3"
               >
                 <v-img
-                  :src="avatarImg"
+                  :src="user.avatar"
                   :lazy-src="require('~/assets/profile/defaultProfile.svg')"
                 ></v-img>
               </v-avatar>
@@ -188,7 +159,7 @@
             <v-list-item
               v-for="item in userDrop"
               :key="item.title"
-              @click="logOut"
+              @click="item.link"
             >
               <v-list-item-title>
                 <v-icon>{{ item.icon }}</v-icon>
@@ -203,34 +174,43 @@
     <v-main>
       <client-only>
         <nuxt />
+        <userDialog ref="userDialog" :is-admin="false" @update="updateMe" />
       </client-only>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import userDialog from '@/components/Setting/System/userDialog'
 export default {
-  // eslint-disable-next-line prettier/prettier
+  components: {
+    userDialog,
+  },
   data() {
     return {
-      user: {
-        name: this.$store.getters.loggedInUser.name,
-        // avatar: (process.env.API_URI || '') + '/api/users/me/avatar',
-      },
-      userDrop: [{ title: 'Logout', link: this.logOut, icon: 'mdi-logout' }],
+      userDrop: [
+        { title: 'Profile', link: this.editProfile, icon: 'mdi-account' },
+        { title: 'Logout', link: this.logOut, icon: 'mdi-logout' },
+      ],
     }
   },
   computed: {
     // a computed getter
-    avatarImg() {
+    user() {
       // `this` points to the vm instance
-      const avatar =
-        process.env.apiUrl +
-        '/api/users/' +
-        this.$store.getters.loggedInUser.id +
-        '/avatar'
+      if (this.$store.state.avatarImg === null) {
+        const avatar =
+          process.env.apiUrl +
+          '/api/users/' +
+          this.$store.getters.loggedInUser.id +
+          '/avatar'
 
-      return avatar
+        this.$store.commit('setAvatar', avatar)
+      }
+      return {
+        avatar: this.$store.state.avatarImg,
+        name: this.$store.getters.loggedInUser.name,
+      }
     },
   },
   watch: {
@@ -242,6 +222,22 @@ export default {
     this.checkQueueStatus()
   },
   methods: {
+    permission(idArray) {
+      for (const id in idArray) {
+        if (
+          this.$store.getters.loggedInUser.roles.some(
+            (role) => role.id === idArray[id]
+          ) ||
+          this.$store.getters.loggedInUser.isAdmin
+        ) {
+          return true
+        }
+      }
+      return false
+    },
+    editProfile() {
+      this.$refs.userDialog.open(this.$store.getters.loggedInUser.id)
+    },
     logOut() {
       this.$auth.logout()
     },
@@ -275,6 +271,11 @@ export default {
             xray: false,
           })
       }
+    },
+    updateMe(me) {
+      console.log(me)
+      this.$store.commit('setMe', me)
+      console.log(this.$store.state.auth.user)
     },
   },
 }
