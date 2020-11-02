@@ -85,7 +85,7 @@ export default {
       this.sendValue()
     },
   },
-  mounted() {
+  created() {
     // this.search = this.$auth.$storage.getState('searchHis')
     if (localStorage.getItem('select') !== null)
       this.select = JSON.parse(localStorage.getItem('select'))
