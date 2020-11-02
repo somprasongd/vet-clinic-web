@@ -330,9 +330,9 @@ export default {
       this.$refs[ref].focus()
     },
     validatePhone(num) {
-      if (num.length > 2) {
-        this.addCustomer.tel.pop()
-      }
+      // if (num.length > 2) {
+      //   this.addCustomer.tel.pop()
+      // }
       if (num.length !== 0) {
         return num.every((n) => {
           return n.match(/^[0-9]{9,10}$/)
