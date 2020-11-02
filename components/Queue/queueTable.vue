@@ -4,6 +4,7 @@
       class="elevation-4 overflow-y-auto"
       :headers="headers"
       :items="dessert"
+      :loading="loading"
       disable-pagination
       hide-default-footer
       fixed-header
@@ -273,6 +274,11 @@ export default {
       default: null,
       type: Array,
       required: false,
+    },
+    loading: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   data() {

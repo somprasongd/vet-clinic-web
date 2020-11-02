@@ -34,6 +34,7 @@
         dense
         flat
         hide-details
+        @change="sendValue"
       ></v-select>
       <v-subheader
         v-show="!this.$vuetify.breakpoint.smAndDown"
@@ -57,6 +58,7 @@
         dense
         flat
         hide-details
+        @change="sendValue"
       >
         <template v-slot:prepend-item>
           <v-list-item
@@ -127,6 +129,14 @@ export default {
     if (this.$store.state.form.visitType.length === 0) {
       this.$store.dispatch('form/addVisitType')
     }
+  },
+  methods: {
+    sendValue() {
+      this.$emit('onSearch', {
+        visitTypeId: this.selectedVisitTypeId,
+        doctorId: this.selectedDoctorId,
+      })
+    },
   },
 }
 </script>

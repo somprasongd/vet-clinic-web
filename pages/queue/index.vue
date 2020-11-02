@@ -4,13 +4,13 @@
       :queue-count="queues.length"
       :default-visit-type-id="defaultVisitTypeId"
       :default-doctor-id="defaultDoctorId"
-      @selectedVisitType="onChangeVisitType"
-      @selectedDoctor="onChangeDoctor"
+      @onSearch="refresh"
     />
 
     <div class="custom-container">
       <queueTable
         :dessert="queues"
+        :loading="$fetchState.pending"
         @update="refresh"
         @delete="deleteQueue"
         @updateStatus="refresh"
@@ -45,28 +45,31 @@ export default {
     )
   },
   async fetch() {
-    const params = {
-      visitTypeId: this.selectedVisitTypeId || this.defaultVisitTypeId,
-      doctorId:
-        this.selectedDoctorId === null
-          ? this.defaultDoctorId
-          : this.selectedDoctorId,
+    let query = this.filter
+    if (query === null) {
+      query = {
+        visitTypeId: this.defaultVisitTypeId,
+        doctorId: this.defaultDoctorId,
+      }
     }
 
-    localStorage.setItem('queueFilters', JSON.stringify(params))
-
-    if (params.doctorId === '') {
-      delete params.doctorId
+    if (query.doctorId === 0) {
+      delete query.doctorId
     }
 
-    const { results = [] } = await this.$axios.$get('/api/visits', { params })
-    this.queues = results
+    try {
+      const res = await this.$axios.$get(`/api/visits`, { params: query })
+      this.queues = res.results
+    } catch (error) {
+      this.queues = []
+    }
   },
+  fetchOnServer: false,
   data() {
     return {
-      selectedVisitTypeId: null,
-      selectedDoctorId: null,
+      filter: null,
       queues: [],
+      polling: null,
     }
   },
   computed: {
@@ -89,47 +92,31 @@ export default {
       })
 
       if (isDoctor) return this.$store.getters.loggedInUser.id
-      else return ''
+      else return 0
     },
   },
-  activated() {
-    // Call fetch again if last fetch more than 30 sec ago
-    if (this.$fetchState.timestamp <= Date.now() - 30000) {
-      this.$fetch()
-    }
+  mounted() {
+    this.pollData()
   },
-  fetchOnServer: false,
+  beforeDestroy() {
+    clearInterval(this.polling)
+  },
   methods: {
-    onChangeVisitType(selectedId) {
-      this.selectedVisitTypeId = selectedId
-      localStorage.queue_filters_visitType = this.selectedVisitTypeId
-      this.refresh()
-    },
-    onChangeDoctor(selectedId) {
-      this.selectedDoctorId = selectedId
+    refresh({ visitTypeId, doctorId }) {
+      this.filter = { visitTypeId, doctorId }
+      localStorage.setItem('queueFilters', JSON.stringify(this.filter))
 
-      localStorage.queue_filters_selectedDoctor = this.selectedDoctorId
-      this.refresh()
-    },
-    refresh() {
       this.$fetch()
     },
-    // async updateVisit(val) {
-    //   const visit = await this.$axios.$get('/api/visits', { progress: false })
-    //   this.visit = visit.results
-    // },
+    pollData() {
+      this.polling = setInterval(() => {
+        this.$fetch()
+      }, process.env.pollingQueueDelay)
+    },
     deleteQueue(id) {
       const index = this.queues.findIndex((queue) => queue.id === id)
       this.queues.splice(index, 1)
     },
-    // updateStatus(val) {
-    //   const index = this.visit.findIndex((queue) => {
-    //     return queue.id === val.visitId
-    //   })
-    //   setTimeout(() => {
-    //     this.visit[index].visitStatus.id = val.visitStatusId
-    //   }, 200)
-    // },
   },
 }
 </script>

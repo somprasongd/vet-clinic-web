@@ -208,5 +208,6 @@ export default {
   // ],
   env: {
     apiUrl: process.env.API_URI || '',
+    pollingQueueDelay: process.env.POLLING_QUEUE_DELAY || 30000,
   },
 }

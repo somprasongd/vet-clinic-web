@@ -7,7 +7,7 @@
     />
 
     <div class="custom-container">
-      <recordTable :dessert="members" :loading="loading" />
+      <recordTable :dessert="members" :loading="$fetchState.pending" />
     </div>
 
     <recordDialog ref="addMemberDialog" />
@@ -45,10 +45,35 @@ export default {
       }) || store.getters.loggedInUser.isAdmin
     )
   },
+  async fetch() {
+    let query = this.filter
+    if (query === null) {
+      query = {
+        key: this.defaultSearchKey,
+        value: this.defaultSearchValue,
+      }
+    }
+
+    if (query.value === '') {
+      this.members = []
+      return
+    }
+
+    const params = {}
+    params[query.key.value] = query.value
+
+    try {
+      const res = await this.$axios.$get(`/api/registration`, { params })
+      this.members = res.results
+    } catch (error) {
+      this.members = []
+    }
+  },
+  fetchOnServer: false,
   data() {
     return {
+      filter: null,
       members: [],
-      loading: false,
     }
   },
   computed: {
@@ -73,24 +98,11 @@ export default {
     addMemberDialog() {
       this.$refs.addMemberDialog.open()
     },
-    async search({ key, value = '' }) {
-      if (value === '') {
-        this.members = []
-        return
-      }
-      this.loading = true
+    search({ key, value = '' }) {
+      this.filter = { key, value }
+      localStorage.setItem('registerFilters', JSON.stringify(this.filter))
 
-      const params = {}
-      params[key.value] = value
-
-      localStorage.setItem('registerFilters', JSON.stringify({ key, value }))
-
-      try {
-        const res = await this.$axios.$get(`/api/registration`, { params })
-        this.members = res.results
-      } finally {
-        this.loading = false
-      }
+      this.$fetch()
     },
   },
 }
