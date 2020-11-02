@@ -35,7 +35,7 @@
         dense
         flat
         hide-details
-        @keydown.enter="sendValue"
+        @keypress.enter="sendValue"
       ></v-select>
       <v-text-field
         v-model="search"
@@ -50,6 +50,7 @@
         flat
         hide-details
         autocomplete="off"
+        @keypress.enter="sendValue"
       ></v-text-field>
     </v-row>
   </v-card>
@@ -68,6 +69,7 @@ export default {
         { label: 'นามสกุลเจ้าของ', value: 'lastName' },
         { label: 'ชื่อสัตว์เลี้ยง', value: 'petName' },
         { label: 'รหัสเจ้าของ', value: 'code' },
+        { label: 'Microchip No.', value: 'microchipNo' },
       ],
     }
   },
@@ -75,7 +77,7 @@ export default {
     search() {
       // this.$auth.$storage.setLocalStorage('search', this.search, false)
       localStorage.search = this.search
-      this.sendValue()
+      // this.sendValue()
     },
     select() {
       // this.$auth.$storage.setLocalStorage('select', this.select, false)
