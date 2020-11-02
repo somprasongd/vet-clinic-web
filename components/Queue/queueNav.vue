@@ -91,17 +91,19 @@ export default {
   data() {
     return {
       selectType: 1,
-      selectDoctor: this.defaultDoctor(),
+      selectDoctor: '',
       type: this.$store.state.form.visitType,
       doctor: this.$store.state.form.doctor,
     }
   },
   watch: {
-    selectType() {
-      this.$emit('selectType', this.selectType)
+    selectType(val) {
+      this.$emit('selectType', val)
+      localStorage.visitType = val
     },
-    selectDoctor() {
-      this.$emit('selectDoctor', this.selectDoctor)
+    selectDoctor(val) {
+      this.$emit('selectDoctor', val)
+      localStorage.visitDoctor = val
     },
   },
   created() {
@@ -116,6 +118,12 @@ export default {
       })
     }
   },
+  mounted() {
+    if (localStorage.visitType !== undefined)
+      this.selectType = parseInt(localStorage.visitType)
+    if (localStorage.visitDoctor !== undefined)
+      this.selectDoctor = this.defaultDoctor()
+  },
   methods: {
     defaultDoctor() {
       if (
@@ -124,7 +132,7 @@ export default {
         })
       )
         return this.$store.getters.loggedInUser.id
-      else return ''
+      else return parseInt(localStorage.visitDoctor) || ''
     },
   },
 }
