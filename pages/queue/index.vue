@@ -1,20 +1,22 @@
 <template>
   <div>
     <queueNav
-      :queue-count="visit.length"
-      @selectType="Type"
-      @selectDoctor="Doctor"
+      :queue-count="queues.length"
+      :default-visit-type-id="defaultVisitTypeId"
+      :default-doctor-id="defaultDoctorId"
+      @selectedVisitType="onChangeVisitType"
+      @selectedDoctor="onChangeDoctor"
     />
 
     <div class="custom-container">
       <queueTable
-        :dessert="visitor"
-        @update="updateVisit"
+        :dessert="queues"
+        @update="refresh"
         @delete="deleteQueue"
-        @updateStatus="updateVisit"
+        @updateStatus="refresh"
       />
     </div>
-    <queueDialog @updateVisit="updateVisit" />
+    <queueDialog @updateVisit="refresh" />
   </div>
 </template>
 
@@ -42,63 +44,83 @@ export default {
       }) || store.getters.loggedInUser.isAdmin
     )
   },
-  async asyncData({ $axios }) {
-    const visit = await $axios.$get('/api/visits', { progress: false })
-    return { visit: visit.results }
+  async fetch() {
+    const params = {
+      visitTypeId: this.selectedVisitTypeId || this.defaultVisitTypeId,
+      doctorId:
+        this.selectedDoctorId === null
+          ? this.defaultDoctorId
+          : this.selectedDoctorId,
+    }
+
+    localStorage.setItem('queueFilters', JSON.stringify(params))
+
+    if (params.doctorId === '') {
+      delete params.doctorId
+    }
+
+    const { results = [] } = await this.$axios.$get('/api/visits', { params })
+    this.queues = results
   },
   data() {
     return {
-      vsType: 1,
-      doctor: this.defaultDoctor(),
+      selectedVisitTypeId: null,
+      selectedDoctorId: null,
+      queues: [],
     }
   },
   computed: {
-    // customer() {
-    //   return this.$store.state.queue.customerQueue
-    // },
-    visitor() {
-      return this.visit.filter((visit) => {
-        if (this.doctor !== '') {
-          if (visit.doctor !== null) {
-            return (
-              visit.visitType.id === this.vsType &&
-              visit.doctor.id === this.doctor
-            )
-          }
-        } else {
-          return visit.visitType.id === this.vsType
-        }
-      })
-    },
-  },
+    defaultVisitTypeId() {
+      if (localStorage.getItem('queueFilters')) {
+        const { visitTypeId } = JSON.parse(localStorage.getItem('queueFilters'))
+        return visitTypeId
+      }
 
-  methods: {
-    defaultDoctor() {
-      if (
-        this.$store.getters.loggedInUser.roles.some((role) => {
-          return role.id === 2
-        })
-      )
-        return this.$store.getters.loggedInUser.id
+      return 1
+    },
+    defaultDoctorId() {
+      if (localStorage.getItem('queueFilters')) {
+        const { doctorId } = JSON.parse(localStorage.getItem('queueFilters'))
+        return doctorId
+      }
+
+      const isDoctor = this.$store.getters.loggedInUser.roles.some((role) => {
+        return role.id === 2
+      })
+
+      if (isDoctor) return this.$store.getters.loggedInUser.id
       else return ''
     },
-    Type(select) {
-      this.vsType = select
+  },
+  activated() {
+    // Call fetch again if last fetch more than 30 sec ago
+    if (this.$fetchState.timestamp <= Date.now() - 30000) {
+      this.$fetch()
+    }
+  },
+  fetchOnServer: false,
+  methods: {
+    onChangeVisitType(selectedId) {
+      this.selectedVisitTypeId = selectedId
+      localStorage.queue_filters_visitType = this.selectedVisitTypeId
+      this.refresh()
     },
-    Doctor(select) {
-      this.doctor = select
+    onChangeDoctor(selectedId) {
+      this.selectedDoctorId = selectedId
+
+      localStorage.queue_filters_selectedDoctor = this.selectedDoctorId
+      this.refresh()
     },
-    async updateVisit(val) {
-      const visit = await this.$axios.$get('/api/visits', { progress: false })
-      this.visit = visit.results
+    refresh() {
+      this.$fetch()
     },
+    // async updateVisit(val) {
+    //   const visit = await this.$axios.$get('/api/visits', { progress: false })
+    //   this.visit = visit.results
+    // },
     deleteQueue(id) {
-      const index = this.visit.findIndex((queue) => {
-        return queue.id === id
-      })
-      setTimeout(() => {
-        this.visit.splice(index, 1)
-      }, 200)
+      const index = this.queues.findIndex((queue) => queue.id === id)
+      this.queues.splice(index, 1)
     },
     // updateStatus(val) {
     //   const index = this.visit.findIndex((queue) => {

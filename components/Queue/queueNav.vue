@@ -20,8 +20,8 @@
         >ประเภทการตรวจ :
       </v-subheader>
       <v-select
-        v-model="selectType"
-        :items="type"
+        v-model="selectedVisitTypeId"
+        :items="visitTypes"
         item-text="label"
         item-value="id"
         class="rounded-lg cus-input mr-3"
@@ -41,8 +41,8 @@
         >แพทย์ผู้ตรวจ :
       </v-subheader>
       <v-select
-        v-model="selectDoctor"
-        :items="doctor"
+        v-model="selectedDoctorId"
+        :items="doctors"
         item-text="name"
         item-value="id"
         :menu-props="{ closeOnContentClick: true }"
@@ -60,13 +60,13 @@
       >
         <template v-slot:prepend-item>
           <v-list-item
-            :style="selectDoctor === '' ? 'background-color: #e2f5fc' : ''"
+            :style="selectedDoctorId === '' ? 'background-color: #e2f5fc' : ''"
             ripple
-            @click="selectDoctor = ''"
+            @click="selectedDoctorId = ''"
           >
             <v-list-item-content>
               <v-list-item-title
-                :class="selectDoctor === '' ? 'cusblue--text' : ''"
+                :class="selectedDoctorId === '' ? 'cusblue--text' : ''"
               >
                 แสดงทั้งหมด
               </v-list-item-title>
@@ -87,53 +87,46 @@ export default {
       required: false,
       default: 0,
     },
+    defaultVisitTypeId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    defaultDoctorId: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   data() {
     return {
-      selectType: 1,
-      selectDoctor: '',
-      type: this.$store.state.form.visitType,
-      doctor: this.$store.state.form.doctor,
+      selectedVisitTypeId: this.defaultVisitTypeId,
+      selectedDoctorId: this.defaultDoctorId,
     }
   },
-  watch: {
-    selectType(val) {
-      this.$emit('selectType', val)
-      localStorage.visitType = val
+  computed: {
+    visitTypes() {
+      return this.$store.state.form.visitType
     },
-    selectDoctor(val) {
-      this.$emit('selectDoctor', val)
-      localStorage.visitDoctor = val
+    doctors() {
+      return this.$store.state.form.doctor
+    },
+  },
+  watch: {
+    selectedVisitTypeId() {
+      this.$emit('selectedVisitType', this.selectedVisitTypeId)
+    },
+    selectedDoctorId() {
+      this.$emit('selectedDoctor', this.selectedDoctorId)
     },
   },
   created() {
     if (this.$store.state.form.doctor.length === 0) {
-      this.$store.dispatch('form/addDoctor').then((res) => {
-        this.doctor = res
-      })
+      this.$store.dispatch('form/addDoctor')
     }
     if (this.$store.state.form.visitType.length === 0) {
-      this.$store.dispatch('form/addVisitType').then((res) => {
-        this.type = res
-      })
+      this.$store.dispatch('form/addVisitType')
     }
-  },
-  mounted() {
-    if (localStorage.visitType !== undefined)
-      this.selectType = parseInt(localStorage.visitType)
-    if (localStorage.visitDoctor !== undefined)
-      this.selectDoctor = this.defaultDoctor()
-  },
-  methods: {
-    defaultDoctor() {
-      if (
-        this.$store.getters.loggedInUser.roles.some((role) => {
-          return role.id === 2
-        })
-      )
-        return this.$store.getters.loggedInUser.id
-      else return parseInt(localStorage.visitDoctor) || ''
-    },
   },
 }
 </script>

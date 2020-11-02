@@ -21,7 +21,7 @@
       </v-subheader>
 
       <v-select
-        v-model="select"
+        v-model="searchKey"
         class="rounded-lg cus-input mr-3"
         background-color="cusblue3"
         :items="items"
@@ -35,10 +35,10 @@
         dense
         flat
         hide-details
-        @keypress.enter="sendValue"
+        @change="sendValue"
       ></v-select>
       <v-text-field
-        v-model="search"
+        v-model="searchValue"
         class="rounded-lg cus-textfield"
         background-color="cusblue3"
         append-icon="mdi-magnify"
@@ -58,10 +58,24 @@
 
 <script>
 export default {
+  props: {
+    defaultSearchKey: {
+      type: Object,
+      required: false,
+      default() {
+        return { label: 'บ้านเลขที่', value: 'houseNo' }
+      },
+    },
+    defaultSearchValue: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
   data() {
     return {
-      select: { label: 'บ้านเลขที่', value: 'houseNo' },
-      search: '',
+      searchKey: this.defaultSearchKey,
+      searchValue: this.defaultSearchValue,
       items: [
         { label: 'บ้านเลขที่', value: 'houseNo' },
         { label: 'เบอร์โทร', value: 'tel' },
@@ -73,27 +87,9 @@ export default {
       ],
     }
   },
-  watch: {
-    search() {
-      // this.$auth.$storage.setLocalStorage('search', this.search, false)
-      localStorage.search = this.search
-      // this.sendValue()
-    },
-    select() {
-      // this.$auth.$storage.setLocalStorage('select', this.select, false)
-      localStorage.setItem('select', JSON.stringify(this.select))
-      this.sendValue()
-    },
-  },
-  mounted() {
-    // this.search = this.$auth.$storage.getState('searchHis')
-    if (localStorage.getItem('select') !== null)
-      this.select = JSON.parse(localStorage.getItem('select'))
-    if (localStorage.search !== undefined) this.search = localStorage.search
-  },
   methods: {
     sendValue() {
-      this.$emit('search', [this.select.value, this.search])
+      this.$emit('onSearch', { key: this.searchKey, value: this.searchValue })
     },
   },
 }
