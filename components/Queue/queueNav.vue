@@ -50,7 +50,7 @@
         class="rounded-lg cus-input"
         background-color="cusblue3"
         item-color="cusblue"
-        label="ทั้งหมด"
+        label="แสดงทั้งหมด"
         dark
         filled
         rounded
@@ -62,13 +62,14 @@
       >
         <template v-slot:prepend-item>
           <v-list-item
-            :style="selectedDoctorId === '' ? 'background-color: #e2f5fc' : ''"
+            :style="selectedDoctorId === 0 ? 'background-color: #e2f5fc' : ''"
             ripple
-            @click="selectedDoctorId = ''"
+            @click="selectedDoctorId = 0"
+            @change="sendValue"
           >
             <v-list-item-content>
               <v-list-item-title
-                :class="selectedDoctorId === '' ? 'cusblue--text' : ''"
+                :class="selectedDoctorId === 0 ? 'cusblue--text' : ''"
               >
                 แสดงทั้งหมด
               </v-list-item-title>
@@ -112,14 +113,6 @@ export default {
     },
     doctors() {
       return this.$store.state.form.doctor
-    },
-  },
-  watch: {
-    selectedVisitTypeId() {
-      this.$emit('selectedVisitType', this.selectedVisitTypeId)
-    },
-    selectedDoctorId() {
-      this.$emit('selectedDoctor', this.selectedDoctorId)
     },
   },
   created() {
