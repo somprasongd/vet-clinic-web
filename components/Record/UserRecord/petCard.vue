@@ -16,6 +16,8 @@
                     type-avatar="pets"
                     :size="100"
                     :delete-img="false"
+                    :border-color="pet.death ? '#E64A19' : '#1E88E5'"
+                    :upload-img="!pet.death"
                   />
                 </v-col>
                 <v-col class="text-center" cols="12">
@@ -61,6 +63,7 @@
                       </v-btn>
                       <v-btn
                         class="cusblue2--text"
+                        :disabled="pet.death"
                         block
                         text
                         tile
@@ -91,56 +94,16 @@
               :order="$vuetify.breakpoint.smAndDown ? 'last' : ''"
             >
               <v-row dense>
-                <v-col
-                  lg="4"
-                  sm="6"
-                  cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-first' : ''"
-                >
+                <v-col lg="4" sm="6" cols="6" class="order-first">
                   <span class="font-weight-medium">ชื่อสัตว์เลี้ยง :</span>
                   <span class="font-weight-light">{{ pet.name }}</span>
                 </v-col>
+
                 <v-col
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-2' : ''"
-                >
-                  <span class="font-weight-medium">สถานะ :</span>
-                  <v-chip
-                    :color="pet.death ? 'red' : '#4ec714'"
-                    text-color="white"
-                    small
-                    label
-                  >
-                    {{ pet.death ? 'ตาย' : 'ปกติ' }}
-                  </v-chip>
-                </v-col>
-                <v-col
-                  lg="4"
-                  sm="6"
-                  cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-4' : ''"
-                >
-                  <span class="font-weight-medium">Microchip No :</span>
-                  <span class="font-weight-light">{{ pet.microchipNo }}</span>
-                </v-col>
-                <v-col
-                  lg="4"
-                  sm="6"
-                  cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-6' : ''"
-                >
-                  <span class="font-weight-medium">วันเกิด :</span>
-                  <span class="font-weight-light">{{
-                    $moment(pet.birthDate).format('DD/MM/YYYY')
-                  }}</span>
-                </v-col>
-                <v-col
-                  lg="4"
-                  sm="6"
-                  cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-8' : ''"
+                  :class="$vuetify.breakpoint.smAndDown ? 'order-2' : 'order-2'"
                 >
                   <span class="font-weight-medium">อายุ :</span>
                   <span class="font-weight-light">{{
@@ -151,54 +114,77 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-10' : ''"
+                  :class="$vuetify.breakpoint.smAndDown ? 'order-4' : 'order-3'"
+                >
+                  <span class="font-weight-medium">วันเกิด :</span>
+                  <span class="font-weight-light">{{
+                    $moment(pet.birthDate).format('DD/MM/YYYY')
+                  }}</span>
+                </v-col>
+
+                <v-col
+                  lg="4"
+                  sm="6"
+                  cols="6"
+                  :class="$vuetify.breakpoint.smAndDown ? 'order-3' : 'order-4'"
                 >
                   <span class="font-weight-medium">ประเภท :</span>
                   <span class="font-weight-light">{{ pet.type.label }}</span>
                 </v-col>
+
                 <v-col
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-1' : ''"
+                  :class="$vuetify.breakpoint.smAndDown ? 'order-5' : 'order-7'"
                 >
                   <span class="font-weight-medium">สายพันธุ์ :</span>
                   <span class="font-weight-light">{{ pet.breed }}</span>
                 </v-col>
+
                 <v-col
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-3' : ''"
+                  :class="
+                    $vuetify.breakpoint.smAndDown ? 'order-7' : 'order-10'
+                  "
                 >
                   <span class="font-weight-medium">เพศ :</span>
                   <span class="font-weight-light">{{ pet.gender.label }}</span>
                 </v-col>
+
                 <v-col
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-5' : ''"
-                >
-                  <span class="font-weight-medium">สี :</span>
-                  <span class="font-weight-light">{{ pet.color }}</span>
-                </v-col>
-                <v-col
-                  lg="4"
-                  sm="6"
-                  cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-7' : ''"
+                  :class="
+                    $vuetify.breakpoint.smAndDown ? 'order-11' : 'order-5'
+                  "
                 >
                   <span class="font-weight-medium">ทำหมัน :</span>
                   <span class="font-weight-light">{{
                     pet.sterilization ? 'ทำแล้ว' : 'ยังไม่ทำ'
                   }}</span>
                 </v-col>
+
+                <v-col
+                  lg="8"
+                  sm="12"
+                  cols="12"
+                  :class="$vuetify.breakpoint.smAndDown ? 'order-9' : 'order-8'"
+                >
+                  <span class="font-weight-medium">สี :</span>
+                  <span class="font-weight-light">{{ pet.color }}</span>
+                </v-col>
+
                 <v-col
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-9' : ''"
+                  :class="
+                    $vuetify.breakpoint.smAndDown ? 'order-6' : 'order-11'
+                  "
                 >
                   <span class="font-weight-medium">ตำหนิ :</span>
                   <span class="font-weight-light">{{ pet.earmark }}</span>
@@ -207,7 +193,21 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-11' : ''"
+                  :class="
+                    $vuetify.breakpoint.smAndDown ? 'order-8' : 'order-12'
+                  "
+                >
+                  <span class="font-weight-medium">Microchip No :</span>
+                  <span class="font-weight-light">{{ pet.microchipNo }}</span>
+                </v-col>
+
+                <v-col
+                  lg="4"
+                  sm="6"
+                  cols="6"
+                  :class="
+                    $vuetify.breakpoint.smAndDown ? 'order-12' : 'order-6'
+                  "
                 >
                   <span class="font-weight-medium">นัดหมายครั้งต่อไป :</span>
                   <span class="font-weight-light">
@@ -255,7 +255,6 @@
               </v-btn>
               <v-btn
                 class="ma-2 px-0"
-                :disabled="pet.death"
                 color="cusblue3 white--text"
                 block
                 depressed

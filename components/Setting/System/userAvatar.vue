@@ -3,7 +3,7 @@
     <v-avatar
       class="avatarImg elevation-2"
       :size="size"
-      style="border: 5px solid white"
+      :style="{ border: '5px solid ' + borderColor }"
       @click="onClickAvatar"
     >
       <v-img
@@ -35,6 +35,7 @@
     </v-avatar>
     <input
       ref="inputAvatar"
+      :disabled="!uploadImg"
       class="d-none"
       type="file"
       accept="image/*"
@@ -67,6 +68,11 @@ export default {
       default: '',
       required: false,
     },
+    uploadImg: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     deleteImg: {
       type: Boolean,
       required: false,
@@ -81,6 +87,11 @@ export default {
       type: String,
       required: false,
       default: 'users',
+    },
+    borderColor: {
+      type: String,
+      required: false,
+      default: 'white',
     },
   },
   data() {
