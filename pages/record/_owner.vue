@@ -83,7 +83,7 @@ export default {
     },
     async updatePet(val) {
       const id = this.$route.params.owner
-      const pets = await this.$axios.$get(`/api/pets?ownerId=${id}&limit=0`, {
+      const pets = await this.$axios.$get(`/api/pets?ownerId=${id}`, {
         progress: false,
       })
       for (const pet in pets.results) {
