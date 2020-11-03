@@ -4,7 +4,7 @@
       :queue-count="queues.length"
       :default-visit-type-id="defaultVisitTypeId"
       :default-doctor-id="defaultDoctorId"
-      @onSearch="refresh"
+      @onSearch="search"
     />
 
     <div class="custom-container">
@@ -102,10 +102,13 @@ export default {
     clearInterval(this.polling)
   },
   methods: {
-    refresh({ visitTypeId, doctorId }) {
+    search({ visitTypeId, doctorId }) {
       this.filter = { visitTypeId, doctorId }
       localStorage.setItem('queueFilters', JSON.stringify(this.filter))
 
+      this.refresh()
+    },
+    refresh() {
       this.$fetch()
     },
     pollData() {
