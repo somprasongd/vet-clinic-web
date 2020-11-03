@@ -103,7 +103,7 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-2' : 'order-2'"
+                  :class="$vuetify.breakpoint.mdAndDown ? 'order-2' : 'order-2'"
                 >
                   <span class="font-weight-medium">อายุ :</span>
                   <span class="font-weight-light">{{
@@ -114,7 +114,7 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-4' : 'order-3'"
+                  :class="$vuetify.breakpoint.mdAndDown ? 'order-4' : 'order-3'"
                 >
                   <span class="font-weight-medium">วันเกิด :</span>
                   <span class="font-weight-light">{{
@@ -126,7 +126,7 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-3' : 'order-4'"
+                  :class="$vuetify.breakpoint.mdAndDown ? 'order-3' : 'order-4'"
                 >
                   <span class="font-weight-medium">ประเภท :</span>
                   <span class="font-weight-light">{{ pet.type.label }}</span>
@@ -136,7 +136,7 @@
                   lg="4"
                   sm="6"
                   cols="6"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-5' : 'order-7'"
+                  :class="$vuetify.breakpoint.mdAndDown ? 'order-5' : 'order-7'"
                 >
                   <span class="font-weight-medium">สายพันธุ์ :</span>
                   <span class="font-weight-light">{{ pet.breed }}</span>
@@ -147,7 +147,7 @@
                   sm="6"
                   cols="6"
                   :class="
-                    $vuetify.breakpoint.smAndDown ? 'order-7' : 'order-10'
+                    $vuetify.breakpoint.mdAndDown ? 'order-7' : 'order-10'
                   "
                 >
                   <span class="font-weight-medium">เพศ :</span>
@@ -159,7 +159,7 @@
                   sm="6"
                   cols="6"
                   :class="
-                    $vuetify.breakpoint.smAndDown ? 'order-11' : 'order-5'
+                    $vuetify.breakpoint.mdAndDown ? 'order-11' : 'order-5'
                   "
                 >
                   <span class="font-weight-medium">ทำหมัน :</span>
@@ -172,7 +172,7 @@
                   lg="8"
                   sm="12"
                   cols="12"
-                  :class="$vuetify.breakpoint.smAndDown ? 'order-9' : 'order-8'"
+                  :class="$vuetify.breakpoint.mdAndDown ? 'order-9' : 'order-8'"
                 >
                   <span class="font-weight-medium">สี :</span>
                   <span class="font-weight-light">{{ pet.color }}</span>
@@ -183,7 +183,7 @@
                   sm="6"
                   cols="6"
                   :class="
-                    $vuetify.breakpoint.smAndDown ? 'order-6' : 'order-11'
+                    $vuetify.breakpoint.mdAndDown ? 'order-6' : 'order-11'
                   "
                 >
                   <span class="font-weight-medium">ตำหนิ :</span>
@@ -194,7 +194,7 @@
                   sm="6"
                   cols="6"
                   :class="
-                    $vuetify.breakpoint.smAndDown ? 'order-8' : 'order-12'
+                    $vuetify.breakpoint.mdAndDown ? 'order-8' : 'order-12'
                   "
                 >
                   <span class="font-weight-medium">Microchip No :</span>
@@ -206,7 +206,7 @@
                   sm="6"
                   cols="6"
                   :class="
-                    $vuetify.breakpoint.smAndDown ? 'order-12' : 'order-6'
+                    $vuetify.breakpoint.mdAndDown ? 'order-12' : 'order-6'
                   "
                 >
                   <span class="font-weight-medium">นัดหมายครั้งต่อไป :</span>
