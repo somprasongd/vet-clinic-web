@@ -50,6 +50,7 @@
         flat
         hide-details
         autocomplete="off"
+        autofocus
         @keypress.enter="sendValue"
       ></v-text-field>
     </v-row>

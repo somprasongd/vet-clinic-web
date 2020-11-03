@@ -1,4 +1,4 @@
-export default async function ({ query, enablePreview }) {
+export default function ({ query, enablePreview }) {
   if (query.preview) {
     enablePreview()
   }

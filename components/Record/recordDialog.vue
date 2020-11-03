@@ -42,6 +42,7 @@
                     label="ชื่อ"
                     :rules="rules.f_name"
                     required
+                    autofocus
                     @keydown.enter="onEnter('l_name')"
                   ></v-text-field>
                 </v-col>
@@ -78,22 +79,10 @@
                     label="ที่อยู่"
                     :rules="rules.address"
                     required
-                    @keydown.enter="onEnter('email')"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    ref="email"
-                    v-model="addCustomer.email"
-                    :disabled="loading"
-                    color="cusblue"
-                    label="อีเมล์"
-                    :rules="rules.email"
-                    required
                     @keydown.enter="onEnter('tel')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" sm="6">
+                <v-col cols="12">
                   <v-combobox
                     ref="tel"
                     v-model="addCustomer.tel"
@@ -106,8 +95,20 @@
                     multiple
                     small-chips
                     deletable-chips
-                    @keydown.enter="onEnter('other')"
+                    @keydown.enter="onEnter('email')"
                   ></v-combobox>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    ref="email"
+                    v-model="addCustomer.email"
+                    :disabled="loading"
+                    color="cusblue"
+                    label="อีเมล์"
+                    :rules="rules.email"
+                    required
+                    @keydown.enter="onEnter('other')"
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
@@ -138,15 +139,24 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn :disabled="loading" color="cusblue2" text @click="cancelForm">
+          <v-btn
+            v-shortkey="['ctrl', 'x']"
+            :disabled="loading"
+            color="cusblue2"
+            text
+            @shortkey="cancelForm"
+            @click="cancelForm"
+          >
             ยกเลิก
           </v-btn>
 
           <v-btn
+            v-shortkey="['ctrl', 'enter']"
             color="cusblue2"
             :disabled="!valid || loading"
             text
-            @click="addCustomer.id ? updateCustomer() : submitCustomer()"
+            @shortkey="onSubmit"
+            @click="onSubmit"
           >
             <v-progress-circular
               v-show="loading"
@@ -156,7 +166,7 @@
               :size="15"
               :width="2"
             ></v-progress-circular>
-            {{ addCustomer.id ? 'บันทึก' : 'ตกลง' }}
+            บันทึก
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -245,11 +255,11 @@ export default {
       )
     })
 
-    this.socket.on('connect_error', () => {
-      setTimeout(() => {
-        this.socket.connect()
-      }, 1000)
-    })
+    // this.socket.on('connect_error', () => {
+    //   setTimeout(() => {
+    //     this.socket.connect()
+    //   }, 1000)
+    // })
 
     this.socket.on('disconnect', () => {
       setTimeout(() => {
@@ -339,8 +349,7 @@ export default {
         })
       }
     },
-    // ************ Request ************
-    submitCustomer() {
+    async onSubmit() {
       if (this.$refs.form.validate()) {
         this.loading = true
         const sendCustomer = { ...this.addCustomer }
@@ -354,64 +363,39 @@ export default {
           email: sendCustomer.email,
           remark: sendCustomer.other,
         }
-        this.$axios
-          .$post('/api/members', sendData, { progress: false })
-          .then((res) => {
-            this.successSubmit(res)
-          })
-          .catch((error) => {
-            this.errorSubmit(error)
-          })
-      }
-    },
-    updateCustomer() {
-      if (this.$refs.form.validate()) {
-        this.loading = true
-        const sendCustomer = { ...this.addCustomer }
-        const sendData = {
-          prefixId: sendCustomer.prefix,
-          firstName: sendCustomer.f_name,
-          lastName: sendCustomer.l_name,
-          houseNo: sendCustomer.houseNo,
-          address: sendCustomer.address,
-          tels: sendCustomer.tel,
-          email: sendCustomer.email,
-          remark: sendCustomer.other,
+        const isNew = !this.addCustomer.id
+        try {
+          let member = null
+          if (isNew) {
+            member = await this.$axios.$post('/api/members', sendData, {
+              progress: false,
+            })
+          } else {
+            member = await this.$axios.$patch(
+              `/api/members/${sendCustomer.id}`,
+              sendData,
+              {
+                progress: false,
+              }
+            )
+          }
+          this.loading = false
+          this.assignModal = false
+          this.alert = false
+          this.$refs.form.reset()
+          if (!isNew) {
+            this.$emit('update', member)
+            return
+          }
+          this.$router.push(`/record/${member.id}`)
+        } catch (error) {
+          this.loading = false
+          this.alert = true
+          this.error = error.response
+            ? error.response.data.error.message
+            : error.message
         }
-        this.$axios
-          .$patch(`/api/members/${sendCustomer.id}`, sendData, {
-            progress: false,
-          })
-          .then((res) => {
-            this.updateubmit(res)
-          })
-          .catch((error) => {
-            this.errorSubmit(error)
-          })
       }
-    },
-    successSubmit(res) {
-      setTimeout(() => {
-        this.loading = false
-        this.assignModal = false
-        this.alert = false
-        this.$refs.form.reset()
-        this.$router.push(`/record/${res.id}`)
-      }, 500)
-    },
-    updateubmit(res) {
-      setTimeout(() => {
-        this.loading = false
-        this.assignModal = false
-        this.alert = false
-        this.$refs.form.reset()
-        this.$emit('update', res)
-      }, 500)
-    },
-    errorSubmit(error) {
-      this.loading = false
-      this.alert = true
-      this.error = error.response.data.error.message
     },
   },
 }

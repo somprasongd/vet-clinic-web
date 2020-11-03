@@ -14,6 +14,7 @@
 
     <v-btn
       :key="$nuxt.$route.path"
+      v-shortkey="['ctrl', 'alt', 'n']"
       color="cusblue2"
       fixed
       fab
@@ -21,6 +22,7 @@
       dark
       bottom
       right
+      @shortkey="addMemberDialog"
       @click.stop="addMemberDialog"
     >
       <v-icon>mdi-plus</v-icon>
