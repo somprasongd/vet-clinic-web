@@ -10,6 +10,14 @@
       <h2 class="pa-5 pb-2">เปลี่ยนเจ้าของ</h2>
       <v-divider></v-divider>
       <v-card-text class="py-3 px-7">
+        <v-select
+          v-model="searchKey"
+          :items="items"
+          item-text="label"
+          item-value="value"
+          label="ตัวเลือก"
+          return-object
+        ></v-select>
         <v-autocomplete
           v-model="owner"
           :items="member"
@@ -17,7 +25,6 @@
           :loading="loading1"
           chips
           hide-no-data
-          dense
           color="cusblue"
           label="เจ้าของใหม่"
           item-text="fullName"
@@ -82,6 +89,15 @@
 
 <script>
 export default {
+  props: {
+    defaultSearchKey: {
+      type: Object,
+      required: false,
+      default() {
+        return { label: 'บ้านเลขที่', value: 'houseNo' }
+      },
+    },
+  },
   data() {
     return {
       sendOwner: false,
@@ -92,6 +108,16 @@ export default {
       loading: false,
       loading1: false,
       timeout: null,
+      searchKey: this.defaultSearchKey,
+      items: [
+        { label: 'บ้านเลขที่', value: 'houseNo' },
+        { label: 'เบอร์โทร', value: 'tel' },
+        { label: 'ชื่อเจ้าของ', value: 'firstName' },
+        { label: 'นามสกุลเจ้าของ', value: 'lastName' },
+        { label: 'ชื่อสัตว์เลี้ยง', value: 'petName' },
+        { label: 'รหัสเจ้าของ', value: 'code' },
+        { label: 'Microchip No.', value: 'microchipNo' },
+      ],
     }
   },
   watch: {
@@ -117,7 +143,7 @@ export default {
       this.loading1 = true
 
       this.$axios
-        .$get(`/api/members?firstName=${v}`, {
+        .$get(`/api/members?${this.searchKey.value}=${v}`, {
           progress: false,
         })
         .then((res) => {
