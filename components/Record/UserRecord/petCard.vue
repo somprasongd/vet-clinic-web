@@ -1,11 +1,26 @@
 <template>
   <div>
     <v-card class="elevation-5">
-      <v-card-title>ข้อมูลสัตว์เลี้ยง</v-card-title>
+      <v-row>
+        <v-col col="6" class="py-0"
+          ><v-card-title>ข้อมูลสัตว์เลี้ยง</v-card-title></v-col
+        >
+        <v-col col="6" class="py-0">
+          <v-layout>
+            <v-spacer></v-spacer>
+            <v-switch
+              v-model="isIncludeDeath"
+              color="primary"
+              label="ทั้งหมด"
+              class="mr-2 pt-2"
+            ></v-switch>
+          </v-layout>
+        </v-col>
+      </v-row>
       <v-divider class="darker-divider"></v-divider>
 
-      <div v-if="pets != ''">
-        <div v-for="(pet, i) in pets" :key="i">
+      <div v-if="petList.length > 0">
+        <div v-for="(pet, i) in petList" :key="i">
           <v-row class="px-10 py-5" no-gutters>
             <v-col lg="1" md="2" cols="6">
               <v-row>
@@ -304,7 +319,17 @@ export default {
     },
   },
   data() {
-    return {}
+    return { isIncludeDeath: false }
+  },
+  computed: {
+    petList() {
+      if (this.pets === null || this.pets.length === 0) {
+        return []
+      }
+      return this.pets.filter((pet) => {
+        return this.isIncludeDeath || !pet.death
+      })
+    },
   },
   methods: {
     getPetAvatar(id) {
