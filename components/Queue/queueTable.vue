@@ -254,7 +254,7 @@
     </v-data-table>
 
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
-    <takeHomeDialog ref="takeHomeDialog" />
+    <takeHomeDialog ref="takeHomeDialog" @onSuccess="removeFromQueue" />
     <confirmDialog ref="confirm" />
   </div>
 </template>
@@ -331,6 +331,9 @@ export default {
     updateSend(res) {
       this.$emit('update', res)
     },
+    removeFromQueue(id) {
+      this.$emit('delete', id)
+    },
     orderNum(data, id) {
       return (
         data
@@ -405,7 +408,7 @@ export default {
               if (status === 2) {
                 this.$router.push(`/queue/${id}`)
               } else if (status === 8) {
-                this.$emit('delete', id)
+                this.removeFromQueue(id)
                 this.cancelQueueDialog = false
               } else {
                 this.$emit('updateStatus', {

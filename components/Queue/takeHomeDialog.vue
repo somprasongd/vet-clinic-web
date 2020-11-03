@@ -14,7 +14,7 @@
           <v-row dense>
             <v-col cols="6">
               <v-text-field
-                v-model="date"
+                :value="visitDate"
                 disabled
                 color="cusblue"
                 label="วันที่รับฝาก"
@@ -22,7 +22,7 @@
             </v-col>
             <v-col cols="6">
               <v-text-field
-                v-model="time"
+                :value="visitTime"
                 disabled
                 color="cusblue"
                 label="เวลารับฝาก"
@@ -30,7 +30,7 @@
             </v-col>
             <v-col cols="12">
               <v-text-field
-                v-model="countTime"
+                :value="summaryTime"
                 disabled
                 color="cusblue"
                 label="สรุประยะเวลา"
@@ -38,7 +38,8 @@
             </v-col>
             <v-col cols="6">
               <v-text-field
-                v-model="dateNum"
+                v-model="qty"
+                autocomplete="nope"
                 :disabled="loading"
                 color="cusblue"
                 label="จำนวนวันฝาก"
@@ -48,6 +49,7 @@
             <v-col cols="6">
               <v-text-field
                 v-model="price"
+                autocomplete="nope"
                 :disabled="loading"
                 color="cusblue"
                 label="ราคาต่อวัน"
@@ -86,36 +88,52 @@
 <script>
 import moment from 'moment'
 export default {
+  async fetch() {
+    try {
+      this.item = await this.$axios.$get(`/api/config/items/1`, {
+        progress: false,
+      })
+    } catch (error) {
+      this.item = {}
+    }
+  },
+  fetchOnServer: false,
   data() {
     return {
+      item: {},
+      id: null,
+      date: new Date(),
+      qty: 1,
+      price: 0,
       assignModal: false,
-
-      id: '',
-      date: '',
-      time: '',
-      countTime: '',
-
-      dateNum: '',
-      price: '',
-
       loading: false,
     }
+  },
+  computed: {
+    visitDate() {
+      return moment(this.date).format('DD/MM/YYYY')
+    },
+    visitTime() {
+      return moment(this.date).format('HH:mm:ss')
+    },
+    summaryTime() {
+      const dateDiff = moment.duration(moment().diff(this.date))
+      return `${dateDiff.days()} วัน ${dateDiff.hours()} ชั่วโมง ${dateDiff.minutes()} นาที`
+    },
   },
   methods: {
     open(id, date) {
       this.id = id
-      this.date = moment(date).format('DD/MM/YYYY')
-      this.time = moment(date).format('HH:mm:ss')
+      this.date = date
 
-      const nowDate = moment()
-      const dateDiff = moment.duration(nowDate.diff(date))
-      this.countTime = `${dateDiff.days()} วัน ${dateDiff.hours()} ชั่วโมง ${dateDiff.minutes()} นาที`
+      const dateDiff = moment.duration(moment().diff(date))
 
+      let days = dateDiff.days() === 0 ? 1 : dateDiff.days()
       if (parseInt(dateDiff.hours()) >= 1) {
-        this.dateNum = parseInt(dateDiff.days()) + 1
-      } else {
-        this.dateNum = dateDiff.days()
+        days = parseInt(dateDiff.days()) + 1
       }
+      this.qty = days
+      this.price = this.item.price || 0
 
       this.assignModal = true
     },
@@ -125,26 +143,28 @@ export default {
         $event.preventDefault()
       }
     },
-    takeHome() {
+    async takeHome() {
       this.loading = true
       const data = {
-        qty: this.dateNum,
+        qty: this.qty,
         price: this.price === '' ? 0 : this.price,
       }
-      this.$axios
-        .$patch(`/api/visit/${this.id}/status/take-home`, data, {
-          progress: false,
-        })
-        .then((res) => {
-          setTimeout(() => {
-            this.loading = false
-            this.assignModal = false
-          }, 500)
-        })
-        .catch((error) => {
-          alert(error)
-          this.loading = false
-        })
+      try {
+        const pos = await this.$axios.$patch(
+          `/api/visits/${this.id}/status/take-home`,
+          data,
+          {
+            progress: false,
+          }
+        )
+        this.assignModal = false
+        this.$emit('onSuccess', this.id)
+        if (pos) {
+          this.$router.push(`/pos/${pos.id}`)
+        }
+      } catch (error) {
+        this.loading = false
+      }
     },
   },
 }

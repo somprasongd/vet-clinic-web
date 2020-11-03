@@ -104,7 +104,6 @@ export default {
   methods: {
     refresh({ visitTypeId, doctorId }) {
       this.filter = { visitTypeId, doctorId }
-      console.log(this.filter)
       localStorage.setItem('queueFilters', JSON.stringify(this.filter))
 
       this.$fetch()
