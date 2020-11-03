@@ -227,7 +227,7 @@
               :size="15"
               :width="2"
             ></v-progress-circular>
-            {{ addPet.id ? 'บันทึก' : 'ตกลง' }}
+            บันทึก
           </v-btn>
         </v-card-actions>
       </v-card>

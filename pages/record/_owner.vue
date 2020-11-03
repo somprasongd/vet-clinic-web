@@ -12,13 +12,16 @@
 
     <v-btn
       :key="$nuxt.$route.path"
+      v-shortkey="['ctrl', 'alt', 'n']"
       color="cusblue2"
       fixed
       fab
-      large
+      :small="this.$vuetify.breakpoint.mobile"
+      :large="!this.$vuetify.breakpoint.mobile"
       dark
       bottom
       right
+      @shortkey="addPetDialog"
       @click.stop="addPetDialog"
     >
       <v-icon>mdi-plus</v-icon>

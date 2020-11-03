@@ -34,7 +34,8 @@
       color="cusblue2"
       fixed
       fab
-      large
+      :small="this.$vuetify.breakpoint.mobile"
+      :large="!this.$vuetify.breakpoint.mobile"
       dark
       bottom
       right

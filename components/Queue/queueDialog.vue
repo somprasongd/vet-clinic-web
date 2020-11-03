@@ -2,13 +2,16 @@
   <div>
     <v-btn
       :key="$nuxt.$route.path"
+      v-shortkey="['ctrl', 'alt', 'a']"
       color="cusblue2"
       fixed
       fab
-      large
+      :small="this.$vuetify.breakpoint.mobile"
+      :large="!this.$vuetify.breakpoint.mobile"
       dark
       bottom
       right
+      @shortkey="assignModal = true"
       @click.stop="assignModal = true"
     >
       <v-icon>mdi-calendar-month</v-icon>
