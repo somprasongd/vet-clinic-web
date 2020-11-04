@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="sendOwner"
-    max-width="450"
+    max-width="600"
     scrollable
     :fullscreen="this.$vuetify.breakpoint.xsOnly"
     transition="dialog-transition"
@@ -10,56 +10,89 @@
       <h2 class="pa-5 pb-2">เปลี่ยนเจ้าของ</h2>
       <v-divider></v-divider>
       <v-card-text class="py-3 px-7">
-        <v-select
-          v-model="searchKey"
-          :items="items"
-          item-text="label"
-          item-value="value"
-          label="ตัวเลือก"
-          return-object
-        ></v-select>
-        <v-autocomplete
-          v-model="owner"
+        <v-row dense>
+          <v-select
+            v-model="searchKey"
+            :items="items"
+            class="col-4"
+            item-text="label"
+            item-value="value"
+            label="ตัวเลือก"
+            outlined
+            rounded
+            dense
+            hide-details
+            return-object
+          ></v-select>
+          <v-text-field
+            id="id"
+            v-model="search"
+            class="col-8"
+            label="ค้นหา"
+            outlined
+            rounded
+            dense
+            hide-details
+          ></v-text-field>
+        </v-row>
+        <v-data-table
+          :headers="headers"
           :items="member"
-          :search-input.sync="search"
-          :loading="loading1"
-          chips
-          hide-no-data
-          color="cusblue"
-          label="เจ้าของใหม่"
-          item-text="fullName"
-          item-value="id"
+          class="elevation-1 my-1"
+          disable-pagination
+          fixed-header
+          hide-default-footer
+          mobile-breakpoint="0"
+          :height="this.$vuetify.breakpoint.xsOnly ? '70vh' : '60vh'"
         >
-          <template v-slot:selection="data">
-            <v-chip
-              v-bind="data.attrs"
-              :input-value="data.selected"
-              @click="data.select"
-            >
-              <v-avatar left>
+          <template v-slot:body>
+            <tbody>
+              <tr
+                v-for="item in member"
+                :key="item.id"
+                v-ripple="{ class: 'cusblue--text' }"
+                style="transform: scale(1); cursor: pointer"
+                :class="owner.id !== item.id ? '' : 'light-blue lighten-4'"
+                @click="owner.id !== item.id ? onClickRow(item) : (owner = '')"
+              >
+                <td>
+                  {{ item.code }}
+                </td>
+                <td class="px-2 py-1">
+                  <v-avatar size="36" left>
+                    <v-img
+                      :src="getOwnerAvatar(item.id)"
+                      :lazy-src="require('~/assets/profile/defaultProfile.svg')"
+                    ></v-img>
+                  </v-avatar>
+                  <span class="px-1">
+                    {{ item.fullName }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+          <!-- <template v-slot:[`item.name`]="{ item }">
+            <div v-ripple>
+              <v-avatar size="36" left>
                 <v-img
-                  :src="getOwnerAvatar(data.item.id)"
+                  :src="getOwnerAvatar(item.id)"
                   :lazy-src="require('~/assets/profile/defaultProfile.svg')"
                 ></v-img>
               </v-avatar>
-              {{ data.item.fullName }}
-            </v-chip>
-          </template>
-
-          <template v-slot:item="data">
-            <template>
-              <v-list-item-avatar>
-                <v-img
-                  :src="getOwnerAvatar(data.item.id)"
-                  :lazy-src="require('~/assets/profile/defaultProfile.svg')"
-                />
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>{{ data.item.fullName }}</v-list-item-title>
-              </v-list-item-content>
-            </template>
-          </template>
-        </v-autocomplete>
+              <span class="px-1">
+                {{ item.fullName }}
+              </span>
+              <v-icon v>
+                {{
+                  owner.id !== item.id
+                    ? 'mdi-radiobox-blank'
+                    : 'mdi-radiobox-marked'
+                }}
+              </v-icon>
+            </div>
+          </template> -->
+        </v-data-table>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -71,7 +104,12 @@
         >
           ยกเลิก
         </v-btn>
-        <v-btn color="cusblue2" :disabled="loading" text @click="submitSend">
+        <v-btn
+          color="cusblue2"
+          :disabled="(owner === '' ? true : false) || loading"
+          text
+          @click="submitSend"
+        >
           <v-progress-circular
             v-show="loading"
             class="mr-2"
@@ -118,6 +156,21 @@ export default {
         { label: 'รหัสเจ้าของ', value: 'code' },
         { label: 'Microchip No.', value: 'microchipNo' },
       ],
+      headers: [
+        {
+          text: 'รหัส',
+          align: 'start',
+          sortable: false,
+          width: '135',
+          value: 'code',
+        },
+        {
+          text: 'ชื่อเจ้าของ',
+          align: 'start',
+          sortable: false,
+          value: 'name',
+        },
+      ],
     }
   },
   watch: {
@@ -126,6 +179,8 @@ export default {
       this.timeout = setTimeout(() => {
         if (val !== null && val !== '') {
           this.querySelections(val)
+        } else {
+          this.member = []
         }
       }, 500)
     },
@@ -147,6 +202,7 @@ export default {
           progress: false,
         })
         .then((res) => {
+          this.owner = ''
           this.member = res.results
           this.loading1 = false
         })
@@ -157,7 +213,7 @@ export default {
     submitSend() {
       this.loading = true
       this.$axios
-        .$patch(`/api/pets/${this.petId}/owner/${this.owner}`, null, {
+        .$patch(`/api/pets/${this.petId}/owner/${this.owner.id}`, null, {
           progress: false,
         })
         .then((res) => {
@@ -171,6 +227,9 @@ export default {
           this.loading = false
           alert(error)
         })
+    },
+    onClickRow(item) {
+      this.owner = item
     },
   },
 }
