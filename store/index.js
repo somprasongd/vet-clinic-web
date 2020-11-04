@@ -6,7 +6,19 @@ export const state = () => ({
     xray: false,
     // queueCount: 0,
   },
+  auth: null,
   avatarImg: null,
+  visitStatus: [
+    'waiting',
+    'treatment',
+    'waiting-result',
+    'reported',
+    'waiting-pharmacy',
+    'doctor-discharge',
+    'discharge',
+    'cancel',
+    'take-home',
+  ],
 })
 
 export const mutations = {
@@ -39,7 +51,7 @@ export const getters = {
   loggedInUser(state) {
     return state.auth.user
   },
-  // getQueueNum(state) {
-  //   return state.queueCount
-  // },
+  getVisitStatus(state) {
+    return (statusId) => state.visitStatus[Number(statusId) - 1]
+  },
 }

@@ -17,11 +17,15 @@
         </v-col>
 
         <v-col cols="12" md="8" lg="9">
-          <xrayCard :xray-item="xray" />
+          <xrayCard
+            :xray-item="xray"
+            :is-show-btn-report="isStatusWaitingReport"
+            :on-click-report="handleUpdateStatusToReport"
+          />
         </v-col>
       </v-row>
-      <!-- <OwnerPetCard v-if="$route.params.page == 'check'" /> -->
     </div>
+    <confirmDialog ref="confirm" />
   </div>
 </template>
 
@@ -29,10 +33,11 @@
 // import checkroomNav from '@/components/Queue/Check/checkroomNav'
 import OwnerPetCard from '@/components/Queue/OwnerPetCard'
 import xrayCard from '@/components/Queue/Xray/xrayCard'
+import confirmDialog from '@/components/Items/confirmDialog'
 
 export default {
   components: {
-    // checkroomNav,
+    confirmDialog,
     OwnerPetCard,
     xrayCard,
   },
@@ -78,6 +83,39 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    isStatusWaitingReport() {
+      return this.oneVisit.visitStatus.id === 3
+    },
+  },
+  methods: {
+    async handleUpdateStatusToReport() {
+      const confirm = await this.$refs.confirm.open(
+        `ยืนยันการรายงานผล?`,
+        `ต้องการยืนยันการรายงานผลใช่หรือไม่`,
+        {
+          width: 290,
+          color: 'primary',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$patch(
+          `/api/visits/${this.oneVisit.id}/status/reported`,
+          {
+            progress: false,
+          }
+        )
+        this.$router.push(`/queue`)
+      } catch (error) {
+        alert(error)
+      }
+    },
   },
 }
 </script>

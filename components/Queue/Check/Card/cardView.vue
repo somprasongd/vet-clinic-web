@@ -42,7 +42,7 @@
             <textarea
               v-model="textContents"
               :disabled="loading"
-              placeholder="write something...."
+              placeholder="Use @ for show helper"
               :readonly="isEditing == false"
             />
 
@@ -54,14 +54,14 @@
               <div class="user">
                 {{ item.value }}
                 <span class="dim" style="opacity: 0.7">
-                  ({{ item.firstName }})
+                  ({{ item.code }})
                 </span>
               </div>
             </template>
           </Mentionable>
         </div>
 
-        <v-card-actions class="customAction">
+        <v-card-actions class="customAction-right">
           <v-progress-circular
             v-if="loading"
             class="ma-2"
@@ -136,27 +136,15 @@ export default {
 
       textContents: this.textContent,
       items: [],
-      // users: [
-      //   {
-      //     value: 'akryum',
-      //     firstName: 'Guillaume',
-      //   },
-      //   {
-      //     value: 'posva',
-      //     firstName: 'Eduardo',
-      //   },
-      //   {
-      //     value: 'atinux',
-      //     firstName: 'Sébastien',
-      //   },
-      // ],
     }
   },
   methods: {
     onOpen(key) {
+      console.log(key, key === '@' ? this.helper : null)
       this.items = key === '@' ? this.helper : null
     },
     Format(content) {
+      if (!content || content.trim() === '') return ''
       // console.log(content)
       // content = content.replace("@", "")
       return content

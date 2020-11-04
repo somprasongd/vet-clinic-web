@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-data-table
-      class="elevation-4"
+      class="elevation-4 hidden-header"
       :headers="headers"
       :items="labItem"
       disable-pagination
       hide-default-footer
       fixed-header
-      height="calc(100vh - 110px)"
+      height="calc(100vh - 160px)"
     >
       <template v-slot:[`item.result`]="props">
         <v-edit-dialog
@@ -51,6 +51,22 @@
           </v-col>
         </v-row>
       </template>
+
+      <template v-slot:[`footer`]>
+        <div class="pa-1 text-right" style="border-top: 1px solid #dadada">
+          <v-row no-gutters align="center" justify="space-between">
+            <v-btn
+              v-if="isShowBtnReport"
+              class="cusblue3 font-weight-regular text-capitalize"
+              depressed
+              dark
+              @click="onClickReport"
+            >
+              รายงานผล
+            </v-btn>
+          </v-row>
+        </div>
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -64,6 +80,16 @@ export default {
   props: {
     labItem: {
       type: Array,
+      required: false,
+      default: null,
+    },
+    isShowBtnReport: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    onClickReport: {
+      type: Function,
       required: false,
       default: null,
     },
@@ -117,42 +143,19 @@ export default {
     }
   },
   methods: {
-    // toStat(num) {
-    //   switch (num) {
-    //     case 1:
-    //       return 'Low'
-    //     case 2:
-    //       return 'Nomal Low'
-    //     case 3:
-    //       return 'Nomal'
-    //     case 4:
-    //       return 'Nomal High'
-    //     case 5:
-    //       return 'High'
-    //     default:
-    //       // console.log(num)
-    //       break
-    //   }
-    // },
-    saveResult(id, value) {
+    async saveResult(id, value) {
       const result = {
         result: value,
       }
-      this.$axios
-        .$patch(
+      try {
+        await this.$axios.$patch(
           `/api/visits/${this.$route.params.queue}/results/lab/${id}`,
           result,
           { progress: false }
         )
-        .then((res) => {
-          // console.log(res)
-          const index = this.labItem.findIndex((lab) => lab.id === res.id)
-          this.labItem[index].interpretLevel = res.interpretLevel
-          this.labItem[index].interpret = res.interpret
-        })
-        .catch((error) => {
-          alert(error)
-        })
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }
