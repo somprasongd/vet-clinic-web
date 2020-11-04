@@ -1,7 +1,5 @@
 <template>
   <div>
-    <userRecordNav :title="oneMember.firstName + ' ' + oneMember.lastName" />
-
     <div class="custom-container">
       <ownerCard :owner="oneMember" @update="updateMember" />
       <div class="pt-5">
@@ -30,13 +28,11 @@
 </template>
 
 <script>
-import userRecordNav from '@/components/Record/UserRecord/userRecordNav'
 import ownerCard from '@/components/Record/UserRecord/ownerCard'
 import petCard from '@/components/Record/UserRecord/petCard'
 import petDialog from '@/components/Record/UserRecord/petDialog'
 export default {
   components: {
-    userRecordNav,
     ownerCard,
     petCard,
     petDialog,

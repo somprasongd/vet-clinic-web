@@ -102,6 +102,7 @@ export default {
   },
   data() {
     return {
+      offset: false,
       petDetail: [],
     }
   },

@@ -23,9 +23,9 @@
             <v-row dense>
               <v-col cols="6">
                 <v-select
-                  v-model="sendCheck.doctor"
+                  v-model="sendCheck.doctorId"
                   :disabled="loading"
-                  :items="doctor"
+                  :items="doctorListItems"
                   item-text="name"
                   item-value="id"
                   color="cusblue"
@@ -36,17 +36,17 @@
                   <template v-slot:prepend-item>
                     <v-list-item
                       :style="
-                        sendCheck.doctor === ''
+                        sendCheck.doctorId === ''
                           ? 'background-color: #e2f5fc'
                           : ''
                       "
                       ripple
-                      @click="sendCheck.doctor = ''"
+                      @click="sendCheck.doctorId = ''"
                     >
                       <v-list-item-content>
                         <v-list-item-title
                           :class="
-                            sendCheck.doctor === '' ? 'cusblue--text' : ''
+                            sendCheck.doctorId === '' ? 'cusblue--text' : ''
                           "
                         >
                           ไม่ระบุแพทย์
@@ -61,11 +61,12 @@
                 <v-select
                   v-model="sendCheck.important"
                   :disabled="loading"
-                  :items="priority"
+                  :items="priorityListItems"
                   item-text="label"
                   item-value="id"
                   color="cusblue"
                   label="ความสำคัญ"
+                  menu-props="auto"
                   :rules="rules.important"
                 ></v-select>
               </v-col>
@@ -188,17 +189,21 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
+            v-shortkey="['ctrl', 'x']"
             color="cusblue2"
             :disabled="loading"
             text
+            @shortkey="sendCheckDialog = false"
             @click="sendCheckDialog = false"
           >
-            ไม่ส่ง
+            ยกเลิก
           </v-btn>
           <v-btn
+            v-shortkey="['ctrl', 'enter']"
             color="cusblue2"
             :disabled="!valid || loading"
             text
+            @shortkey="submitCheck"
             @click="submitCheck"
           >
             <v-progress-circular
@@ -209,7 +214,7 @@
               :size="15"
               :width="2"
             ></v-progress-circular>
-            ส่ง
+            บันทึก
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -223,9 +228,6 @@ export default {
     return {
       sendCheckDialog: false,
 
-      doctor: this.$store.state.form.doctor,
-      priority: this.$store.state.form.priority,
-
       loading: false,
       alert: false,
       error: '',
@@ -235,7 +237,7 @@ export default {
         type: '',
         time: '',
         status: '',
-        doctor: '',
+        doctorId: '',
         important: 1,
         weight: '',
         temp: '',
@@ -259,7 +261,8 @@ export default {
         ],
         temp: [
           // (v) => !!v || 'กรุณากรอกอุณหภูมิ',
-          (v) => /^[0-9]*\.?[0-9]{1,2}$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+          (v) =>
+            !v || /^[0-9]*\.?[0-9]{1,2}$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
           (v) =>
             !v ||
             v.split('.')[0].length <= 3 ||
@@ -268,6 +271,14 @@ export default {
       },
     }
   },
+  computed: {
+    doctorListItems() {
+      return this.$store.state.form.doctor
+    },
+    priorityListItems() {
+      return this.$store.state.form.priority
+    },
+  },
   watch: {
     sendCheckDialog() {
       if (this.sendCheckDialog === false) this.$refs.form.reset()
@@ -275,31 +286,28 @@ export default {
   },
   mounted() {
     if (this.$store.state.form.doctor.length === 0) {
-      this.$store.dispatch('form/addDoctor').then((res) => {
-        this.doctor = res
-      })
+      this.$store.dispatch('form/addDoctor')
     }
     if (this.$store.state.form.priority.length === 0) {
-      this.$store.dispatch('form/addPriority').then((res) => {
-        this.priority = res
-      })
+      this.$store.dispatch('form/addPriority')
     }
   },
   methods: {
-    open(id, doctor) {
+    open(id) {
       this.sendCheck.petId = id
-      this.sendCheckDialog = true
-      this.sendCheck.doctor = this.$store.getters.loggedInUser.roles.some(
+      this.sendCheck.doctorId = this.$store.getters.loggedInUser.roles.some(
         (role) => {
           return role.id === 2
         }
       )
         ? this.$store.getters.loggedInUser.id
         : ''
+      this.sendCheck.appointId = null
+      this.sendCheckDialog = true
     },
-    open1(id, doctor, appointId) {
+    openWithAppointment(id, doctorId, appointId) {
       this.sendCheck.petId = id
-      this.sendCheck.doctor = doctor !== null ? doctor : ''
+      this.sendCheck.doctorId = doctorId !== null ? doctorId : ''
       this.sendCheck.appointId = appointId
       this.sendCheckDialog = true
     },
@@ -312,7 +320,7 @@ export default {
         }
         const sendPet = {
           petId: pet.petId,
-          doctorId: pet.doctor === '' ? null : pet.doctor,
+          doctorId: pet.doctorId === '' ? null : pet.doctorId,
           visitPriorityId: pet.important,
           weight: pet.weight,
           temp: pet.temp === '' ? null : pet.temp,

@@ -221,7 +221,7 @@ export default {
     sendCheck(id, doctor, appointId) {
       this.assignModal = false
       setTimeout(() => {
-        this.$refs.checkDialog.open1(id, doctor, appointId)
+        this.$refs.checkDialog.openWithAppointment(id, doctor, appointId)
       }, 150)
     },
     UpdateAppoint(val) {
