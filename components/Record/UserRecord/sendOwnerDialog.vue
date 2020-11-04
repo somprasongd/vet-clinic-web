@@ -11,29 +11,31 @@
       <v-divider></v-divider>
       <v-card-text class="py-3 px-7">
         <v-row dense>
-          <v-select
-            v-model="searchKey"
-            :items="items"
-            class="col-4"
-            item-text="label"
-            item-value="value"
-            label="ตัวเลือก"
-            outlined
-            rounded
-            dense
-            hide-details
-            return-object
-          ></v-select>
-          <v-text-field
-            id="id"
-            v-model="search"
-            class="col-8"
-            label="ค้นหา"
-            outlined
-            rounded
-            dense
-            hide-details
-          ></v-text-field>
+          <v-col cols="4">
+            <v-select
+              v-model="searchKey"
+              :items="items"
+              item-text="label"
+              item-value="value"
+              label="ตัวเลือก"
+              outlined
+              rounded
+              dense
+              hide-details
+              return-object
+            ></v-select>
+          </v-col>
+          <v-col cols="8">
+            <v-text-field
+              id="id"
+              v-model="search"
+              label="ค้นหา"
+              outlined
+              rounded
+              dense
+              hide-details
+            ></v-text-field>
+          </v-col>
         </v-row>
         <v-data-table
           :headers="headers"
