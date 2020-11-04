@@ -173,7 +173,7 @@ export default {
     formatArray(array) {
       return array.map((item) => {
         return {
-          firstName: item.code,
+          code: item.code,
           value: item.label,
         }
       })

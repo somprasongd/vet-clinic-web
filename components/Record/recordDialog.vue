@@ -23,7 +23,7 @@
                     v-model="addCustomer.prefix"
                     color="cusblue"
                     :disabled="loading"
-                    :items="nameTitle"
+                    :items="prefixes"
                     item-text="label"
                     item-value="id"
                     label="คำนำหน้าชื่อ"
@@ -185,7 +185,6 @@ export default {
       alert: false,
       error: '',
 
-      nameTitle: this.$store.state.form.prefixes,
       addCustomer: {
         id: '',
         prefix: 1,
@@ -228,11 +227,14 @@ export default {
       },
     }
   },
+  computed: {
+    prefixes() {
+      return this.$store.state.form.prefixes
+    },
+  },
   mounted() {
     if (this.$store.state.form.prefixes.length === 0) {
-      this.$store.dispatch('form/addPrefixes').then((res) => {
-        this.nameTitle = res
-      })
+      this.$store.dispatch('form/addPrefixes')
     }
     this.socket = this.$nuxtSocket({
       reconnection: true, // whether to reconnect automatically

@@ -157,14 +157,6 @@
               รอผลตรวจ
             </v-btn>
             <v-spacer v-else></v-spacer>
-            <!-- <v-btn
-            v-if="visitData !== null && visitData.visitStatus.id === 6"
-            class="cusblue3 font-weight-regular text-capitalize"
-            depressed
-            dark
-          >
-            รับชำระเงิน
-          </v-btn> -->
             <div class="font-weight-medium" style="display: inline-block">
               <span>ราคารวม : {{ sumPrice }} บาท</span>
             </div>
