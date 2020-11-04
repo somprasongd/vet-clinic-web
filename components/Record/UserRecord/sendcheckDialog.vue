@@ -75,6 +75,7 @@
                   :disabled="loading"
                   color="cusblue"
                   label="นำหนัก / kg"
+                  autofocus
                   :rules="rules.weight"
                 ></v-text-field>
               </v-col>
