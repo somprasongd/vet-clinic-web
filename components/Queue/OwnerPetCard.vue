@@ -110,7 +110,7 @@
             dark
             small
             color="cusblue"
-            @click="endCheck($route.params.queue, getVisitStatus(2))"
+            @click="endCheck($route.params.queue, 2)"
           >
             เข้ารับการตรวจ
           </v-btn>
@@ -123,7 +123,7 @@
             dark
             small
             color="cusblue"
-            @click="endCheck($route.params.queue, getVisitStatus(3))"
+            @click="endCheck($route.params.queue, 3)"
           >
             รอผลตรวจ
           </v-btn>
@@ -135,12 +135,7 @@
             dark
             small
             color="cusblue"
-            @click="
-              endCheck(
-                $route.params.queue,
-                getVisitStatus(isStatusWaiting ? 8 : 6)
-              )
-            "
+            @click="endCheck($route.params.queue, isStatusWaiting ? 8 : 6)"
           >
             {{ isStatusWaiting ? 'ยกเลิกการรักษา' : 'จบการรักษา' }}
           </v-btn>
@@ -287,7 +282,7 @@
                 block
                 depressed
                 dark
-                @click="endCheck($route.params.queue, getVisitStatus(2))"
+                @click="endCheck($route.params.queue, 2)"
               >
                 เข้ารับการตรวจ
               </v-btn>
@@ -297,7 +292,7 @@
                 block
                 depressed
                 dark
-                @click="endCheck($route.params.queue, getVisitStatus(3))"
+                @click="endCheck($route.params.queue, 3)"
               >
                 รอผลตรวจ
               </v-btn>
@@ -306,12 +301,7 @@
                 block
                 depressed
                 dark
-                @click="
-                  endCheck(
-                    $route.params.queue,
-                    getVisitStatus(isStatusWaiting ? 8 : 6)
-                  )
-                "
+                @click="endCheck($route.params.queue, isStatusWaiting ? 8 : 6)"
               >
                 {{ isStatusWaiting ? 'ยกเลิกการรักษา' : 'จบการรักษา' }}
               </v-btn>
@@ -521,14 +511,29 @@ export default {
       if (!confirm) {
         return
       }
-      await this.$axios
-        .$patch(`/api/visits/${id}/status/${status}`, { progress: false })
-        .then((res) => {
-          this.$router.push(`/queue`)
-        })
-        .catch((error) => {
-          alert(error)
-        })
+      try {
+        await this.$axios.$patch(
+          `/api/visits/${id}/status/${this.getVisitStatus(status)}`,
+          {
+            progress: false,
+          }
+        )
+
+        if (status === 2) {
+          this.visitData.visitStatus.id = 2
+          this.$store.commit('setNavTab', {
+            check: false,
+            checkList: false,
+            lab: false,
+            xray: false,
+          })
+          return
+        }
+
+        this.$router.push(`/queue`)
+      } catch (error) {
+        alert(error)
+      }
     },
     getVisitStatus(id) {
       return this.$store.getters.getVisitStatus(id)
