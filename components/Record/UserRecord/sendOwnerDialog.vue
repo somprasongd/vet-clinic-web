@@ -86,26 +86,6 @@
               </tr>
             </tbody>
           </template>
-          <!-- <template v-slot:[`item.name`]="{ item }">
-            <div v-ripple>
-              <v-avatar size="36" left>
-                <v-img
-                  :src="getOwnerAvatar(item.id)"
-                  :lazy-src="require('~/assets/profile/defaultProfile.svg')"
-                ></v-img>
-              </v-avatar>
-              <span class="px-1">
-                {{ item.fullName }}
-              </span>
-              <v-icon v>
-                {{
-                  owner.id !== item.id
-                    ? 'mdi-radiobox-blank'
-                    : 'mdi-radiobox-marked'
-                }}
-              </v-icon>
-            </div>
-          </template> -->
         </v-data-table>
       </v-card-text>
       <v-card-actions>

@@ -47,25 +47,31 @@
       </template>
       <template v-slot:[`item.action`]="{ item }">
         <v-btn
-          :disabled="item.state === 'cancel' || item.state === 'success'"
+          :disabled="item.state === 'cancel'"
           icon
           depressed
           x-small
-          @click="delPOS(item.id)"
+          @click="
+            item.state === 'success' ? reasonDel(item.id) : delPOS(item.id)
+          "
         >
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </template>
     </v-data-table>
+
     <confirmDialog ref="confirm" />
+    <reasonDialog ref="reasonDialog" @del="delPOSSuccess" />
   </div>
 </template>
 
 <script>
 import confirmDialog from '@/components/Items/confirmDialog'
+import reasonDialog from '@/components/Items/resonDialog'
 export default {
   components: {
     confirmDialog,
+    reasonDialog,
   },
   props: {
     posQueue: {
@@ -82,6 +88,7 @@ export default {
     return {
       confirmDel: false,
       checkout: false,
+
       headers: [
         {
           text: 'ลำดับ',
@@ -169,15 +176,44 @@ export default {
       }
       try {
         await this.$axios.$delete(`/api/pos/${id}`, { progress: false })
-        this.$emit('deletePOS', id)
+        this.changeState(id)
       } catch (error) {
         alert(error)
       }
+    },
+    reasonDel(id) {
+      this.$refs.reasonDialog.open(id)
+    },
+    delPOSSuccess(val) {
+      const id = val.id
+      const datas = {
+        cancelReason: val.reason,
+      }
+      this.$axios({
+        method: 'DELETE',
+        url: `/api/pos/${id}`,
+        data: datas,
+      })
+        .then((res) => {
+          this.$refs.reasonDialog.close()
+          this.changeState(id)
+        })
+        .catch((error) => {
+          alert(error)
+        })
     },
     getColor(status) {
       if (status === 'cancel') return 'rgb(255, 98, 98)'
       else if (status === 'pending') return 'rgb(255, 191, 72)'
       else return 'rgb(87, 243, 87)'
+    },
+    changeState(id) {
+      const index = this.posQueue.findIndex((pos) => pos.id === id)
+      if (this.state === '') {
+        this.posQueue[index].state = 'cancel'
+      } else {
+        this.$emit('deletePOS', id)
+      }
     },
   },
 }
