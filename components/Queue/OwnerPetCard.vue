@@ -113,12 +113,12 @@
 
               <v-btn
                 v-if="!isStatusWaiting"
-                :to="'/queue/' + this.$route.params.queue + '/appoint'"
                 class="font-weight-regular text-capitalize my-2"
                 color="brown lighten-1"
                 block
                 depressed
                 dark
+                @click="$refs.appDialog.open(petData.id)"
               >
                 ทำนัด
               </v-btn>
@@ -226,6 +226,7 @@
     </v-card>
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
     <confirmDialog ref="confirm" />
+    <appointDialog ref="appDialog" />
 
     <template>
       <v-bottom-sheet v-model="sheet">
@@ -386,10 +387,13 @@ import moment from 'moment'
 import vsCard from '@/components/Queue/Check/Card/vsCard'
 import sendDoctorDialog from '@/components/Queue/sendDoctorDialog'
 import confirmDialog from '@/components/Items/confirmDialog'
+import appointDialog from '@/components/Record/UserRecord/appointDialog'
+
 export default {
   components: {
     vsCard,
     sendDoctorDialog,
+    appointDialog,
     confirmDialog,
   },
   props: {
