@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="sendOwner"
-    max-width="600"
+    max-width="850"
     scrollable
     :fullscreen="this.$vuetify.breakpoint.xsOnly"
     transition="dialog-transition"
@@ -34,6 +34,7 @@
               rounded
               dense
               hide-details
+              @keydown.enter="searchOwner(search)"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -57,19 +58,30 @@
                 :class="owner.id !== item.id ? '' : 'light-blue lighten-4'"
                 @click="owner.id !== item.id ? onClickRow(item) : (owner = '')"
               >
-                <td>
-                  {{ item.code }}
-                </td>
                 <td class="px-2 py-1">
-                  <v-avatar size="36" left>
-                    <v-img
-                      :src="getOwnerAvatar(item.id)"
-                      :lazy-src="require('~/assets/profile/defaultProfile.svg')"
-                    ></v-img>
-                  </v-avatar>
-                  <span class="px-1">
-                    {{ item.fullName }}
-                  </span>
+                  <div>
+                    <v-avatar size="36" left>
+                      <v-img
+                        :src="getOwnerAvatar(item.id)"
+                        :lazy-src="
+                          require('~/assets/profile/defaultProfile.svg')
+                        "
+                      ></v-img>
+                    </v-avatar>
+                    <span class="px-1">
+                      {{ item.fullName }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {{ item.tels.join() }}
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {{ item.houseNo + ' ' + item.address }}
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -154,39 +166,33 @@ export default {
         { label: 'เบอร์โทร', value: 'tel' },
         { label: 'ชื่อเจ้าของ', value: 'firstName' },
         { label: 'นามสกุลเจ้าของ', value: 'lastName' },
-        { label: 'ชื่อสัตว์เลี้ยง', value: 'petName' },
-        { label: 'รหัสเจ้าของ', value: 'code' },
-        { label: 'Microchip No.', value: 'microchipNo' },
+        // { label: 'ชื่อสัตว์เลี้ยง', value: 'petName' },
+        // { label: 'รหัสเจ้าของ', value: 'code' },
+        // { label: 'Microchip No.', value: 'microchipNo' },
       ],
       headers: [
-        {
-          text: 'รหัส',
-          align: 'start',
-          sortable: false,
-          width: '135',
-          value: 'code',
-        },
         {
           text: 'ชื่อเจ้าของ',
           align: 'start',
           sortable: false,
           value: 'name',
         },
+        {
+          text: 'เบอร์โทร',
+          align: 'start',
+          sortable: false,
+          value: 'tel',
+        },
+        {
+          text: 'ที่อยู่',
+          align: 'start',
+          sortable: false,
+          value: 'address',
+        },
       ],
     }
   },
-  watch: {
-    search(val) {
-      clearTimeout(this.timeout)
-      this.timeout = setTimeout(() => {
-        if (val !== null && val !== '') {
-          this.querySelections(val)
-        } else {
-          this.member = []
-        }
-      }, 500)
-    },
-  },
+  watch: {},
   methods: {
     open(id) {
       this.owner = ''
@@ -195,6 +201,16 @@ export default {
     },
     getOwnerAvatar(id) {
       return `${process.env.apiUrl}/api/members/${id}/avatar`
+    },
+    searchOwner(val) {
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        if (val !== null && val !== '') {
+          this.querySelections(val)
+        } else {
+          this.member = []
+        }
+      }, 500)
     },
     querySelections(v) {
       this.loading1 = true
