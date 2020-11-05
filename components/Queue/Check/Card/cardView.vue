@@ -140,7 +140,6 @@ export default {
   },
   methods: {
     onOpen(key) {
-      console.log(key, key === '@' ? this.helper : null)
       this.items = key === '@' ? this.helper : null
     },
     Format(content) {
