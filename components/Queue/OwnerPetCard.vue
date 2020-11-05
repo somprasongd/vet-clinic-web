@@ -3,143 +3,6 @@
     <v-card class="elevation-4" max-height="100%">
       <v-card-title class="pb-1 pt-3">
         เจ้าของสัตว์ และสัตว์เลี้ยง
-        <v-spacer></v-spacer>
-        <!-- for mobile -->
-        <v-speed-dial
-          v-model="fab"
-          class="hidden-md-and-up"
-          top
-          right
-          direction="bottom"
-          open-on-hover
-          transition="slide-y-reverse-transition"
-        >
-          <template v-slot:activator>
-            <v-btn v-model="fab" color="cusblue2" dark fab x-small>
-              <v-icon v-if="fab">mdi-close</v-icon>
-              <v-icon v-else>mdi-dots-horizontal</v-icon>
-            </v-btn>
-          </template>
-          <v-btn
-            :to="'/history/' + petData.id"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-          >
-            ประวัติการรักษา
-          </v-btn>
-          <v-btn
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="
-              openSendDocs(
-                visitData.doctor === null ? '' : visitData.doctor.name,
-                visitData.id
-              )
-            "
-          >
-            ส่งต่อ
-          </v-btn>
-          <v-btn
-            v-if="!isStatusWaiting"
-            :to="'/queue/' + this.$route.params.queue + '/appoint'"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-          >
-            ทำนัด
-          </v-btn>
-          <v-btn
-            v-if="!isStatusWaiting"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="admit($route.params.queue)"
-          >
-            Admit
-          </v-btn>
-          <v-btn
-            v-if="!isStatusWaiting"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="petDead(petData.id, !petData.death)"
-          >
-            {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
-          </v-btn>
-          <v-btn
-            v-if="!isStatusWaiting"
-            :to="'/queue/' + this.$route.params.queue + '/insertImg'"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-          >
-            แนบไฟล์ภาพ
-          </v-btn>
-          <v-btn
-            v-if="isShowReceive"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="endCheck($route.params.queue, 2)"
-          >
-            เข้ารับการตรวจ
-          </v-btn>
-          <v-btn
-            v-if="isStatusTreament"
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="endCheck($route.params.queue, 3)"
-          >
-            รอผลตรวจ
-          </v-btn>
-          <v-btn
-            class="px-1"
-            rounded
-            left
-            depressed
-            dark
-            small
-            color="cusblue"
-            @click="endCheck($route.params.queue, isStatusWaiting ? 8 : 6)"
-          >
-            {{ isStatusWaiting ? 'ยกเลิกการรักษา' : 'จบการรักษา' }}
-          </v-btn>
-        </v-speed-dial>
       </v-card-title>
 
       <v-divider class="darker-divider"></v-divider>
@@ -215,15 +78,78 @@
             <div class="px-3 pt-1 hidden-sm-and-down">
               <v-btn
                 :to="'/history/' + petData.id"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
+                color="blue lighten-1"
+                class="font-weight-regular text-capitalize my-2"
                 block
                 depressed
                 dark
               >
                 ประวัติการรักษา
               </v-btn>
+
               <v-btn
-                class="cusblue3 font-weight-regular text-capitalize my-2"
+                v-if="!isStatusWaiting"
+                :to="'/queue/' + this.$route.params.queue + '/insertImg'"
+                color="blue lighten-1"
+                class="font-weight-regular text-capitalize my-2"
+                block
+                depressed
+                dark
+              >
+                แนบไฟล์ภาพ
+              </v-btn>
+
+              <v-btn
+                v-if="!isStatusWaiting"
+                class="font-weight-regular text-capitalize my-2"
+                color="blue-grey darken-1"
+                block
+                depressed
+                dark
+                @click="petDead(petData.id, !petData.death)"
+              >
+                {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
+              </v-btn>
+
+              <v-btn
+                v-if="!isStatusWaiting"
+                :to="'/queue/' + this.$route.params.queue + '/appoint'"
+                class="font-weight-regular text-capitalize my-2"
+                color="brown lighten-1"
+                block
+                depressed
+                dark
+              >
+                ทำนัด
+              </v-btn>
+
+              <v-btn
+                v-if="!isStatusWaiting"
+                class="font-weight-regular text-capitalize my-2"
+                color="brown lighten-1"
+                block
+                depressed
+                dark
+                @click="admit($route.params.queue)"
+              >
+                Admit
+              </v-btn>
+
+              <v-btn
+                v-if="isShowReceive"
+                class="font-weight-regular text-capitalize my-2"
+                color="cyan lighten-1"
+                block
+                depressed
+                dark
+                @click="endCheck($route.params.queue, 2)"
+              >
+                เข้ารับการตรวจ
+              </v-btn>
+
+              <v-btn
+                class="font-weight-regular text-capitalize my-2"
+                color="amber accent-4"
                 block
                 depressed
                 dark
@@ -236,59 +162,11 @@
               >
                 ส่งต่อ
               </v-btn>
-              <v-btn
-                v-if="!isStatusWaiting"
-                :to="'/queue/' + this.$route.params.queue + '/appoint'"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
-                block
-                depressed
-                dark
-              >
-                ทำนัด
-              </v-btn>
-              <v-btn
-                v-if="!isStatusWaiting"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
-                block
-                depressed
-                dark
-                @click="admit($route.params.queue)"
-              >
-                Admit
-              </v-btn>
-              <v-btn
-                v-if="!isStatusWaiting"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
-                block
-                depressed
-                dark
-                @click="petDead(petData.id, !petData.death)"
-              >
-                {{ petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย' }}
-              </v-btn>
-              <v-btn
-                v-if="!isStatusWaiting"
-                :to="'/queue/' + this.$route.params.queue + '/insertImg'"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
-                block
-                depressed
-                dark
-              >
-                แนบไฟล์ภาพ
-              </v-btn>
-              <v-btn
-                v-if="isShowReceive"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
-                block
-                depressed
-                dark
-                @click="endCheck($route.params.queue, 2)"
-              >
-                เข้ารับการตรวจ
-              </v-btn>
+
               <v-btn
                 v-if="isStatusTreament"
-                class="cusblue3 font-weight-regular text-capitalize my-2"
+                class="font-weight-regular text-capitalize my-2"
+                color="amber accent-4"
                 block
                 depressed
                 dark
@@ -297,7 +175,8 @@
                 รอผลตรวจ
               </v-btn>
               <v-btn
-                class="cusblue3 font-weight-regular text-capitalize my-2"
+                class="font-weight-regular text-capitalize my-2"
+                color="amber accent-4"
                 block
                 depressed
                 dark
@@ -347,6 +226,158 @@
     </v-card>
     <sendDoctorDialog ref="sendDoctor" @updateDoctor="updateSend" />
     <confirmDialog ref="confirm" />
+
+    <template>
+      <v-bottom-sheet v-model="sheet">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            class="hidden-md-and-up"
+            bottom
+            left
+            fixed
+            fab
+            x-small
+            color="cusblue"
+            dark
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-subheader>ตัวเลือก</v-subheader>
+          <v-list-item :to="'/history/' + petData.id" @click="sheet = false">
+            <v-list-item-avatar>
+              <v-avatar tile color="blue lighten-1" size="32px">
+                <v-icon dark>mdi-medical-bag</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>ประวัติการรักษา</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="!isStatusWaiting"
+            @click=";[(sheet = false), endCheck($route.params.queue, 2)]"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="blue lighten-1" size="32px">
+                <v-icon dark>mdi-file-image</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>แนบไฟล์ภาพ</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="!isStatusWaiting"
+            @click=";[(sheet = false), petDead(petData.id, !petData.death)]"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="blue-grey darken-1" size="32px">
+                <v-icon dark>mdi-skull</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>{{
+              petData.death ? 'ยกเลิกแจ้งตาย' : 'แจ้งตาย'
+            }}</v-list-item-title>
+          </v-list-item>
+
+          <v-divider class="dash-divider"></v-divider>
+          <v-list-item
+            v-if="!isStatusWaiting"
+            :to="'/queue/' + this.$route.params.queue + '/appoint'"
+            @click="sheet = false"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="brown lighten-1" size="32px">
+                <v-icon dark>mdi-calendar-plus</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>ทำนัด</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="!isStatusWaiting"
+            @click=";[(sheet = false), admit($route.params.queue)]"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="brown lighten-1" size="32px">
+                <v-icon dark>mdi-format-color-text</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>Admit</v-list-item-title>
+          </v-list-item>
+
+          <v-divider class="dash-divider"></v-divider>
+
+          <v-list-item
+            v-if="isShowReceive"
+            @click=";[(sheet = false), endCheck($route.params.queue, 2)]"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="cyan lighten-1" size="32px">
+                <v-icon dark>mdi-file-send</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>เข้ารับการตรวจ</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            @click="
+              ;[
+                (sheet = false),
+                openSendDocs(
+                  visitData.doctor === null ? '' : visitData.doctor.name,
+                  visitData.id
+                ),
+              ]
+            "
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="amber accent-4" size="32px">
+                <v-icon dark>mdi-file-send</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>ส่งต่อ</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="isStatusTreament"
+            @click=";[(sheet = false), endCheck($route.params.queue, 3)]"
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="amber accent-4" size="32px">
+                <v-icon dark>mdi-file-send</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>รอผลตรวจ</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="isStatusTreament"
+            @click="
+              ;[
+                (sheet = false),
+                ndCheck($route.params.queue, isStatusWaiting ? 8 : 6),
+              ]
+            "
+          >
+            <v-list-item-avatar>
+              <v-avatar tile color="amber accent-4" size="32px">
+                <v-icon dark>mdi-file-send</v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>{{
+              isStatusWaiting ? 'ยกเลิกการรักษา' : 'จบการรักษา'
+            }}</v-list-item-title>
+          </v-list-item>
+
+          <div class="text-center">
+            <v-btn color="red lighten-1" dark @click="sheet = false">ปิด</v-btn>
+          </div>
+        </v-list>
+      </v-bottom-sheet>
+    </template>
   </div>
 </template>
 
@@ -395,6 +426,7 @@ export default {
   },
   data() {
     return {
+      sheet: false,
       petCardHidden: !this.$vuetify.breakpoint.smAndDown,
       fab: false,
     }
@@ -437,22 +469,6 @@ export default {
     },
     openSendDocs(name, id) {
       this.$refs.sendDoctor.open(name, id)
-    },
-    startCheck(id) {
-      this.$axios
-        .$patch(`/api/visits/${id}`, { visitStatusId: 2 }, { progress: false })
-        .then((res) => {
-          this.visitData.visitStatus.id = 2
-          this.$store.commit('setNavTab', {
-            check: false,
-            checkList: false,
-            lab: false,
-            xray: false,
-          })
-        })
-        .catch((error) => {
-          alert(error)
-        })
     },
     updateSend() {
       this.$router.push('/queue')
@@ -538,27 +554,27 @@ export default {
     getVisitStatus(id) {
       return this.$store.getters.getVisitStatus(id)
     },
-    petDead(id, isDeath) {
-      this.$refs.confirm
-        .open(
-          'คุณแน่ใจหรือไม่?',
-          `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
-          {
-            width: 290,
-            color: 'red',
-          }
+    async petDead(id, isDeath) {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
+        {
+          width: 290,
+          color: 'red',
+        }
+      )
+      if (!confirm) return
+
+      try {
+        await this.$axios.$patch(
+          `/api/pets/${id}`,
+          { death: isDeath },
+          { progress: false }
         )
-        .then((confirm) => {
-          this.$axios
-            .$patch(`/api/pets/${id}`, { death: isDeath }, { progress: false })
-            .then((res) => {
-              this.petData.death = isDeath
-            })
-            .catch((err) => {
-              alert(err)
-            })
-        })
-        .catch(() => {})
+        this.petData.death = isDeath
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }
