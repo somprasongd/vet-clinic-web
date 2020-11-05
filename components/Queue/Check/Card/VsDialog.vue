@@ -87,64 +87,79 @@
                   :rules="rules.weight"
                   color="cusblue"
                   label="Weight/kg"
+                  autofocus
+                  @keydown.enter="onEnter('temp')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="temp"
                   v-model="editedItem.temp"
                   :disabled="loading"
                   :rules="rules.temp"
                   color="cusblue"
                   label="Temp/F"
+                  @keydown.enter="onEnter('pulse')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="pulse"
                   v-model="editedItem.pulse"
                   :disabled="loading"
                   :rules="rules.pulse"
                   color="cusblue"
                   label="Pulse"
+                  @keydown.enter="onEnter('r')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="r"
                   v-model="editedItem.rr"
                   :disabled="loading"
                   :rules="rules.rr"
                   color="cusblue"
                   label="R"
+                  @keydown.enter="onEnter('sys')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="sys"
                   v-model="editedItem.sys"
                   :disabled="loading"
                   :rules="rules.sys"
                   color="cusblue"
                   label="Systolic P/bpm"
+                  @keydown.enter="onEnter('dia')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="dia"
                   v-model="editedItem.dia"
                   :disabled="loading"
                   :rules="rules.dia"
                   color="cusblue"
                   label="Diastolic P/bpm"
+                  @keydown.enter="onEnter('bcs')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="bcs"
                   v-model="editedItem.bcs"
                   :disabled="loading"
                   :rules="rules.bcs"
                   color="cusblue"
                   label="BCS"
+                  @keydown.enter="onEnter('ps')"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  ref="ps"
                   v-model="editedItem.painScore"
                   :disabled="loading"
                   :rules="rules.painScore"
@@ -157,11 +172,20 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="cusblue2" text @click="close">ยกเลิก</v-btn>
           <v-btn
+            v-shortkey="['ctrl', 'x']"
+            color="cusblue2"
+            text
+            @shortkey="close"
+            @click="close"
+            >ยกเลิก</v-btn
+          >
+          <v-btn
+            v-shortkey="['ctrl', 'enter']"
             color="cusblue2"
             :disabled="!valid || loading"
             text
+            @shortkey="submit"
             @click="submit"
           >
             <v-progress-circular
@@ -172,7 +196,7 @@
               :size="15"
               :width="2"
             ></v-progress-circular>
-            ยืนยัน
+            บันทึก
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -298,39 +322,44 @@ export default {
         time: [(v) => !!v || 'กรุณาเลือกเวลา'],
         rr: [
           (v) =>
-            (v && /^[0-9]{1,3}$/.test(v)) ||
+            !v ||
+            /^[0-9]{1,3}$/.test(v) ||
             'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
         ],
         pulse: [
           (v) =>
-            (v && /^[0-9]{1,3}$/.test(v)) ||
+            !v ||
+            /^[0-9]{1,3}$/.test(v) ||
             'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
         ],
         sys: [
           (v) =>
-            (v && /^[0-9]{1,3}$/.test(v)) ||
+            !v ||
+            /^[0-9]{1,3}$/.test(v) ||
             'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
         ],
         dia: [
           (v) =>
-            (v && /^[0-9]{1,3}$/.test(v)) ||
+            !v ||
+            /^[0-9]{1,3}$/.test(v) ||
             'กรุณากรอกตัวเลข ไม่เกิน 3 ตัว เท่านั้น',
         ],
         painScore: [
           (v) =>
-            (v && /^(?:[1-9]|0[1-9]|10)$/.test(v)) ||
+            !v ||
+            /^(?:[1-9]|0[1-9]|10)$/.test(v) ||
             'กรุณากรอกตัวเลข 1 - 10 เท่านั้น',
         ],
         bcs: [
-          (v) => (v && /^[1-9]$/.test(v)) || 'กรุณากรอกตัวเลข 1 - 9 เท่านั้น',
+          (v) => !v || /^[1-9]$/.test(v) || 'กรุณากรอกตัวเลข 1 - 9 เท่านั้น',
         ],
         temp: [
           (v) =>
-            (v && /^[0-9]*\.?[0-9]{1,2}$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+            !v || /^[0-9]*\.?[0-9]{1,2}$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
         ],
         weight: [
           (v) =>
-            (v && /^[0-9]*\.?[0-9]{1,2}$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+            !v || /^[0-9]*\.?[0-9]{1,2}$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
         ],
       },
     }
@@ -355,6 +384,9 @@ export default {
     },
   },
   methods: {
+    onEnter(ref) {
+      this.$refs[ref].focus()
+    },
     openCreate() {
       this.assignModalVS = true
     },
