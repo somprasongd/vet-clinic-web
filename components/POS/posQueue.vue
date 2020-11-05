@@ -47,7 +47,7 @@
       </template>
       <template v-slot:[`item.action`]="{ item }">
         <v-btn
-          :disabled="item.state === 'cancel'"
+          :disabled="item.state === 'cancel' || item.state === 'success'"
           icon
           depressed
           x-small
