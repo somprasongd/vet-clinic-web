@@ -18,7 +18,7 @@
           <v-form ref="form" v-model="valid" lazy-validation autocomplete="off">
             <div>
               <v-row dense>
-                <v-col cols="12" sm="4">
+                <v-col cols="12" md="4">
                   <v-select
                     v-model="addCustomer.prefix"
                     color="cusblue"
@@ -33,7 +33,7 @@
                     @keydown.enter="onEnter('f_name')"
                   ></v-select>
                 </v-col>
-                <v-col cols="12" sm="4">
+                <v-col cols="12" md="4">
                   <v-text-field
                     ref="f_name"
                     v-model="addCustomer.f_name"
@@ -46,7 +46,7 @@
                     @keydown.enter="onEnter('l_name')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" sm="4">
+                <v-col cols="12" md="4">
                   <v-text-field
                     ref="l_name"
                     v-model="addCustomer.l_name"
@@ -58,7 +58,7 @@
                     @keydown.enter="onEnter('houseno')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="12" md="4">
                   <v-text-field
                     ref="houseno"
                     v-model="addCustomer.houseNo"
@@ -70,7 +70,7 @@
                     @keydown.enter="onEnter('address')"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="8">
+                <v-col cols="12" md="8">
                   <v-text-field
                     ref="address"
                     v-model="addCustomer.address"
@@ -317,6 +317,7 @@ export default {
           tel: [],
           other: '',
         }
+        this.onEnter('tel')
       })
       this.socket.on('smc-error', (msg) => {
         this.loading = false
