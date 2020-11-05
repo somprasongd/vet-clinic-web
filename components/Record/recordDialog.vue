@@ -175,6 +175,7 @@
 </template>
 
 <script>
+import { base64ToFile } from '~/utils/index.js'
 export default {
   data() {
     return {
@@ -196,6 +197,7 @@ export default {
         tel: [],
         other: '',
       },
+      file: null,
       rules: {
         prefix: [(v) => !!v || 'กรุณาใส่คำนำหน้าชื่อ'],
         f_name: [
@@ -246,15 +248,9 @@ export default {
 
     this.socket.on('connect', (data) => {
       /* Emit events */
-      this.socket.emit(
-        'set-query',
-        {
-          query: ['name', 'address', 'photo'],
-        },
-        (resp) => {
-          //
-        }
-      )
+      this.socket.emit('set-query', {
+        query: ['name', 'address', 'photo'],
+      })
     })
 
     // this.socket.on('connect_error', () => {
@@ -288,12 +284,19 @@ export default {
         return
       }
       /* Listen for events: */
-      this.socket.on('smc-data', (msg) => {
+      this.socket.on('smc-data', async (msg) => {
         this.loading = false
         const {
           name: { prefix, firstname, lastname },
           address: { houseNo, full },
+          photo,
         } = msg.data
+
+        try {
+          this.file = await base64ToFile('data:image/jpeg;base64,' + photo)
+        } catch (error) {
+          this.file = null
+        }
 
         this.addCustomer = {
           id: '',
@@ -372,6 +375,21 @@ export default {
             member = await this.$axios.$post('/api/members', sendData, {
               progress: false,
             })
+            // upload avatar
+            if (this.file !== null) {
+              const formData = new FormData()
+              formData.append('avatar', this.file)
+              await this.$axios.$post(
+                `/api/members/${member.id}/avatar`,
+                formData,
+                {
+                  headers: {
+                    'Content-Type': 'multipart/form-data',
+                  },
+                  progress: false,
+                }
+              )
+            }
           } else {
             member = await this.$axios.$patch(
               `/api/members/${sendCustomer.id}`,
