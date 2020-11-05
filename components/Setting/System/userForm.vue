@@ -97,25 +97,26 @@ export default {
     },
   },
   methods: {
-    deleteUser(id) {
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+    async deleteUser(id) {
+      const confirm = await this.$refs.confirm.open(
+        `คุณแน่ใจหรือไม่?`,
+        `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`,
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/users/${id}`, { progress: false })
-            .then((response) => {
-              // this.$refs.form.reset()
-              // this.assignModal = false
-              this.$emit('removed', id)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(`/api/users/${id}`, { progress: false })
+        this.$emit('removed', id)
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }

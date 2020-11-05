@@ -476,34 +476,35 @@ export default {
           alert(error)
         })
     },
-    deleteVs(item) {
+    async deleteVs(item) {
       const index = this.cardData.indexOf(item)
       this.dialogShow = false
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้',
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/visits/${this.$route.params.queue}/vs/${item.id}`, {
-              progress: false,
-            })
-            .then((res) => {
-              setTimeout(() => {
-                this.dialogShow = true
-                this.cardData.splice(index, 1)
-              }, 200)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {
-          setTimeout(() => {
-            this.dialogShow = true
-          }, 200)
-        })
+        }
+      )
+
+      if (!confirm) {
+        this.dialogShow = true
+        return
+      }
+
+      try {
+        await this.$axios.$delete(
+          `/api/visits/${this.$route.params.queue}/vs/${item.id}`,
+          {
+            progress: false,
+          }
+        )
+        this.dialogShow = true
+        this.cardData.splice(index, 1)
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }

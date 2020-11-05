@@ -352,105 +352,111 @@ export default {
       else if (status === 9) return 'rgb(255, 145, 98)'
       else return 'rgb(87, 243, 87)'
     },
-    updateStatus(id, status, statId) {
-      this.$refs.confirm
-        .open(
-          `ยืนยัน${
-            status === 2
-              ? 'เข้ารับการตรวจ'
+    async updateStatus(id, status, statId) {
+      const confirm = await this.$refs.confirm.open(
+        `ยืนยัน${
+          status === 2
+            ? 'เข้ารับการตรวจ'
+            : status === 3
+            ? 'การรอผลตรวจ'
+            : status === 4
+            ? 'การรายงานผล'
+            : status === 7
+            ? 'การจบการรับบริการ'
+            : status === 8 && statId === 9
+            ? 'ยกเลิกการฝาก'
+            : status === 8
+            ? 'ยกเลิกการรักษา'
+            : 'การจบการรักษา'
+        }?`,
+        `ต้องการยืนยัน${
+          status === 2
+            ? 'เข้ารับการตรวจ'
+            : status === 3
+            ? 'การรอผลตรวจ'
+            : status === 4
+            ? 'การรายงานผล'
+            : status === 7
+            ? 'การจบการรับบริการ'
+            : status === 8 && statId === 9
+            ? 'ยกเลิกการฝากเลี้ยง'
+            : status === 8
+            ? 'ยกเลิกการรักษา'
+            : 'การจบการรักษา'
+        }ใช่หรือไม่`,
+        {
+          width: 290,
+          color:
+            status === 8
+              ? 'red'
               : status === 3
-              ? 'การรอผลตรวจ'
+              ? 'primary'
               : status === 4
-              ? 'การรายงานผล'
-              : status === 7
-              ? 'การจบการรับบริการ'
-              : status === 8 && statId === 9
-              ? 'ยกเลิกการฝาก'
-              : status === 8
-              ? 'ยกเลิกการรักษา'
-              : 'การจบการรักษา'
-          }?`,
-          `ต้องการยืนยัน${
-            status === 2
-              ? 'เข้ารับการตรวจ'
-              : status === 3
-              ? 'การรอผลตรวจ'
-              : status === 4
-              ? 'การรายงานผล'
-              : status === 7
-              ? 'การจบการรับบริการ'
-              : status === 8 && statId === 9
-              ? 'ยกเลิกการฝากเลี้ยง'
-              : status === 8
-              ? 'ยกเลิกการรักษา'
-              : 'การจบการรักษา'
-          }ใช่หรือไม่`,
-          {
-            width: 290,
-            color:
-              status === 8
-                ? 'red'
-                : status === 3
-                ? 'primary'
-                : status === 4
-                ? 'rgb(214, 185, 81)'
-                : 'green',
-          }
+              ? 'rgb(214, 185, 81)'
+              : 'green',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$patch(
+          `/api/visits/${id}`,
+          { visitStatusId: status },
+          { progress: false }
         )
-        .then((confirm) => {
-          this.$axios
-            .$patch(
-              `/api/visits/${id}`,
-              { visitStatusId: status },
-              { progress: false }
-            )
-            .then((res) => {
-              if (status === 2) {
-                this.$router.push(`/queue/${id}`)
-              } else if (status === 8) {
-                this.removeFromQueue(id)
-                this.cancelQueueDialog = false
-              } else {
-                this.$emit('updateStatus', {
-                  visitId: id,
-                  visitStatusId: status,
-                })
-              }
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        if (status === 2) {
+          this.$router.push(`/queue/${id}`)
+        } else if (status === 8) {
+          this.removeFromQueue(id)
+          this.cancelQueueDialog = false
+        } else {
+          this.$emit('updateStatus', {
+            visitId: id,
+            visitStatusId: status,
+          })
+        }
+      } catch (error) {
+        alert(error)
+      }
     },
-    discharge(id) {
-      this.$refs.confirm
-        .open(`ยืนยันการจบการรับชำระ?`, `ต้องการยืนยันรับชำระเงินใช่หรือไม่`, {
+    async discharge(id) {
+      const confirm = await this.$refs.confirm.open(
+        `ยืนยันการจบการรับชำระ?`,
+        `ต้องการยืนยันรับชำระเงินใช่หรือไม่`,
+        {
           width: 300,
           color: 'green',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$patch(`/api/visits/${id}/status/discharge`, null, {
-              progress: false,
-            })
-            .then((res) => {
-              if (
-                res.id !== undefined &&
-                this.$store.getters.loggedInUser.roles.some((role) => {
-                  return role.id === 6
-                })
-              ) {
-                this.$router.push('/pos/' + res.id)
-              } else {
-                this.$emit('delete', id)
-              }
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        const res = await this.$axios.$patch(
+          `/api/visits/${id}/status/discharge`,
+          null,
+          {
+            progress: false,
+          }
+        )
+        if (
+          res.id !== undefined &&
+          this.$store.getters.loggedInUser.roles.some((role) => {
+            return role.id === 6
+          })
+        ) {
+          this.$router.push('/pos/' + res.id)
+        } else {
+          this.$emit('delete', id)
+        }
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }

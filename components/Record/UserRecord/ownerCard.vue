@@ -127,25 +127,28 @@ export default {
     sendMemberData(val) {
       this.$emit('update', val)
     },
-    deleteMember() {
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+    async deleteMember() {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้',
+        {
           width: 290,
           color: 'red',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(`/api/members/${this.$route.params.owner}`, {
+          progress: false,
         })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/members/${this.$route.params.owner}`, {
-              progress: false,
-            })
-            .then((res) => {
-              this.$router.push('/record')
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        this.$router.push('/record')
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }

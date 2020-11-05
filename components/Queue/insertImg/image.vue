@@ -99,23 +99,31 @@ export default {
       this.dialogImg = true
       this.imgShowing = id
     },
-    delImg(id) {
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบภาพนี้', {
+    async delImg(id) {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        'คุณแน่ใจหรือไม่ที่จะลบภาพนี้',
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/visits/${this.$route.params.queue}/images/${id}`, {
-              progress: false,
-            })
-            .then(() => {
-              this.$emit('delete', id)
-            })
-            .catch((error) => alert(error))
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(
+          `/api/visits/${this.$route.params.queue}/images/${id}`,
+          {
+            progress: false,
+          }
+        )
+        this.$emit('delete', id)
+      } catch (error) {
+        alert(error)
+      }
     },
   },
 }

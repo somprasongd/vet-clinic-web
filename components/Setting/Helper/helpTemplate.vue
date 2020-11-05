@@ -108,16 +108,21 @@ export default {
     editHelper(id) {
       this.$emit('editHelper', id)
     },
-    delHelper(id) {
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
+    async delHelper(id) {
+      const confirm = await this.$refs.confirm.open(
+        `คุณแน่ใจหรือไม่?`,
+        `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`,
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$emit('delete', id)
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      this.$emit('delete', id)
     },
   },
 }

@@ -154,23 +154,25 @@ export default {
           .indexOf(id) + 1
       )
     },
-    delPOS(id) {
-      this.$refs.confirm
-        .open(`คุณแน่ใจหรือไม่?`, `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`, {
+    async delPOS(id) {
+      const confirm = await this.$refs.confirm.open(
+        `คุณแน่ใจหรือไม่?`,
+        `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`,
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/pos/${id}`, { progress: false })
-            .then((res) => {
-              this.$emit('deletePOS', id)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+      try {
+        await this.$axios.$delete(`/api/pos/${id}`, { progress: false })
+        this.$emit('deletePOS', id)
+      } catch (error) {
+        alert(error)
+      }
     },
     getColor(status) {
       if (status === 'cancel') return 'rgb(255, 98, 98)'

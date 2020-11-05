@@ -362,83 +362,89 @@ export default {
         progress: false,
       })
       if (check.status) {
-        this.$refs.confirm
-          .open(
-            'ต้องการส่งอีกครั้งหรือไม่?',
-            'สัตว์เลี้ยงตัวนี้ได้ถูกฝากเลี้ยงแล้วคุณต้องการส่งอีกครั้งหรือไม่',
-            {
-              width: 350,
-              color: 'red',
-            }
-          )
-          .then((confirm) => {
-            this.$refs.checkDialog.open(id)
-          })
-          .catch(() => {})
-      } else this.$refs.checkDialog.open(id)
+        const confirm = await this.$refs.confirm.open(
+          'ต้องการส่งอีกครั้งหรือไม่?',
+          'สัตว์เลี้ยงตัวนี้ได้ถูกฝากเลี้ยงแล้วคุณต้องการส่งอีกครั้งหรือไม่',
+          {
+            width: 350,
+            color: 'red',
+          }
+        )
+        if (!confirm) {
+          return
+        }
+      }
+
+      this.$refs.checkDialog.open(id)
     },
     async onClickDepo(id) {
       const check = await this.$axios.$get(`/api/visits/is-daycare/${id}`, {
         progress: false,
       })
       if (check.status) {
-        this.$refs.confirm
-          .open(
-            'ต้องการส่งอีกครั้งหรือไม่?',
-            'สัตว์เลี้ยงตัวนี้ได้ถูกส่งตรวจแล้วคุณต้องการส่งอีกครั้งหรือไม่',
-            {
-              width: 350,
-              color: 'red',
-            }
-          )
-          .then((confirm) => {
-            this.$refs.depoDialog.open(id)
-          })
-          .catch(() => {})
-      } else this.$refs.depoDialog.open(id)
-    },
-    deletePet(id) {
-      this.$refs.confirm
-        .open('คุณแน่ใจหรือไม่?', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้', {
-          width: 290,
-          color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(`/api/pets/${id}`, { progress: false })
-            .then((res) => {
-              this.$emit('del', id)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
-    },
-    petDead(id, isDeath) {
-      this.$refs.confirm
-        .open(
-          'คุณแน่ใจหรือไม่?',
-          `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
+        const confirm = await this.$refs.confirm.open(
+          'ต้องการส่งอีกครั้งหรือไม่?',
+          'สัตว์เลี้ยงตัวนี้ได้ถูกส่งตรวจแล้วคุณต้องการส่งอีกครั้งหรือไม่',
           {
-            width: 290,
+            width: 350,
             color: 'red',
           }
         )
-        .then((confirm) => {
-          this.$axios
-            .$patch(`/api/pets/${id}`, { death: isDeath }, { progress: false })
-            .then((res) => {
-              const index = this.pets.findIndex((pet) => {
-                return pet.id === id
-              })
-              this.pets[index].death = isDeath
-            })
-            .catch((err) => {
-              alert(err)
-            })
+
+        if (!confirm) {
+          return
+        }
+      }
+      this.$refs.depoDialog.open(id)
+    },
+    async deletePet(id) {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        'คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้',
+        {
+          width: 290,
+          color: 'red',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(`/api/pets/${id}`, { progress: false })
+        this.$emit('del', id)
+      } catch (error) {
+        alert(error)
+      }
+    },
+    async petDead(id, isDeath) {
+      const confirm = await this.$refs.confirm.open(
+        'คุณแน่ใจหรือไม่?',
+        `คุณแน่ใจหรือไม่ที่จะ${isDeath ? 'แจ้งตาย' : 'ยกเลิกแจ้งตาย'}`,
+        {
+          width: 290,
+          color: 'red',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$patch(
+          `/api/pets/${id}`,
+          { death: isDeath },
+          { progress: false }
+        )
+        const index = this.pets.findIndex((pet) => {
+          return pet.id === id
         })
-        .catch(() => {})
+        this.pets[index].death = isDeath
+      } catch (error) {
+        alert(error)
+      }
     },
     updateAppoint(val) {
       const index = this.pets.findIndex((pet) => {

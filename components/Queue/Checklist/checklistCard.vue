@@ -420,58 +420,50 @@ export default {
     updateStatePOS(state) {
       this.posData.state = state
     },
-    updateState(id, states) {
-      this.$refs.confirm
-        .open(
-          `คุณแน่ใจหรือไม่?`,
-          `คุณแน่ใจหรือไม่ที่${
+    async updateState(id, states) {
+      const confirm = await this.$refs.confirm.open(
+        `คุณแน่ใจหรือไม่?`,
+        `คุณแน่ใจหรือไม่ที่${
+          states === 'active' ? 'ยกเลิกพัก' : states === 'active' ? 'ลบ' : 'พัก'
+        }รายการนี้`,
+        {
+          width: 290,
+          color:
             states === 'active'
-              ? 'ยกเลิกพัก'
-              : states === 'active'
-              ? 'ลบ'
-              : 'พัก'
-          }รายการนี้`,
-          {
-            width: 290,
-            color:
-              states === 'active'
-                ? 'success'
-                : states === 'cancel'
-                ? 'red'
-                : 'warning',
+              ? 'success'
+              : states === 'cancel'
+              ? 'red'
+              : 'warning',
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      const state = {
+        state: states,
+      }
+      try {
+        if (states === 'cancel') {
+          await this.$axios.$delete(`/api/pos/${id}`, {
+            progress: false,
+          })
+          this.$router.push('/pos')
+        } else {
+          await this.$axios.$patch(`/api/pos/${id}`, state, {
+            progress: false,
+          })
+
+          if (states === 'active') {
+            this.updateStatePOS('active')
+            return
           }
-        )
-        .then((confirm) => {
-          const state = {
-            state: states,
-          }
-          if (states === 'cancel') {
-            this.$axios
-              .$delete(`/api/pos/${id}`, {
-                progress: false,
-              })
-              .then((res) => {
-                this.$router.push('/pos')
-              })
-              .catch((error) => {
-                alert(error)
-              })
-          } else {
-            this.$axios
-              .$patch(`/api/pos/${id}`, state, {
-                progress: false,
-              })
-              .then((res) => {
-                states === 'pending'
-                  ? this.$router.push('/pos')
-                  : this.updateStatePOS('active')
-              })
-              .catch((error) => {
-                alert(error)
-              })
-          }
-        })
-        .catch(() => {})
+          this.$router.push('/pos')
+        }
+      } catch (error) {
+        alert(error)
+      }
     },
     addOrder(res) {
       this.$emit('add', res)
@@ -482,32 +474,35 @@ export default {
         $event.preventDefault()
       }
     },
-    delOrder(id) {
-      this.$refs.confirm
-        .open(`คุณแน่ใจหรือไม่?`, `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`, {
+    async delOrder(id) {
+      const confirm = await this.$refs.confirm.open(
+        `คุณแน่ใจหรือไม่?`,
+        `คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้`,
+        {
           width: 290,
           color: 'red',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$delete(
-              `/api${
-                this.$route.params.queue !== undefined
-                  ? `/visits/${this.$route.params.queue}`
-                  : ''
-              }/orders/${id}`,
-              {
-                progress: false,
-              }
-            )
-            .then((res) => {
-              this.$emit('delete', id)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(
+          `/api${
+            this.$route.params.queue !== undefined
+              ? `/visits/${this.$route.params.queue}`
+              : ''
+          }/orders/${id}`,
+          {
+            progress: false,
+          }
+        )
+        this.$emit('delete', id)
+      } catch (error) {
+        alert(error)
+      }
     },
     saveQTY(id, value) {
       const sendQTY = {
@@ -545,27 +540,30 @@ export default {
           alert(error)
         })
     },
-    endCheck(id, status) {
-      this.$refs.confirm
-        .open(`ยืนยันการรอผลตรวจ?`, `ต้องการยืนยันการรอผลตรวจใช่หรือไม่`, {
+    async endCheck(id, status) {
+      const confirm = await this.$refs.confirm.open(
+        `ยืนยันการรอผลตรวจ?`,
+        `ต้องการยืนยันการรอผลตรวจใช่หรือไม่`,
+        {
           width: 290,
           color: 'primary',
-        })
-        .then((confirm) => {
-          this.$axios
-            .$patch(
-              `/api/visits/${id}`,
-              { visitStatusId: status },
-              { progress: false }
-            )
-            .then((res) => {
-              this.$router.push(`/queue`)
-            })
-            .catch((error) => {
-              alert(error)
-            })
-        })
-        .catch(() => {})
+        }
+      )
+
+      if (!confirm) {
+        return
+      }
+
+      try {
+        await this.$axios.$patch(
+          `/api/visits/${id}`,
+          { visitStatusId: status },
+          { progress: false }
+        )
+        this.$router.push(`/queue`)
+      } catch (error) {
+        alert(error)
+      }
     },
     async getReceipt(id) {
       const receipt = await this.$axios.$get(`/api/pos/${id}/receipts`, {

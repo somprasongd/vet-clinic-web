@@ -128,40 +128,39 @@ export default {
         progress: false,
       })
       if (check.status) {
-        this.$refs.confirm
-          .open(
-            'ต้องการส่งอีกครั้งหรือไม่?',
-            'สัตว์เลี้ยงตัวนี้ได้ถูกฝากเลี้ยงแล้วคุณต้องการส่งอีกครั้งหรือไม่',
-            {
-              width: 350,
-              color: 'red',
-            }
-          )
-          .then((confirm) => {
-            this.$refs.checkDialog.open(id)
-          })
-          .catch(() => {})
-      } else this.$refs.checkDialog.open(id)
+        const confirm = await this.$refs.confirm.open(
+          'ต้องการส่งอีกครั้งหรือไม่?',
+          'สัตว์เลี้ยงตัวนี้ได้ถูกฝากเลี้ยงแล้วคุณต้องการส่งอีกครั้งหรือไม่',
+          {
+            width: 350,
+            color: 'red',
+          }
+        )
+        if (!confirm) {
+          return
+        }
+      }
+      this.$refs.checkDialog.open(id)
     },
     async onClickDepo(id) {
       const check = await this.$axios.$get(`/api/visits/is-daycare/${id}`, {
         progress: false,
       })
       if (check.status) {
-        this.$refs.confirm
-          .open(
-            'ต้องการส่งอีกครั้งหรือไม่?',
-            'สัตว์เลี้ยงตัวนี้ได้ถูกส่งตรวจแล้วคุณต้องการส่งอีกครั้งหรือไม่',
-            {
-              width: 350,
-              color: 'red',
-            }
-          )
-          .then((confirm) => {
-            this.$refs.depoDialog.open(id)
-          })
-          .catch(() => {})
-      } else this.$refs.depoDialog.open(id)
+        const confirm = await this.$refs.confirm.open(
+          'ต้องการส่งอีกครั้งหรือไม่?',
+          'สัตว์เลี้ยงตัวนี้ได้ถูกส่งตรวจแล้วคุณต้องการส่งอีกครั้งหรือไม่',
+          {
+            width: 350,
+            color: 'red',
+          }
+        )
+        if (!confirm) {
+          return
+        }
+      }
+
+      this.$refs.depoDialog.open(id)
     },
     onClickApp(id) {
       this.$refs.appDialog.open(id)
