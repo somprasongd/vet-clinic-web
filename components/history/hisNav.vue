@@ -22,16 +22,15 @@
       </v-subheader>
 
       <v-menu
-        ref="menu"
         v-model="startMenuDate"
-        :close-on-content-click="false"
+        :close-on-content-click="true"
         transition="scale-transition"
         offset-y
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
-            v-model="start"
+            :value="startDateFormatted"
             class="rounded-lg cus-input mr-3"
             background-color="cusblue3"
             append-icon="mdi-calendar-month"
@@ -51,7 +50,9 @@
           ref="picker"
           v-model="startDate"
           color="cusblue"
+          locale="th-TH"
           :max="nowDate"
+          scrollable
         ></v-date-picker>
       </v-menu>
 
@@ -63,16 +64,15 @@
       </v-subheader>
 
       <v-menu
-        ref="menu"
         v-model="endMenuDate"
-        :close-on-content-click="false"
+        :close-on-content-click="true"
         transition="scale-transition"
         offset-y
         min-width="290px"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
-            v-model="end"
+            :value="endDateFormatted"
             class="rounded-lg cus-input mr-3"
             background-color="cusblue3"
             append-icon="mdi-calendar-month"
@@ -92,7 +92,9 @@
           ref="picker"
           v-model="endDate"
           color="cusblue"
+          locale="th-TH"
           :max="nowDate"
+          scrollable
         ></v-date-picker>
       </v-menu>
     </v-row>
@@ -102,6 +104,18 @@
 <script>
 import moment from 'moment'
 export default {
+  props: {
+    defaultDates: {
+      type: Object,
+      required: false,
+      default() {
+        return {
+          start: moment().format('YYYY-MM-DD'),
+          end: moment().format('YYYY-MM-DD'),
+        }
+      },
+    },
+  },
   data() {
     return {
       startMenuDate: false,
@@ -109,18 +123,16 @@ export default {
 
       nowDate: new Date().toISOString().substr(0, 10),
 
-      startDate: moment().subtract(3, 'months').format('YYYY-MM-DD'),
-      endDate: new Date().toISOString().substr(0, 10),
+      startDate: this.defaultDates.start,
+      endDate: this.defaultDates.end,
     }
   },
   computed: {
-    start() {
-      if (!this.startDate) return null
-      else return moment(this.startDate).format('DD/MM/YYYY')
+    startDateFormatted() {
+      return moment(this.startDate).format('DD/MM/YYYY')
     },
-    end() {
-      if (!this.endDate) return null
-      else return moment(this.endDate).format('DD/MM/YYYY')
+    endDateFormatted() {
+      return moment(this.endDate).format('DD/MM/YYYY')
     },
   },
   watch: {
@@ -134,14 +146,10 @@ export default {
   methods: {
     emitDate() {
       this.$emit('updateDate', {
-        startDate: this.startDate,
-        endDate: this.endDate,
+        start: this.startDate,
+        end: this.endDate,
       })
     },
   },
-  // created() {
-  //   this.startDate = this.oldDate
-  //   this.endDate = this.nowDate
-  // },
 }
 </script>

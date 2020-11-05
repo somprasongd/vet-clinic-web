@@ -358,7 +358,7 @@
             @click="
               ;[
                 (sheet = false),
-                ndCheck($route.params.queue, isStatusWaiting ? 8 : 6),
+                endCheck($route.params.queue, isStatusWaiting ? 8 : 6),
               ]
             "
           >

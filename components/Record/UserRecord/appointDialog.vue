@@ -218,7 +218,7 @@
       :fullscreen="this.$vuetify.breakpoint.xsOnly"
     >
       <v-card>
-        <h2 class="pa-5 pb-2">นัดหมายเก่า</h2>
+        <h2 class="pa-5 pb-2">รายการนัดหมายถัดไป</h2>
         <v-btn
           class="mt-4"
           icon

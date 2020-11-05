@@ -1,6 +1,6 @@
 <template>
   <div>
-    <hisNav @updateDate="updateDate" />
+    <hisNav :default-dates="dates" @updateDate="updateDate" />
 
     <div v-if="showImages === false" class="custom-container">
       <v-row no-gutters>
@@ -117,20 +117,29 @@ export default {
       }) || store.getters.loggedInUser.isAdmin
     )
   },
-  async asyncData({ $axios, params }) {
-    const visit = await $axios.$get(
-      `/api/visits?petId=${params.id}&dateRange0=${moment()
-        .subtract(3, 'months')
-        .toISOString()}&dateRange1=${moment().toISOString()}`,
-      { progress: false }
-    )
-    return { visit: visit.results }
+  async fetch() {
+    const start = moment(this.dates.start).toISOString()
+    const end = moment(this.dates.end).toISOString()
+    try {
+      const visit = await this.$axios.$get(
+        `/api/visits?petId=${this.$route.params.id}&visitStatusId=7&dateRange0=${start}&dateRange1=${end}&orderBy=-date`,
+        { progress: false }
+      )
+      this.visit = visit.results
+    } catch (error) {
+      this.visit = []
+    }
   },
+  fetchOnServer: false,
   data() {
     return {
       dialog: false,
+      visit: [],
       selectedItem: null,
-      date: null,
+      dates: {
+        start: moment().subtract(3, 'months').format('YYYY-MM-DD'),
+        end: moment().format('YYYY-MM-DD'),
+      },
 
       selectedVisit: null,
       vs: null,
@@ -153,19 +162,13 @@ export default {
         this.dialog = true
       }
     },
-    updateDate(val) {
-      this.reset()
-      this.date = val
-      this.findVisit()
+    updateDate({ start, end }) {
+      this.dates = { start, end }
+      this.refresh()
     },
-    async findVisit() {
-      const start = moment(this.date.startDate).add(1, 'days').toISOString()
-      const end = moment(this.date.endDate).add(1, 'days').toISOString()
-      const visit = await this.$axios.$get(
-        `/api/visits?petId=${this.$route.params.id}&dateRange0=${start}&dateRange1=${end}`,
-        { progress: false }
-      )
-      this.visit = visit.results
+    refresh() {
+      this.reset()
+      this.$fetch()
     },
     async getVS(id) {
       const vs = await this.$axios.$get(`/api/visits/${id}/vs`, {
@@ -199,9 +202,9 @@ export default {
       this.images = img
     },
     reset() {
+      this.visit = []
       this.dialog = false
       this.selectedItem = null
-      this.date = null
       this.selectedVisit = null
       this.vs = null
       this.lab = null
