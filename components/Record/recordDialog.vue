@@ -267,6 +267,7 @@ export default {
   },
   methods: {
     open(val) {
+      this.file = null
       this.assignModal = true
       if (this.$route.params.owner) {
         // console.log(val)
@@ -399,6 +400,7 @@ export default {
               }
             )
           }
+          this.file = null
           this.loading = false
           this.assignModal = false
           this.alert = false
