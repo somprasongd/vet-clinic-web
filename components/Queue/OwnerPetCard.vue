@@ -454,7 +454,9 @@ export default {
         this.$store.getters.loggedInUser.roles &&
         this.$store.getters.loggedInUser.roles.some((role) => {
           return role.id === 2 // only doctor
-        })
+        }) &&
+        (this.visitData.doctor === null ||
+          this.visitData.doctor.id === this.$store.getters.loggedInUser.id)
       )
     },
   },

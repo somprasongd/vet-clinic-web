@@ -585,7 +585,7 @@ export default {
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         this.$axios
-          .$get(`/api/config/items?itemGroupId=3&isSet=false&label=${v}`, {
+          .$get(`/api/config/items?groupId=3&isSet=false&label=${v}`, {
             progress: false,
           })
           .then((res) => {

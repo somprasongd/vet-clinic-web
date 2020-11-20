@@ -11,7 +11,9 @@
     >
       <template v-slot:[`item.qty`]="props">
         <v-edit-dialog
-          v-if="posData.state !== 'success' && posData.state !== 'cancel'"
+          v-if="
+            isEditable && props.item.typeId !== 3 && props.item.typeId !== 4
+          "
           :return-value.sync="props.item.qty"
           @save="saveQTY(props.item.id, props.item.qty)"
         >
@@ -34,7 +36,7 @@
 
       <template v-slot:[`item.price`]="props">
         <v-edit-dialog
-          v-if="posData.state !== 'success' && posData.state !== 'cancel'"
+          v-if="isEditable"
           :return-value.sync="props.item.price"
           @save="savePrice(props.item.id, props.item.price)"
         >
@@ -87,7 +89,7 @@
         >
           <v-row no-gutters align="center" justify="space-between">
             <v-btn
-              v-if="posData.state === 'active'"
+              v-if="posData !== null && posData.state === 'active'"
               class="font-weight-regular text-capitalize"
               color="orange accent-2"
               depressed
@@ -120,7 +122,7 @@
             <div class="font-weight-medium" style="display: inline-block">
               <span>ราคารวม : {{ sumPrice }} บาท</span>
               <v-btn
-                v-if="posData.state === 'active'"
+                v-if="posData !== null && posData.state === 'active'"
                 class="font-weight-regular text-capitalize ml-2"
                 color="cusblue3 white--text"
                 :disabled="orderItem.length === 0"
@@ -130,7 +132,7 @@
                 สรุปยอด
               </v-btn>
               <v-btn
-                v-else-if="posData.state === 'success'"
+                v-else-if="posData !== null && posData.state === 'success'"
                 class="cusblue3 font-weight-regular text-capitalize ml-2"
                 depressed
                 dark
@@ -408,6 +410,12 @@ export default {
         return (sum += item.price * item.qty)
       })
       return sum
+    },
+    isEditable() {
+      return (
+        this.posData === null ||
+        (this.posData.state !== 'success' && this.posData.state !== 'cancel')
+      )
     },
   },
   methods: {

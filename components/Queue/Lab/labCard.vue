@@ -12,7 +12,7 @@
       <template v-slot:[`item.result`]="props">
         <v-edit-dialog
           :return-value.sync="props.item.result"
-          @save="saveResult(props.item.id, props.item.result)"
+          @save="saveResult(props.item)"
         >
           <span class="cusblue--text">
             {{ props.item.result }}
@@ -143,16 +143,20 @@ export default {
     }
   },
   methods: {
-    async saveResult(id, value) {
-      const result = {
-        result: value,
+    async saveResult(item) {
+      const body = {
+        result: item.result,
       }
       try {
-        await this.$axios.$patch(
-          `/api/visits/${this.$route.params.queue}/results/lab/${id}`,
-          result,
+        const result = await this.$axios.$patch(
+          `/api/visits/${this.$route.params.queue}/results/lab/${item.id}`,
+          body,
           { progress: false }
         )
+        const targetIndex = this.labItem.findIndex(
+          (labItem) => labItem.id === item.id
+        )
+        this.$set(this.labItem, targetIndex, result)
       } catch (error) {
         alert(error)
       }

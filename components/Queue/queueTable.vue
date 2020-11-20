@@ -97,7 +97,11 @@
               <!-- รอตรวจ -->
               <div v-if="item.visitStatus.id === 1">
                 <v-btn
-                  v-if="permission([2])"
+                  v-if="
+                    permission([2]) &&
+                    (item.doctor === null ||
+                      item.doctor.id === $store.getters.loggedInUser.id)
+                  "
                   class="cusblue2--text"
                   block
                   text
