@@ -230,17 +230,26 @@
         </v-btn>
         <v-divider class="darker-divider"></v-divider>
         <v-tabs class="pb-5" show-arrows grow hide-slider color="cusblue">
-          <v-tab v-for="item in oldAppoint" :key="item.id">
+          <v-tab
+            v-for="item in oldAppoint"
+            :key="item.id"
+            @click="editAppoint = true"
+          >
             <v-icon left>mdi-calendar-month</v-icon>
             {{ $moment(item.appointDate).format('DD/MM/YYYY') }}
           </v-tab>
 
-          <v-tab-item v-for="item in oldAppoint" :key="item.id">
+          <v-tab-item v-for="(item, i) in oldAppoint" :key="item.id">
             <v-card flat>
-              <v-card-text>
+              <v-card-text v-if="editAppoint">
                 <v-text-field
                   label="เจ้าของ"
                   :value="item.pet.owner.name"
+                  disabled
+                ></v-text-field>
+                <v-text-field
+                  label="สัตว์เลี้ยง"
+                  :value="item.pet.name + '(' + item.pet.type + ')'"
                   disabled
                 ></v-text-field>
                 <v-text-field
@@ -248,11 +257,6 @@
                   :value="
                     item.doctor !== null ? item.doctor.name : 'ไม่ระบุแพทย์'
                   "
-                  disabled
-                ></v-text-field>
-                <v-text-field
-                  label="สัตว์เลี้ยง"
-                  :value="item.pet.name + '(' + item.pet.type + ')'"
                   disabled
                 ></v-text-field>
                 <v-text-field
@@ -265,6 +269,133 @@
                   :value="item.appointTime"
                   disabled
                 ></v-text-field>
+                <v-btn
+                  v-if="
+                    permission([2])
+                      ? editAppoint &&
+                        oldAppoint[i].doctor !== null &&
+                        $store.getters.loggedInUser.id ===
+                          oldAppoint[i].doctor.id
+                      : editAppoint
+                  "
+                  color="cusblue2"
+                  block
+                  outlined
+                  @click="saveAppoint(item, i)"
+                >
+                  แก้ไข
+                </v-btn>
+              </v-card-text>
+              <v-card-text v-else>
+                <v-text-field
+                  label="เจ้าของ"
+                  :value="item.pet.owner.name"
+                  disabled
+                ></v-text-field>
+                <v-text-field
+                  label="สัตว์เลี้ยง"
+                  :value="item.pet.name + '(' + item.pet.type + ')'"
+                  disabled
+                ></v-text-field>
+                <v-select
+                  v-model="editAppoints.doctor"
+                  :items="doctor"
+                  item-text="name"
+                  item-value="id"
+                  color="cusblue"
+                  item-color="cusblue"
+                  label="แพทย์ผู้ตรวจ"
+                  :menu-props="{ closeOnContentClick: true }"
+                  return-object
+                >
+                  <template v-slot:prepend-item>
+                    <v-list-item
+                      :style="
+                        editAppoints.doctor === ''
+                          ? 'background-color: #e2f5fc'
+                          : ''
+                      "
+                      ripple
+                      @click="editAppoints.doctor = ''"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title
+                          :class="
+                            editAppoints.doctor === '' ? 'cusblue--text' : ''
+                          "
+                        >
+                          ไม่ระบุแพทย์
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-divider class="mt-2"></v-divider>
+                  </template>
+                </v-select>
+                <v-text-field
+                  v-model="editAppoints.cause"
+                  label="นัดเพื่อ"
+                ></v-text-field>
+                <v-menu
+                  ref="menu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="editAppoints.appointTime"
+                      :rules="rules.appointTime"
+                      color="cusblue"
+                      append-icon="mdi-clock-outline"
+                      background-color="white"
+                      v-bind="attrs"
+                      label="เวลา"
+                      readonly
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-time-picker
+                    ref="picker"
+                    v-model="editAppoints.appointTime"
+                    color="cusblue"
+                    format="24hr"
+                    scrollable
+                  ></v-time-picker>
+                </v-menu>
+                <v-btn
+                  v-if="
+                    permission([2])
+                      ? !editAppoint &&
+                        oldAppoint[i].doctor !== null &&
+                        $store.getters.loggedInUser.id ===
+                          oldAppoint[i].doctor.id
+                      : !editAppoint
+                  "
+                  color="success"
+                  block
+                  outlined
+                  @click="saveAppoint(item, i)"
+                >
+                  บันทึก
+                </v-btn>
+                <v-btn
+                  v-if="
+                    permission([2])
+                      ? !editAppoint &&
+                        oldAppoint[i].doctor !== null &&
+                        $store.getters.loggedInUser.id ===
+                          oldAppoint[i].doctor.id
+                      : !editAppoint
+                  "
+                  class="mt-1"
+                  color="red"
+                  block
+                  outlined
+                  @click="editAppoint = true"
+                >
+                  ยกเลิก
+                </v-btn>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -315,6 +446,13 @@ export default {
         cause: '',
         remark: '',
         fromVisitId: '',
+      },
+
+      editAppoint: true,
+      editAppoints: {
+        appointTime: '',
+        doctor: '',
+        cause: '',
       },
 
       rules: {
@@ -405,6 +543,35 @@ export default {
           })
       }
     },
+    saveAppoint(data, i) {
+      this.editAppoint = !this.editAppoint
+      if (this.editAppoint) {
+        const sendData = {
+          doctorId:
+            this.editAppoints.doctor === ''
+              ? null
+              : this.editAppoints.doctor.id,
+          appointTime: this.editAppoints.appointTime,
+          cause: this.editAppoints.cause,
+        }
+        this.$axios
+          .patch(`/api/appoints/${data.id}`, sendData, { progress: false })
+          .then((res) => {
+            this.oldAppoint[i].doctor =
+              this.editAppoints.doctor === '' ? '' : this.editAppoints.doctor
+            this.oldAppoint[i].cause = this.editAppoints.cause
+            this.oldAppoint[i].appointTime = this.editAppoints.appointTime
+          })
+          .catch((error) => alert(error))
+      } else {
+        this.editAppoints.doctor = data.doctor
+        this.editAppoints.cause = data.cause
+        this.editAppoints.appointTime = moment(
+          data.appointTime,
+          'HH:mm:ss'
+        ).format('HH:mm')
+      }
+    },
     successSubmit(res, id) {
       setTimeout(() => {
         this.loading = false
@@ -421,6 +588,19 @@ export default {
       this.loading = false
       this.alert = true
       this.error = error.response.data.error.message
+    },
+    permission(idArray) {
+      for (const id in idArray) {
+        if (
+          this.$store.getters.loggedInUser.roles.some(
+            (role) => role.id === idArray[id]
+          ) &&
+          !this.$store.getters.loggedInUser.isAdmin
+        ) {
+          return true
+        }
+      }
+      return false
     },
   },
 }
