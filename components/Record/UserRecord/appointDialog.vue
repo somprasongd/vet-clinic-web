@@ -558,13 +558,13 @@ export default {
           .patch(`/api/appoints/${data.id}`, sendData, { progress: false })
           .then((res) => {
             this.oldAppoint[i].doctor =
-              this.editAppoints.doctor === '' ? '' : this.editAppoints.doctor
+              this.editAppoints.doctor === null ? '' : this.editAppoints.doctor
             this.oldAppoint[i].cause = this.editAppoints.cause
             this.oldAppoint[i].appointTime = this.editAppoints.appointTime
           })
           .catch((error) => alert(error))
       } else {
-        this.editAppoints.doctor = data.doctor
+        this.editAppoints.doctor = data.doctor === null ? '' : data.doctor
         this.editAppoints.cause = data.cause
         this.editAppoints.appointTime = moment(
           data.appointTime,
