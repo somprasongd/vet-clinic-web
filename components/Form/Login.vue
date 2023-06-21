@@ -90,7 +90,9 @@ export default {
           data: this.loginData,
         })
       } catch (err) {
-        this.error = err.response.data.error.message
+        this.error = err.response
+          ? err.response.data.error.message
+          : err.message
         this.alert = true
       }
     },
